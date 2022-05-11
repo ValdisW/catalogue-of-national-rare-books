@@ -8,13 +8,22 @@ const routes = [
     component: Introduction,
   },
   {
-    path: "/exploration",
-    name: "Exploration",
+    path: "/exploration-unit",
+    name: "Exploration-Unit",
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
     component: () =>
-      import(/* webpackChunkName: "about" */ "../views/Exploration.vue"),
+      import(/* webpackChunkName: "about" */ "../views/Exploration-Unit.vue"),
+  },
+  {
+    path: "/exploration-map",
+    name: "Exploration-Map",
+    // route level code-splitting
+    // this generates a separate chunk (about.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    component: () =>
+      import(/* webpackChunkName: "about" */ "../views/Exploration-Map.vue"),
   },
 ];
 
