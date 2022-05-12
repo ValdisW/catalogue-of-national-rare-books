@@ -27,21 +27,30 @@ export default {
   data() {
     return {
       projection: null,
+      // batchTitle: null,
     }
   },
-    props: {
+  props: {
       size: {
         type: Object,
         default: function () {
           return { width: 0, height: 0 };
         }
       },
+      batchTitle: {
+        type: String,
+        default: "第1批"
+      }
     },
-    watch: {
+  watch: {
     size: function (val, oldval) {
       const self = this
       console.log(val, oldval)
       self.init()  //强制false，true才判断Period和Type
+    },
+    batchTitle: function (val, oldval) {
+      console.log(val, oldval)
+      this.init()
     },
     CurrentCount: function (val, oldval) {
       console.log(val, oldval)
@@ -73,59 +82,21 @@ export default {
     },
   },
   mounted() {
+    // this.$on("batchChanged", b => {
+    //   console.log("batch", b)
+    //   this.batchTitle = b;
+    // })
     // let self = this
   },
   components: {
 
   },
   computed: {
-      ...mapState([
-      'InteractionId',
-      'keepTooltip',
-      'filterCondition',
-      'Interaction',
-      "SelectedProvince",
-      "SelectedType",
-      "SelectedGroup",
-      "AllData",
-      "SelectedPeriod",
-      "MapShowType",
-      "TimeSlot",
-      "isFirstTime",
-      "SelectedProject",
-      "MainMouseover"
-    ]),
   },
   methods: {
-    ...mapActions(['updateSelectedProvince',"updateKeepTooltip", 'updateMainMouseover','updateSelectedPeriod',"updateSelectedProject"]),
-    changeTitle(){
-        const self = this;
-        let Timeslot = self.filterCondition.Timeslot
-        let unit_group = self.filterCondition.unit_group
-        let type = self.filterCondition.type
-        let province = self.filterCondition.province
-        let unit = self.filterCondition.unit
-        let status = self.filterCondition.status
-        let period = self.filterCondition.period.join("、")
-        let cooperation = self.filterCondition.cooperation.replace("-", " 与 ")
-        let entity = ""
-        if (unit_group != "") entity = unit_group + " 考古单位"
-        if (unit != "") entity = unit
-        if (cooperation != "") entity = cooperation + "合作"
-
-        let firstRow = Timeslot
-        let secondRow = province + period
-        let thirdRow = "共" + self.CurrentCount + "项"
-        if (entity != "") firstRow +=  " " + entity
-        if (status != "") firstRow +=  " " + status
-        if (secondRow == "") secondRow = "考古发现分布"
-        else secondRow +=  " - 考古发现分布"
-        if (type != "") secondRow += " (" + type + ")"
-
-        d3.select(self.$el).select('.timeheader').text(firstRow)
-        d3.select(self.$el).select('.periodheader').text(secondRow)
-        d3.select(self.$el).select('.numberheader').text(thirdRow)
-    },
+    // updateBatchTitle() {
+    //   console.log(this.batchTitle)
+    // },
     // clickProvince(province, isCompulsory = false) {
     //   let self = this;
     //   let previous_centeredProvince = self.centeredProvince;
@@ -379,7 +350,8 @@ export default {
     ProcessRawdata(){
       let self = this;
       self.inst_id_list = Data.get_institution_list()
-      let display_data = []
+      let display_data = {}
+      let inst_dict = {}
       let max_cnt = 0
 
       for (let inst_id in self.inst_id_list){
@@ -389,50 +361,36 @@ export default {
           if (inst_info['经度']==undefined) continue;
           
           let loc=self.projection([inst_info['经度'], inst_info['纬度']])
-          display_data.push({
+          inst_dict[self.inst_id_list[inst_id]]={
             'id': self.inst_id_list[inst_id],
             'name': inst_info['馆名'],
             'x': loc[0],
             'y': loc[1],
             'cnt': inst_info.cnt
-          })
+          }
           max_cnt = Math.max(max_cnt, inst_info.cnt)
       }
-      self.display_data = display_data
+
+      console.log(Data.get_batch_list(self.batchTitle))
+      let batch_list = Data.get_batch_list(self.batchTitle)
+      for (let dynasty in batch_list) {
+        let dy_lst = batch_list[dynasty]
+        for (let book_id in dy_lst) {
+          let book_info = Data.get_book_info(dy_lst[book_id])
+          let inst_id = book_info['收藏单位代码']
+          if (display_data[inst_id]==undefined && inst_dict[inst_id]!=undefined) {
+            display_data[inst_id]=inst_dict[inst_id]
+            display_data[inst_id].cnt=1
+          }
+          else if (display_data[inst_id]!=undefined) {
+            display_data[inst_id].cnt=display_data[inst_id].cnt+1
+          }
+        }
+      }
+      
+      self.display_data = Object.values(display_data)
       self.max_cnt = max_cnt
     },
-    // GetStatistic(){
-    //   let self = this;
-    //   let data = []
-    //   self.radius = self.scale == 1 ? self.normal_radius : self.normal_radius * 2 / self.scale
-    //   self.Disturbance_r = self.scale == 1 ? 0.5 : 1 / self.scale
-    //   for (let Province in self.LocationDict){
-    //       for (let District in self.LocationDict[Province]){
-    //         let projects_in_district = self.LocationDict[Province][District]["project"]
-    //         let same_position = Object.values(projects_in_district).length
-    //         let cp = self.LocationDict[Province][District].cp
-    //         let cnt = 0
-    //         let start_angle = 0 // 设置不同的初始相位
-    //         for (let project in projects_in_district){
-    //           let period = projects_in_district[project]["覆盖年代"][0]
-    //           let period_agg = global.getAggPeriod(period);
-    //           let Disturbance_x = 0;
-    //           let Disturbance_y = 0;
-    //           let center = cp
-    //           // if (projects_in_district[project]["manual_coordinates"]) center = projects_in_district[project]["坐标"]
-    //           if (same_position > 0 && cnt > 0) { // 第一个重复地方添加扰动
-    //                   let angle = 2 * Math.PI * cnt / (same_position - 1) + start_angle
-    //                   Disturbance_x = self.Disturbance_r * Math.cos(angle)
-    //                   Disturbance_y = self.Disturbance_r * self.size.height / self.size.width * Math.sin(angle)
-    //           }
-    //           let cp_disturbed =  self.projection([center[0] + Disturbance_x, center[1] + Disturbance_y])
-    //           data.push({'name':District, 'name':project, 'period_agg': period_agg, 'type':self.LocationDict[Province][District]["project"][project]["类型"], 'project': self.LocationDict[Province][District]["project"][project], "x": cp_disturbed[0], "y": cp_disturbed[1],"show":true})
-    //           cnt += 1
-    //         }
-    //     }
-    //   }
-    //   return data;
-    // },
     init() {
 
       let self = this;
@@ -468,7 +426,7 @@ export default {
       self.map.select("#layer_contour").selectAll("path").remove()
       self.rScale = d3.scaleLinear()
                 .domain([0, self.max_cnt+1])
-                .range([2, 12])
+                .range([2, 30])
 
       // let showWordle = self.SelectedPeriod.length == 0 ? false : true
       // if (showWordle) self.drawWordle(self.display_data) //只在展示某一类型的时候有contour

@@ -28,14 +28,14 @@ const displayOrder = {
 
 export default {
   name: "UnityView",
-  props: ['canvasWidth', 'canvasHeight'],
+  props: ['canvasWidth', 'canvasHeight', "batchTitle"],
   data() {
     return {
         
     }
   },
   computed: {
-    ...mapState(['rem', 'batchTitle'])
+    ...mapState(['rem'])
   },
   watch: { // for interaction
     batchTitle: function() {
@@ -59,8 +59,6 @@ export default {
         circle
           .attr('cx', (d,i)=>{(i%circlePerRow)*4})
       }
-
-      self.drawDynastyDisplay()
     },
     drawTooltip() {
       let tooltip = Tooltip.Tooltip()
@@ -187,10 +185,13 @@ export default {
         .attr('cy', (d, i)=>0.6*Math.floor(i/circlePerRow)+'rem')
 
       // text
+      self.drawDynastyDisplay()
+
       self.dynastyDisplay = self.unity.selectAll('g.unityset')
         .append('g')
         .attr('class', "dynasty-display")
         .call(self.dynastyStyle);
+      
 
       self.svg.attr('height', function(){
         let text_box = document.getElementsByClassName('dynasty-display')[0].getBoundingClientRect();
@@ -201,7 +202,7 @@ export default {
     }
   },
   mounted() {
-    this.initializeUnityView(this.canvasWidth, this.canvasHeight)
+    // this.initializeUnityView(this.canvasWidth, this.canvasHeight)
   }
 }
 </script>
