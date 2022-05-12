@@ -10,7 +10,7 @@
 </template>
 
 <script>
-const d3 = require("d3")
+// const d3 = require("d3")
 export default {
     name: "Button",
     // props: ['canvasWidth', 'canvasHeight'],

@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import * as Data from "@/data/dataLoader";
+// import * as Data from "@/data/dataLoader";
 
 export default {
   name: "BatchFilter",

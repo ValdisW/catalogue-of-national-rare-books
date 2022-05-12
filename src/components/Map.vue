@@ -4,7 +4,7 @@
 
 <script>
 import * as d3 from 'd3'
-import { mapState, mapActions } from "vuex";
+// import { mapState, mapActions } from "vuex";
 import global from "@/constants/global"
 import * as Data from "@/data/dataLoader"
 // import { jsonp } from 'vue-jsonp'
