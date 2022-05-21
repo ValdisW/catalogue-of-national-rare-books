@@ -54,7 +54,11 @@ export function get_batch_list(batchNumber='第1批') {
     return Data.batch_info[batchNumber];
 }
 
-export function get_batch_info() {
+export function get_batch_dynasty_num(batchTitle, dynasty) {
+    return Data.batch_info[batchTitle][dynasty].length;
+}
+
+export function get_batchTitle_info() {
     let batch = Object.keys(Data.batch_info);
     return batch.sort();
 }
@@ -65,4 +69,26 @@ export function get_institution_info(institution_id) {
 
 export function get_institution_list() {
     return Object.keys(Data.institution_info);
+}
+
+export function get_statics(displayOrder) {
+    let data = []
+    let bacthTitle = get_batchTitle_info()
+    let dispLength = Object.keys(displayOrder).length
+    for (let i=0; i<dispLength; i++) {
+        let dispTitle = displayOrder[i]
+        // console.log(i, dispTitle)
+        let dict = {}
+        for (let j in bacthTitle) {
+            let title = bacthTitle[j]
+            let len = 0
+            if (Data.batch_info[title][dispTitle]!=undefined)
+                len = Object.keys(Data.batch_info[title][dispTitle]).length
+            // console.log(title, Data.batch_info[title], len)
+            dict[title]=len
+        }
+        data.push(dict)
+    }
+    // console.log(data)
+    return data
 }

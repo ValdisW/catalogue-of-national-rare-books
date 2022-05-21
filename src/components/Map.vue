@@ -390,6 +390,7 @@ export default {
       
       self.display_data = Object.values(display_data)
       self.max_cnt = max_cnt
+      console.log("max cnt", max_cnt)
     },
     init() {
 

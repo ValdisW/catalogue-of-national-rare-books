@@ -1,5 +1,5 @@
 import * as d3 from "d3";
-import * as Data from "@/data/dataLoader"
+// import * as Data from "@/data/dataLoader"
 
 
 export function Tooltip() {
@@ -16,7 +16,8 @@ export function Tooltip() {
         padding = new Array([4, 4]),
         translation = new Array([0, 0]),
         // tooltipDims = new Array([0, 0]),
-        fontSize = 12;
+        fontSize = 12,
+        dataProcess = function(e, d){return d};
 
     let tooltipGroup = d3.select(null),
         // tooltipRect = d3.select(null),
@@ -55,14 +56,15 @@ export function Tooltip() {
     };
 
 
-    function displayTooltip(d) {
+    function displayTooltip(e, d) {
         tooltipGroup.style("display", null)
             .style('width', 'auto');
 
 
         // tooltipText.selectAll("tspan").remove();
         
-        d = Data.get_book_info(d);
+        // d = Data.get_book_info(d);
+        d=dataProcess(e, d)
         // console.log("tooltip", d)
 
 
@@ -114,7 +116,8 @@ export function Tooltip() {
         tooltipGroup.style("display", "none");
     }
 
-    function moveTooltip() {
+    function moveTooltip(e, d) {
+        displayTooltip(e, d);
         updateTranslation();
         tooltipGroup.attr(
             "transform",
@@ -136,7 +139,7 @@ export function Tooltip() {
             .on("mouseenter", function(e, d) {
                 currentEvent = e;
                 me(e, d);
-                displayTooltip(d);
+                displayTooltip(e, d);
             })
             .on("mouseleave", function(e, d) {
                 currentEvent = e;
@@ -146,7 +149,7 @@ export function Tooltip() {
             .on("mousemove", function(e, d) {
                 currentEvent = e;
                 mm(e, d);
-                moveTooltip();
+                moveTooltip(e, d);
             });
     };
 
@@ -170,7 +173,7 @@ export function Tooltip() {
         return tooltip;
     };
 
-    tooltip.tips = function(_tips, _tipNames, _tipFormats) {
+    tooltip.tips = function(_tips, _tipNames, _tipFormats, _dataProcessfunc) {
         tips = _tips || tips;
         tipNames = _tipNames || tips;
         tipFormats =
@@ -178,6 +181,9 @@ export function Tooltip() {
             tips.map(function() {
                 return null;
             });
+        if (_dataProcessfunc != null) {
+            dataProcess = _dataProcessfunc
+        }
         return tooltip;
     };
 

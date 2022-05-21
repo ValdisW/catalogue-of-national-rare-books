@@ -1,7 +1,8 @@
 <template>
   <div id="nav">
     <router-link to="/">名录介绍</router-link> |
-    <router-link to="/exploration">古籍浏览</router-link>
+    <router-link to="/exploration">古籍浏览</router-link> |
+    <router-link to="/streamgraph">河流图</router-link>
   </div>
   <router-view />
 </template>
