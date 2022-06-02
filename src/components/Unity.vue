@@ -19,11 +19,20 @@ const margin = {
 
 const circle_r = '0.2rem'
 const displayOrder = {
-        0: "先秦两汉",
-        1: "魏晋南北朝隋唐五代",
-        2: "宋辽金夏元",
-        3: "明清",
-        4: "其它&未知",
+        0: "战国",
+        1: "秦",
+        2: "漢",
+        3: "三国",
+        4: "魏晋",
+        5: "南北朝",
+        6: "唐",
+        7: "隋",
+        8: "五代十国",
+        9: "宋",
+        10: "元",
+        11: "明",
+        12: "清",
+        13: "其它&未知",
       }
 
 export default {
@@ -61,6 +70,10 @@ export default {
       }
     },
     drawTooltip() {
+      let processFunc = function(e, d){
+          // console.log(e,d);
+          return Data.get_book_info(d)
+        }
       let tooltip = Tooltip.Tooltip()
         .extent([
             [0, 0],
@@ -69,7 +82,8 @@ export default {
         .tips(
             ["名录ID", "图录解说"],
             ["名录ID: ", "图录解说: "],
-            [null]
+            [null],
+            processFunc
         )
         .fontSize(16)
         .padding([8, 4])

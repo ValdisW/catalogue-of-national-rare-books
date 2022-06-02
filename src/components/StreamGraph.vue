@@ -90,22 +90,31 @@ export default {
             // console.log(this.layers)
         },
         drawTooltip() {
-            let processFunc = function(e, d){
-                    // console.log(e,d);
-                    let mydata = {"批次": d.key}
+            let get_dynasty = function(event) {
                     let min_dis=1e5;
                     let min_t="";
+                    let min_pos=0;
                     d3.selectAll('g.tick')._groups[0].forEach(element => {
                         let pos=element.getBoundingClientRect().x
                         let t=d3.select(element).select('text').text()
-                        let dis=Math.abs(pos-e.x)
+                        let dis=Math.abs(pos-event.x)
                         if (dis<min_dis) {
                             min_t=t
                             min_dis=dis
+                            min_pos=pos
                         }
                     });
-                    mydata["朝代"]=min_t
-                    mydata["数量"]=Data.get_batch_dynasty_num(d.key,min_t)
+                    let res = {
+                        "朝代": min_t,
+                        "位置": min_pos
+                    }
+                    return res
+                }
+            let processFunc = function(e, d){
+                    // console.log(e,d);
+                    let mydata = {"批次": d.key}
+                    mydata["朝代"]=get_dynasty(e)["朝代"]
+                    mydata["数量"]=Data.get_batch_dynasty_num(d.key,mydata["朝代"])
                     return mydata;
                 }
             let tooltip = Tooltip.Tooltip()

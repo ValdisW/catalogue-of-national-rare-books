@@ -12,10 +12,12 @@ export async function loadData(){
     let book_info = await d3.json('/data/data.json');
     let batch_info = await d3.json('/data/batch.json');
     let institution_info = await d3.json('/data/institution.json');
+    let province_info = await d3.json('/data/position.json');
     Data =  {
         'book_info': book_info,
         'batch_info': batch_info,
         'institution_info': institution_info,
+        'province_info': province_info,
     };
     
 }
@@ -91,4 +93,8 @@ export function get_statics(displayOrder) {
     }
     // console.log(data)
     return data
+}
+
+export function get_province_list() {
+    return Data.province_info;
 }
