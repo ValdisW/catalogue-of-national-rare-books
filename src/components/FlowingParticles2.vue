@@ -193,8 +193,8 @@ export default {
                     })/2
                     return Math.max(0,r)*self.vh
                 })
-                .attr('cx', -2)
-                .attr('cy', -2)
+                .attr('cx', width+10)
+                .attr('cy', height/2)
 
             self.drawTooltip()
         }

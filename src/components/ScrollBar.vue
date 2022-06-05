@@ -26,7 +26,7 @@ export default {
             let self = this
 
             let bar_height = height/1.5
-            let bar_width = width/10.0
+            let bar_width = width/12.0
             
             d3.select(self.$el).selectAll("svg").remove()
             self.svg = d3.select(self.$el)
@@ -53,7 +53,7 @@ export default {
                 .attr('fill', 'rgba(0, 0, 0, 0.3)')
                 .attr('transform', 'translate(0, 0)')
 
-            self.rate = 0
+            self.rate = -0.1
             // self.isMouseDown = false
             // self.svg.on("mousedown", (e)=>{
             //     self.isMouseDown = true
@@ -82,7 +82,7 @@ export default {
                     if (x<0) x=0
                     if (x+bar_width>=width) x=width-bar_width
                     self.bar.attr('transform', `translate(${x}, 0)`)
-                    self.rate = x/width
+                    self.rate = (x/width)*1.2-0.1
                 })
             self.bar.call(box_drag) 
         }
