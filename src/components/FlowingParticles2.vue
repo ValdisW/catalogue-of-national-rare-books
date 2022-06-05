@@ -85,12 +85,26 @@ export default {
             
             const vh=this.vh
             let start_id = Math.round(rate*this.NUM_PARTICLES)
+            
+            let left, right
+            if (rate > rate_old) {
+                left = Math.round(rate_old*this.NUM_PARTICLES)
+                right = start_id+this.PER_NUM
+            }
+            else {
+                left = start_id
+                right = Math.round(rate_old*this.NUM_PARTICLES)+this.PER_NUM
+            }
+            left -= this.NUM_PARTICLES/2
+            right += this.NUM_PARTICLES/2
+            if (left<0) left=0
 
             this.flow.selectAll('circle')
+                .filter((d,i)=>{return i<=right && i>=left})
                 .transition()
                 .duration(10000*Math.abs(rate-rate_old))
                 .attr('cx', (d,i)=>{
-                    const progress = (i-start_id)/this.PER_NUM
+                    const progress = (i+left-start_id)/this.PER_NUM
                     return progress*width
                 })
                 .attr('cy', (d,i)=>{
@@ -157,7 +171,7 @@ export default {
 
             self.book_list = Object.keys(Data.get_data().book_info)
             self.NUM_PARTICLES = this.book_list.length
-            self.PER_NUM = this.NUM_PARTICLES/10
+            self.PER_NUM = Math.round(this.NUM_PARTICLES/10)
             
             self.initializePointAttribute()
 
