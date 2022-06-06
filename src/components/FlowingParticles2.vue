@@ -57,7 +57,7 @@ export default {
             let processFunc = function(e, d){
                     return Data.get_book_info(d)
                 }
-            let tooltip = Tooltip.Tooltip()
+            this.tooltip = Tooltip.Tooltip()
                 .extent([
                     [0, 0],
                     [this.svg.attr("width"), this.svg.attr("height")],
@@ -72,8 +72,8 @@ export default {
                 .padding([8, 4])
                 .margin([10, 10]);
             d3.select(this.$el)
-                .call(tooltip);
-            this.svg.selectAll('circle').each(tooltip.events);
+                .call(this.tooltip);
+            // this.svg.selectAll('circle').each(tooltip.events);
         },
         removeTooltip() {
             d3.select(this.$el).select('.d3Tooltip').remove();
@@ -127,6 +127,7 @@ export default {
                 })
                 .attr('cx', width+10)
                 .attr('cy', height/2)
+                .each(this.tooltip.events)
             }
 
             this.flow.selectAll('circle')
