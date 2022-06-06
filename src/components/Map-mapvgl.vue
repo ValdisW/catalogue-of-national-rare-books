@@ -317,8 +317,7 @@ export default {
                 }
                 let li = document.createElement("li")
                 li.innerHTML = `${child.name} - 藏书数: ${child.count}`
-                li.onclick = function(e) {
-                    console.log(e)
+                li.onclick = function() {
                     self.zoom = 10
                     self.map.flyTo(child.pos, 10)
                 }

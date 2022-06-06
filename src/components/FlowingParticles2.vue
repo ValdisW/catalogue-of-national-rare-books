@@ -82,6 +82,8 @@ export default {
             // this.flow.selectAll('circle')
             //     .attr('cx', -2)
             //     .attr('cy', -2)
+
+            let size=this.flow.selectAll('circle').size()
             
             const vh=this.vh
             let start_id = Math.round(rate*this.NUM_PARTICLES)
@@ -95,9 +97,37 @@ export default {
                 left = start_id
                 right = Math.round(rate_old*this.NUM_PARTICLES)+this.PER_NUM
             }
-            left -= this.NUM_PARTICLES/2
-            right += this.NUM_PARTICLES/2
+            left -= this.PER_NUM
+            right += this.PER_NUM
             if (left<0) left=0
+            if (right>this.NUM_PARTICLES) right=this.NUM_PARTICLES
+
+            if (size<right) {
+                this.flow.selectAll('circle')
+                .data(this.book_list.filter((d,i)=>{return i<=right;}))
+                .join('circle')
+                .filter((d,i)=>{return i>=size})
+                .attr("fill", ()=>{
+                        let colour = {
+                            r: 255,
+                            g: this.randomNormal({ mean: 125, dev: 20 }),
+                            b: 50,
+                            a: this.rand(0, 1),
+                        };
+                        return `rgba(${colour.r}, ${colour.g}, ${colour.b}, ${colour.a})`
+                    })
+                .attr("class", (d,i)=>`point-${i+size}`)
+                .style("cursor","pointer")
+                .attr('r', ()=>{
+                    let r=this.randomNormal({
+                        mean: this.PARTICLE_SIZE,
+                        dev: this.PARTICLE_SIZE / 2,
+                    })
+                    return Math.max(0,r)*vh
+                })
+                .attr('cx', width+10)
+                .attr('cy', height/2)
+            }
 
             this.flow.selectAll('circle')
                 .filter((d,i)=>{return i<=right && i>=left})
@@ -186,29 +216,29 @@ export default {
  
             self.removeTooltip()
 
-            self.points = self.flow.selectAll('circle')
-                .data(self.book_list)
-                .join('circle')
-                .attr("fill", ()=>{
-                        let colour = {
-                            r: 255,
-                            g: this.randomNormal({ mean: 125, dev: 20 }),
-                            b: 50,
-                            a: this.rand(0, 1),
-                        };
-                        return `rgba(${colour.r}, ${colour.g}, ${colour.b}, ${colour.a})`
-                    })
-                .attr("class", (d,i)=>`point-${i}`)
-                .style("cursor","pointer")
-                .attr('r', ()=>{
-                    let r=this.randomNormal({
-                        mean: this.PARTICLE_SIZE,
-                        dev: this.PARTICLE_SIZE / 2,
-                    })
-                    return Math.max(0,r)*self.vh
-                })
-                .attr('cx', width+10)
-                .attr('cy', height/2)
+            // self.points = self.flow.selectAll('circle')
+            //     .data(self.book_list)
+            //     .join('circle')
+            //     .attr("fill", ()=>{
+            //             let colour = {
+            //                 r: 255,
+            //                 g: this.randomNormal({ mean: 125, dev: 20 }),
+            //                 b: 50,
+            //                 a: this.rand(0, 1),
+            //             };
+            //             return `rgba(${colour.r}, ${colour.g}, ${colour.b}, ${colour.a})`
+            //         })
+            //     .attr("class", (d,i)=>`point-${i}`)
+            //     .style("cursor","pointer")
+            //     .attr('r', ()=>{
+            //         let r=this.randomNormal({
+            //             mean: this.PARTICLE_SIZE,
+            //             dev: this.PARTICLE_SIZE / 2,
+            //         })
+            //         return Math.max(0,r)*self.vh
+            //     })
+            //     .attr('cx', width+10)
+            //     .attr('cy', height/2)
 
             self.drawTooltip()
         }
