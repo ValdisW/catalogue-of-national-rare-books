@@ -1,49 +1,105 @@
 <template>
   <div class="exploration">
     <div class="search-tool">
-      <input type="text" />
-      <button @click="search" id="search"></button>
+      <input type="text" ref="text" />
+      <button @click="search" id="search-button"></button>
       <div class="filters">
-        <div class="filter">
+        <div class="filter" id="batch" @click="showFilterOptions($event)">
           <p class="name">批次</p>
-          <p class="value">第一批</p>
+          <p class="value" val="">不限</p>
+          <div class="down-arrow"></div>
+          <div class="options">
+            <ul>
+              <li v-for="e in batches" :key="e.name" :val="e.value" v-text="e.name" @click.stop="choose"></li>
+            </ul>
+          </div>
         </div>
-        <div class="filter">
-          <p class="name">文种</p>
-          <p class="value">汉文</p>
+        <div class="filter" id="language" @click="showFilterOptions($event)">
+          <p class="name">文種</p>
+          <p class="value" val="">不限</p>
+          <div class="down-arrow"></div>
+          <div class="options">
+            <ul>
+              <li v-for="e in languages" :key="e.name" :val="e.value" v-text="e.name" @click.stop="choose"></li>
+            </ul>
+            <!-- <ul v-if="e.children" class="sub-list">
+              <li v-for="ee in e.children" :key="ee.name" v-text="ee.name"></li>
+            </ul> -->
+          </div>
         </div>
-        <div class="filter">
-          <p class="name">出版时代</p>
-          <p class="value">明</p>
+        <div class="filter" id="dynasty_or_nation" @click="showFilterOptions($event)">
+          <p class="name">版本年代/国别</p>
+          <p class="value" val="">不限</p>
+          <div class="down-arrow"></div>
+          <div class="options">
+            <ul>
+              <li v-for="e in dynasties" :key="e.name" :val="e.value" v-text="e.name" @click.stop="choose"></li>
+            </ul>
+          </div>
         </div>
-        <div class="filter">
-          <p class="name">古籍类型</p>
-          <p class="value">汉文古籍</p>
+        <div class="filter" id="document_type" @click="showFilterOptions($event)">
+          <p class="name">文獻類型</p>
+          <p class="value" val="">不限</p>
+          <div class="down-arrow"></div>
+          <div class="options">
+            <ul>
+              <li v-for="e in document_types" :key="e.name" :val="e.value" v-text="e.name" @click.stop="choose"></li>
+            </ul>
+          </div>
         </div>
-        <div class="filter">
-          <p class="name">版本类型</p>
-          <p class="value">刻本</p>
+        <div class="filter" @click="showFilterOptions($event)">
+          <p class="name">版本類型</p>
+          <p class="value" val="">不限</p>
+          <div class="down-arrow"></div>
+          <div class="options">
+            <ul>
+              <li v-for="e in editions" :key="e.name" :val="e.value" v-text="e.name" @click.stop="choose"></li>
+            </ul>
+          </div>
         </div>
-        <div class="filter">
-          <p class="name">相关人物</p>
-          <p class="value">黄丕烈</p>
+        <div class="filter" @click="showFilterOptions($event)">
+          <p class="name">相關人物</p>
+          <p class="value">不限</p>
+          <div class="down-arrow"></div>
+          <div class="options"></div>
         </div>
-        <div class="filter">
-          <p class="name">收藏单位</p>
-          <p class="value">国家图书馆</p>
+        <div class="filter" @click="showFilterOptions($event)">
+          <p class="name">收藏者</p>
+          <p class="value">不限</p>
+          <div class="down-arrow"></div>
+          <div class="options"></div>
         </div>
       </div>
-      <p class="total">共123条结果</p>
+      <p class="total">共{{ search_result.length }}条结果</p>
+      <div class="ranking">排序</div>
     </div>
     <div class="search-result">
       <div class="results results-plain" v-if="!relationship_mode">
-        <div class="classification">
-          <label for="">分类依据：</label>
-          <input type="radio" name="classify-by" id="all" /><span>不限</span> <input type="radio" name="classify-by" id="" /><span>出版时间</span>
-          <input type="radio" name="classify-by" id="" /><span>版刻地点</span> <input type="radio" name="classify-by" id="" /><span>相关人物</span>
-          <input type="radio" name="classify-by" id="" /><span>古籍类型</span> <input type="radio" name="classify-by" id="" /><span>版本类型</span>
-        </div>
-        <div class="ranking"></div>
+        <table class="results-list">
+          <tr>
+            <th>ID</th>
+            <th>規範題名</th>
+            <th>名錄内容</th>
+            <th>文獻類型</th>
+            <th>文種</th>
+            <th>收藏</th>
+          </tr>
+          <tr v-for="item in curr_d" :key="item.id" class="item-block">
+            <td>
+              <router-link v-text="item.id" :to="'/book-detail/' + item.id"></router-link>
+            </td>
+            <td>
+              <router-link v-text="item.content.split('　')[0]" :to="'/book-detail/' + item.id"></router-link>
+            </td>
+            <td>
+              <router-link v-text="item.content" :to="'/book-detail/' + item.id"></router-link>
+            </td>
+            <td v-text="item.document_type"></td>
+            <td v-text="item.language"></td>
+            <td v-text="item.institution"></td>
+          </tr>
+        </table>
+        <PageDivider @turnTo="alterPage" :items_sum="items_sum" :each_page_items="each_page_items" />
       </div>
       <div class="results results-relation" v-if="relationship_mode"></div>
       <div class="toggle-view">
@@ -55,219 +111,213 @@
 </template>
 
 <script>
+import axios from "axios";
+import PageDivider from "@/components/PageDivider.vue";
+
 export default {
   name: "Exploration",
+  components: { PageDivider },
   data() {
     return {
+      search_result: [],
       relationship_mode: false,
-      temp_arr: [
+      curr_d: [],
+      items_sum: 1,
+      each_page_items: 50,
+      batches: [
+        { name: "不限", value: "" },
+        { name: "第一批", value: 1 },
+        { name: "第二批", value: 2 },
+        { name: "第三批", value: 3 },
+        { name: "第四批", value: 4 },
+        { name: "第五批", value: 5 },
+        { name: "第六批", value: 6 },
+      ],
+      languages: [
+        { name: "不限", value: "" },
+        { name: "漢文", value: "漢文" },
         {
-          id: "51",
-          batch: "第1批",
-          "名录内容（国务院版）": "引书　西汉　竹简　湖北江陵张家山247号汉墓　湖北省荆州市博物馆",
-          "图录版名录内容 纠错版": "引書　西漢　竹簡　湖北江陵張家山247號漢墓　湖北省荆州市博物館",
-          名录纠错说明: "",
-          文献类型: "簡帛",
-          language: "漢文",
-          province_code: "420000",
-          province: "湖北",
-          收藏单位代码: "2382",
-          "收藏单位名称 1简转繁": "荆州博物館",
-          索书号: "",
-          批校题跋0: "",
-          出土地: "湖北江陵張家山247號漢墓",
-          是否完整: "是",
-          "存缺卷 未替换": "",
-          册数: "112（现存）",
-          册数计量单位: "枚",
-          全文影像链接: "",
-          装帧形式: "",
-          开本尺寸: "簡長30至30.5厘米",
-          版框尺寸: "",
-          版式: "",
-          牌记: "",
-          钤印: "",
-          批校题跋: "",
+          name: "少數民族文字",
+          value: "少數民族文字古籍",
+          children: [
+            { name: "多文種", value: "少數民族文字古籍/多文種" },
+            { name: "焉耆—龜茲文", value: "焉耆—龜茲文" },
+            { name: "于闐文", value: "于闐文" },
+            { name: "藏文", value: "藏文" },
+            { name: "回鶻文", value: "回鶻文" },
+            { name: "西夏文", value: "西夏文" },
+            { name: "白文", value: "白文" },
+            { name: "蒙古文", value: "蒙古文" },
+            { name: "察合臺文", value: "察合臺文" },
+            { name: "彝文", value: "彝文" },
+            { name: "滿文", value: "滿文" },
+            { name: "東巴文", value: "東巴文" },
+            { name: "傣文", value: "傣文" },
+            { name: "水文", value: "水文" },
+            { name: "古壯字", value: "古壯字" },
+            { name: "布依文", value: "布依文" },
+          ],
         },
         {
-          id: "222",
-          batch: "第1批",
-          "名录内容（国务院版）": "禹贡论二卷后论一卷山川地理图二卷　（宋）程大昌撰　宋淳熙八年（1181）陈应行泉州州学刻本　国家图书馆",
-          "图录版名录内容 纠错版": "禹貢論二卷後論一卷山川地理圖二卷　（宋）程大昌撰　宋淳熙八年（1181）陳應行泉州州學刻本　國家圖書館",
-          名录纠错说明: "",
-          文献类型: "漢文古籍",
-          language: "漢文",
-          province_code: "110000",
-          province: "北京",
-          收藏单位代码: "101",
-          "收藏单位名称 1简转繁": "國家圖書館",
-          索书号: "9584",
-          批校题跋0: "",
-          出土地: "",
-          是否完整: "是",
-          "存缺卷 未替换": "",
-          册数: "4",
-          册数计量单位: "册",
-          全文影像链接: "http://read.nlc.cn/allSearch/searchDetail?searchType=&showType=1&indexName=data_892&fid=412004001744",
-          装帧形式: "",
-          开本尺寸: "",
-          版框尺寸: "匡高19.6厘米，廣13.6厘米",
-          版式: "半葉十二行，行二十二字，白口，左右雙邊",
-          牌记: "",
-          钤印: "有“郁印松年”、“田耕堂藏”、“蔣祖詒”、“榖孫”、“祁陽陳澄中藏書記”等印",
-          批校题跋: "",
+          name: "其他文字",
+          value: "其他文字古籍",
+          children: [
+            { name: "多文種", value: "其他文字古籍/多文種" },
+            { name: "阿拉伯文", value: "阿拉伯文" },
+            { name: "粟特文", value: "粟特文" },
+            { name: "拉丁文", value: "拉丁文" },
+            { name: "梵文", value: "梵文" },
+            { name: "波斯文", value: "波斯文" },
+            { name: "意大利文", value: "意大利文" },
+            { name: "古敘利亞文", value: "古敘利亞文" },
+            { name: "英文", value: "英文" },
+            { name: "德文", value: "德文" },
+          ],
+        },
+      ],
+      document_types: [
+        { name: "不限", value: "" },
+        { name: "漢文古籍", value: "漢文古籍" },
+        { name: "少數民族文字古籍", value: "少數民族文字古籍" },
+        { name: "其他文字古籍", value: "其他文字古籍" },
+        { name: "甲骨", value: "甲骨" },
+        { name: "簡帛", value: "簡帛" },
+        { name: "敦煌遺書", value: "敦煌遺書" },
+        { name: "碑帖拓本", value: "碑帖拓本" },
+        { name: "古地圖", value: "古地圖" },
+      ],
+      editions: [
+        { name: "不限", value: "" },
+        { name: "刻本", children: [{ name: "木刻" }, { name: "石刻" }] },
+        { name: "稿本" },
+        { name: "拓本", children: [{ name: "拓東庫本" }, { name: "拓泉州本" }] },
+        {
+          name: "印本",
+          children: [
+            { name: "公文紙印本" },
+            { name: "朱墨套印本" },
+            { name: "三色套印本" },
+            { name: "套印本" },
+            { name: "活字印本" },
+            { name: "朱印本" },
+            { name: "藍印本" },
+            { name: "銅版印本" },
+            { name: "鈐印本" },
+            { name: "彩色套印本" },
+            { name: "四色套印本" },
+            { name: "銅活字印本" },
+            { name: "官印本" },
+            { name: "泥活字印本" },
+            { name: "重印本" },
+            { name: "五色套印本" },
+            { name: "活字泥板印本" },
+            { name: "木活字印本" },
+            { name: "銅活字藍印本" },
+            { name: "木刻朱印本" },
+            { name: "木印本" },
+            { name: "六色套印本" },
+            { name: "朱墨印本" },
+            { name: "鉛印本" },
+          ],
         },
         {
-          id: "4806",
-          batch: "第2批",
-          "名录内容（国务院版）": "澄怀录二卷　（宋）周密辑　清吴翌凤家抄本　秦更年录吴翌凤校跋　南开大学图书馆",
-          "图录版名录内容 纠错版": "澄懷錄二卷　（宋）周密輯　清吳翌鳳家抄本　吳翌鳳校　南開大學圖書館",
-          名录纠错说明: "秦更年录吴翌凤校跋改为“吳翌鳳校”",
-          文献类型: "漢文古籍",
-          language: "漢文",
-          province_code: "120000",
-          province: "天津",
-          收藏单位代码: "341",
-          "收藏单位名称 1简转繁": "南開大學圖書館",
-          索书号: "善857.1526 818-2",
-          批校题跋0: "吳翌鳳校",
-          出土地: "",
-          是否完整: "是",
-          "存缺卷 未替换": "",
-          册数: "1",
-          册数计量单位: "册",
-          全文影像链接: "",
-          装帧形式: "",
-          开本尺寸: "",
-          版框尺寸: "",
-          版式: "半葉十行，行十八字",
-          牌记: "",
-          钤印: "有“莫棠字楚生印”、“曾在秦嬰闇處”、“蔓青手校”等印",
-          批校题跋: "",
+          name: "繪本",
+          children: [
+            { name: "彩繪本" },
+            { name: "手繪本" },
+            { name: "摹繪本" },
+            { name: "絹地繪本" },
+            { name: "彩繪進呈本" },
+            { name: "彩色摹繪本" },
+            { name: "彩色絹繪本" },
+          ],
         },
-        {
-          id: "9820",
-          batch: "第3批",
-          "名录内容（国务院版）": "龙戏　清抄本　中国民族图书馆",
-          "图录版名录内容 纠错版": "龍戲　清抄本　中國民族圖書館",
-          名录纠错说明: "",
-          文献类型: "少數民族文字古籍",
-          language: "水文",
-          province_code: "110000",
-          province: "北京",
-          收藏单位代码: "3194",
-          "收藏单位名称 1简转繁": "中國民族圖書館",
-          索书号: "",
-          批校题跋0: "",
-          出土地: "",
-          是否完整: "是",
-          "存缺卷 未替换": "",
-          册数: "1",
-          册数计量单位: "册",
-          全文影像链接: "",
-          装帧形式: "綫裝",
-          开本尺寸: "開本高28厘米，廣20.4厘米",
-          版框尺寸: "",
-          版式: "",
-          牌记: "",
-          钤印: "",
-          批校题跋: "",
-        },
-        {
-          id: "9982",
-          batch: "第4批",
-          "名录内容（国务院版）":
-            "增广注释音辩唐柳先生集四十三卷别集二卷外集二卷　（唐）柳宗元撰　（宋）童宗说注释　（宋）张敦颐音辩　（宋）潘纬音义　年谱一卷　（宋）文安礼撰　附录一卷　元刻本　袁克文跋　国家图书馆",
-          "图录版名录内容 纠错版":
-            "增廣註釋音辯唐柳先生集四十三卷別集二卷外集二卷　（唐）柳宗元撰　（宋）童宗說註釋　（宋）張敦頤音辯　（宋）潘緯音義　年譜一卷　（宋）文安禮撰　附錄一卷　元刻本　袁克文跋　國家圖書館",
-          名录纠错说明: "",
-          文献类型: "漢文古籍",
-          language: "漢文",
-          province_code: "110000",
-          province: "北京",
-          收藏单位代码: "101",
-          "收藏单位名称 1简转繁": "國家圖書館",
-          索书号: "8711",
-          批校题跋0: "袁克文跋",
-          出土地: "",
-          是否完整: "是",
-          "存缺卷 未替换": "",
-          册数: "12",
-          册数计量单位: "册",
-          全文影像链接: "http://read.nlc.cn/allSearch/searchDetail?searchType=&showType=1&indexName=data_892&fid=412004001155",
-          装帧形式: "",
-          开本尺寸: "",
-          版框尺寸: "匡高18.9厘米，廣12.5厘米",
-          版式: "半葉十二行，行二十一字，小字雙行同，細黑口，四周雙邊",
-          牌记: "",
-          钤印: "",
-          批校题跋: "",
-        },
-        {
-          id: "11839",
-          batch: "第5批",
-          "名录内容（国务院版）":
-            "李翰林全集四十二卷目录四卷　（唐）李白撰　（明）刘世教辑　年谱一卷　（宋）薛仲邕撰　明万历四十年（1612）刻合刻分体李杜全集本　赵士春批　海滨漫士题识　翁同龢跋　上海图书馆",
-          "图录版名录内容 纠错版":
-            "李翰林全集四十二卷目錄四卷　（唐）李白撰　（明）劉世教輯　年譜一卷　（宋）薛仲邕撰　明萬曆四十年（1612）刻合刻分體李杜全集本　趙士春批　海濱漫士題識　翁同龢跋　上海圖書館",
-          名录纠错说明: "",
-          文献类型: "漢文古籍",
-          language: "漢文",
-          province_code: "310000",
-          province: "上海",
-          收藏单位代码: "201",
-          "收藏单位名称 1简转繁": "上海圖書館",
-          索书号: "823256-59，43/B570",
-          批校题跋0: "趙士春批　海濱漫士題識　翁同龢跋",
-          出土地: "",
-          是否完整: "是",
-          "存缺卷 未替换": "",
-          册数: "4",
-          册数计量单位: "册",
-          全文影像链接: "",
-          装帧形式: "",
-          开本尺寸: "",
-          版框尺寸: "匡高20.2厘米，廣14.6厘米",
-          版式: "半葉九行，行十八字，白口，左右雙邊",
-          牌记: "",
-          钤印: "有“東田舊史”、“翁印同龢”、“虞山翁同龢印”等印",
-          批校题跋: "",
-        },
-        {
-          id: "12564",
-          batch: "第6批",
-          "名录内容（国务院版）": " [弘治]衢州府志十五卷　（明）吾冔　吴夔等纂修　明弘治刻本　宁波市天一阁博物院",
-          "图录版名录内容 纠错版": "[弘治]衢州府志十五卷　（明）吾冔　吳夔等纂修　明弘治刻本　寧波市天一閣博物院",
-          名录纠错说明: "",
-          文献类型: "漢文古籍",
-          language: "漢文",
-          province_code: "330000",
-          province: "浙江",
-          收藏单位代码: "1705",
-          "收藏单位名称 1简转繁": "寧波市天一閣博物院",
-          索书号: "",
-          批校题跋0: "",
-          出土地: "",
-          是否完整: "是",
-          "存缺卷 未替换": "",
-          册数: "",
-          册数计量单位: "",
-          全文影像链接: "",
-          装帧形式: "",
-          开本尺寸: "",
-          版框尺寸: "匡高23.5厘米，廣14.9厘米",
-          版式: "半葉九行，行二十二字，小字雙行同，黑口，四周雙邊",
-          牌记: "",
-          钤印: "有“范氏天一閣藏書”等印",
-          批校题跋: "",
-        },
+        { name: "活字本", children: [{ name: "銅活字本" }, { name: "木活字本" }, { name: "泥活字本" }] },
+        { name: "修補本" },
+        { name: "集配本" },
+        { name: "印刷本" },
+        { name: "重修本" },
+        { name: "增修本" },
+        { name: "補修本" },
+        { name: "刺綉本" },
+      ],
+      dynasties: [
+        { name: "不限" },
+        { name: "戰國" },
+        { name: "秦" },
+        { name: "漢" },
+        { name: "西漢" },
+        { name: "東漢" },
+        { name: "三國" },
+        { name: "北魏" },
+        { name: "東魏" },
+        { name: "南朝宋" },
+        { name: "南朝梁" },
+        { name: "齊" },
+        { name: "隋" },
+        { name: "唐" },
+        { name: "晚唐" },
+        { name: "十國後蜀" },
+        { name: "五代" },
+        { name: "後唐" },
+        { name: "十國" },
+        { name: "五代宋初" },
+        { name: "宋" },
+        { name: "宋元明清" },
+        { name: "西夏" },
+        { name: "西夏或元" },
+        { name: "北宋" },
+        { name: "南宋" },
+        { name: "宋蜀" },
+        { name: "大理國" },
+        { name: "金" },
+        { name: "遼" },
+        { name: "元" },
+        { name: "元明" },
+        { name: "明" },
+        { name: "南明" },
+        { name: "明末清初" },
+        { name: "明末" },
+        { name: "清" },
+        { name: "太平天國" },
+        { name: "民國" },
       ],
     };
   },
   methods: {
+    // 开始搜索。根据检索词及筛选条件
     search() {
-      console.log(2333);
+      let batch = document.querySelector("#batch>.value").getAttribute("val"),
+        language = document.querySelector("#language>.value").getAttribute("val"),
+        document_type = document.querySelector("#document_type>.value").getAttribute("val");
+
+      axios.get(`/data/text?query=${this.$refs.text.value}&batch=${batch}&language=${language}&document_type=${document_type}`).then((d) => {
+        this.search_result = d.data;
+        this.items_sum = d.data.length;
+        this.curr_d = this.search_result.slice(0, this.each_page_items); // 当前页数据
+      });
     },
+    alterPage(page_index) {
+      this.curr_d = this.search_result.slice(this.each_page_items * (page_index - 1), this.each_page_items * page_index); // 当前页码的文件
+    },
+    showFilterOptions(e) {
+      let b = e.currentTarget.querySelector(".options").style.display == "block";
+      document.querySelectorAll(".options").forEach((e) => (e.style.display = "none"));
+      e.currentTarget.querySelector(".options").style.display = b ? "none" : "block";
+    },
+    choose(e) {
+      document.querySelectorAll(".options").forEach((e) => (e.style.display = "none"));
+      let parent_filter_value = e.path[3].querySelector(".value");
+      parent_filter_value.setAttribute("val", e.currentTarget.getAttribute("val"));
+      parent_filter_value.innerText = e.currentTarget.innerText;
+    },
+  },
+  mounted() {
+    axios.get(`/data/text?query=`).then((d) => {
+      this.search_result = d.data;
+      this.items_sum = d.data.length;
+      this.curr_d = this.search_result.slice(0, this.each_page_items); // 当前页数据
+    });
   },
 };
 </script>
@@ -277,7 +327,6 @@ export default {
   font-size: 0.8rem;
   width: 100vw;
   height: 100vh;
-  background: #f2e0c4;
   padding: 2rem 5rem;
   box-sizing: border-box;
   // background: linear-gradient(#b8a885, #fff2d9, #fff2d9, #fff2d9, #fff2d9, #fff2d9, #fff2d9, #fff2d9, #fff2d9, #fff2d9, #b8a885);
@@ -286,8 +335,11 @@ export default {
       height: 2rem;
       width: 15rem;
       border-radius: 0.5rem;
+      font-size: 0.9rem;
+      outline: none;
+      vertical-align: top; // 防错位
     }
-    #search {
+    #search-button {
       background: #fbb03b url(../assets/icons/search.svg) center no-repeat;
       background-size: 66%;
       width: 2rem;
@@ -295,19 +347,83 @@ export default {
       border-radius: 0.5rem;
       border: none;
       cursor: pointer;
+      margin: 0 0 0 0.7rem;
+    }
+    #search-button:hover {
+      filter: brightness(80%);
     }
 
     .filters {
       display: flex;
       justify-content: space-between;
       .filter {
+        position: relative;
         background: #4a3300;
         border-radius: 0.5rem;
         text-align: center;
-        padding: 0.5rem 1rem;
+        padding: 0.3rem 1rem;
+        flex: 1 1 auto;
+        margin: 0.5rem 0.7rem;
         color: #fff;
         user-select: none;
         cursor: pointer;
+        .name {
+          font-weight: bold;
+        }
+        .value {
+          font-size: 0.7rem;
+        }
+        .down-arrow {
+          border: 0.3rem solid transparent;
+          border-top-color: #a8742f;
+          border-bottom-width: 0;
+          width: 0;
+          margin: 0.3rem auto 0;
+        }
+        ::-webkit-scrollbar {
+          width: 0.5rem;
+        }
+        ::-webkit-scrollbar-track {
+          -webkit-box-shadow: inset006pxrgba(0, 0, 0, 0.3);
+          border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+          border-radius: 10px;
+          background: #ccc;
+          -webkit-box-shadow: inset006pxrgba(0, 0, 0, 0.5);
+        }
+        .options {
+          position: absolute;
+          left: 0;
+          top: 3.7rem;
+          width: 100%;
+          border-radius: 0.5rem;
+          background: #333;
+          z-index: 100;
+          max-height: 40vmax;
+          overflow-y: scroll;
+          display: none;
+          font-size: 0.7rem;
+          ul {
+            margin: 0 0 0 0.5rem;
+            list-style-type: none;
+            li {
+              padding: 0.4rem 0;
+              .sub-list {
+                position: absolute;
+              }
+            }
+            li:hover {
+              background: #666;
+            }
+          }
+        }
+      }
+      .filter:first-child {
+        margin-left: 0;
+      }
+      .filter:last-child {
+        margin-right: 0;
       }
     }
   }
@@ -315,8 +431,45 @@ export default {
     position: relative;
     .results {
       background: #42210b11;
-      min-height: 50vh;
+      height: 60vh;
+      overflow-y: scroll;
+      table.results-list {
+        font-size: 0.7rem;
+        border-collapse: collapse;
+        .item-block {
+          td {
+            text-align: center;
+            padding: 4px 8px;
+            a {
+              text-decoration: none;
+              color: #4a0400;
+            }
+            a:hover {
+              text-decoration: underline;
+            }
+          }
+          td:nth-of-type(2) {
+            font-size: 0.8rem;
+          }
+          td:nth-of-type(3) {
+            width: 25rem;
+            text-align: left;
+
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 3;
+            overflow: hidden;
+          }
+        }
+        .item-block:nth-child(2n + 1) {
+          background: #42210b12;
+        }
+        .item-block:hover {
+          background-color: #ccc;
+        }
+      }
     }
+
     .toggle-view {
       position: absolute;
       top: 5rem;

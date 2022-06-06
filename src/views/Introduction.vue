@@ -20,6 +20,7 @@
       <router-link to="/exploration">转到检索系统>></router-link>
     </section>
     <section class="section-2">
+      <FlowingParticles />
       <!-- <div>
         <p>《国家珍贵古籍名录》是由国务院批准发布的我国现存珍贵古籍目录。</p>
         <p>
@@ -30,15 +31,22 @@
         </p>
       </div> -->
     </section>
+    <section class="section-3"></section>
+    <section class="section-4"></section>
   </div>
 </template>
 
 <script>
+import FlowingParticles from "@/components/FlowingParticles.vue";
+
 export default {
   name: "Introduction",
+  components: {
+    FlowingParticles,
+  },
   methods: {
     rowScroll(e) {
-      this.$refs.introduction.scrollLeft -= e.deltaY;
+      this.$refs.introduction.scrollLeft += e.deltaY;
     },
   },
 };
@@ -47,8 +55,9 @@ export default {
 <style lang="less" scoped>
 .introduction {
   display: flex;
-  flex-direction: row-reverse;
+  flex-direction: row;
   overflow-x: scroll;
+  overflow-y: hidden;
   section {
     width: 100vw;
     height: 100vh;
@@ -60,9 +69,6 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #f2e0c4;
-  height: 100vh;
-  width: 100vw;
   // padding: 5rem 0 0;
   box-sizing: border-box;
   .cover {
@@ -108,9 +114,5 @@ export default {
     right: 6rem;
     color: #666;
   }
-}
-.section-2 {
-  height: 100vh;
-  background: #f2e0c4;
 }
 </style>
