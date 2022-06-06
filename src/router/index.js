@@ -20,6 +20,11 @@ const routes = [
     name: "BookDetail",
     component: () => import("../views/BookDetail.vue"),
   },
+  {
+    path: "/person-detail/:personID",
+    name: "PersonDetail",
+    component: () => import("../views/PersonDetail.vue"),
+  },
 ];
 
 const router = createRouter({

@@ -46,7 +46,7 @@ export default {
   },
   methods: {
     rowScroll(e) {
-      this.$refs.introduction.scrollLeft -= e.deltaY;
+      this.$refs.introduction.scrollLeft += e.deltaY;
     },
   },
 };
@@ -55,7 +55,7 @@ export default {
 <style lang="less" scoped>
 .introduction {
   display: flex;
-  flex-direction: row-reverse;
+  flex-direction: row;
   overflow-x: scroll;
   overflow-y: hidden;
   section {
@@ -63,7 +63,6 @@ export default {
     height: 100vh;
     flex: 0 0 100vw;
     position: relative;
-    background-color: #f2e0c4;
   }
 }
 .section-1 {

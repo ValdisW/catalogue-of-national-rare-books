@@ -14,7 +14,9 @@
         <div class="person">
           <table>
             <tr v-for="e in person_data" :key="e">
-              <td v-text="'[' + e.dynasty_or_nation + ']' + e.责任人姓名"></td>
+              <td>
+                <router-link v-text="'[' + e.dynasty_or_nation + ']' + e.责任人姓名" :to="'/person-detail/' + e.责任人姓名"></router-link>
+              </td>
               <td v-text="e.责任行为"></td>
             </tr>
           </table>

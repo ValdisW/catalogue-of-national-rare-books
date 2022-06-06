@@ -27,8 +27,8 @@
             </ul> -->
           </div>
         </div>
-        <div class="filter" id="time" @click="showFilterOptions($event)">
-          <p class="name">出版時代</p>
+        <div class="filter" id="dynasty_or_nation" @click="showFilterOptions($event)">
+          <p class="name">版本年代/国别</p>
           <p class="value" val="">不限</p>
           <div class="down-arrow"></div>
           <div class="options">
