@@ -15,7 +15,10 @@
           <table>
             <tr v-for="e in person_data" :key="e">
               <td>
-                <router-link v-text="'[' + e.dynasty_or_nation + ']' + e.责任人姓名" :to="'/person-detail/' + e.责任人姓名"></router-link>
+                <router-link
+                  v-text="'[' + e.dynasty_or_nation + ']' + e.责任人姓名"
+                  :to="'/person-detail/' + e.责任人姓名"
+                ></router-link>
               </td>
               <td v-text="e.责任行为"></td>
             </tr>
@@ -23,7 +26,12 @@
         </div>
       </div>
     </div>
-    <BookInfoDialog ref="book-info-dialog" :id="hover_data.id" :title="hover_data.title" :detail="hover_data.detail" />
+    <BookInfoDialog
+      ref="book-info-dialog"
+      :id="hover_data.id"
+      :title="hover_data.title"
+      :detail="hover_data.detail"
+    />
   </div>
 </template>
 
@@ -76,7 +84,8 @@ export default {
         })
         // .on("mouseenter", () => (this.$refs["book-info-dialog"].$el.style.display = "block"))
         .on("mousemove", (ev) => {
-          this.$refs["book-info-dialog"].$el.style.left = ev.clientX + 10 + "px";
+          this.$refs["book-info-dialog"].$el.style.left =
+            ev.clientX + 10 + "px";
           this.$refs["book-info-dialog"].$el.style.top = ev.clientY + 30 + "px";
         })
         .on("mouseenter", (ev, data) => {
@@ -84,8 +93,12 @@ export default {
           this.$refs["book-info-dialog"].$el.style.display = "block";
           this.hover_data = {
             id: data.名录ID,
-            title: this.$store.getters.getData.data.find((elem) => elem.id == data.名录ID).content.split("　")[0],
-            detail: this.$store.getters.getData.data.find((elem) => elem.id == data.名录ID).detail,
+            title: this.$store.getters.getData.data
+              .find((elem) => elem.id == data.名录ID)
+              .content.split("　")[0],
+            detail: this.$store.getters.getData.data.find(
+              (elem) => elem.id == data.名录ID
+            ).detail,
           };
         })
         .on("mouseleave", (ev) => {

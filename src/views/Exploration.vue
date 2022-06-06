@@ -10,7 +10,13 @@
           <div class="down-arrow"></div>
           <div class="options">
             <ul>
-              <li v-for="e in batches" :key="e.name" :val="e.value" v-text="e.name" @click.stop="choose"></li>
+              <li
+                v-for="e in batches"
+                :key="e.name"
+                :val="e.value"
+                v-text="e.name"
+                @click.stop="choose"
+              ></li>
             </ul>
           </div>
         </div>
@@ -20,30 +26,56 @@
           <div class="down-arrow"></div>
           <div class="options">
             <ul>
-              <li v-for="e in languages" :key="e.name" :val="e.value" v-text="e.name" @click.stop="choose"></li>
+              <li
+                v-for="e in languages"
+                :key="e.name"
+                :val="e.value"
+                v-text="e.name"
+                @click.stop="choose"
+              ></li>
             </ul>
             <!-- <ul v-if="e.children" class="sub-list">
               <li v-for="ee in e.children" :key="ee.name" v-text="ee.name"></li>
             </ul> -->
           </div>
         </div>
-        <div class="filter" id="dynasty_or_nation" @click="showFilterOptions($event)">
+        <div
+          class="filter"
+          id="dynasty_or_nation"
+          @click="showFilterOptions($event)"
+        >
           <p class="name">版本年代/国别</p>
           <p class="value" val="">不限</p>
           <div class="down-arrow"></div>
           <div class="options">
             <ul>
-              <li v-for="e in dynasties" :key="e.name" :val="e.value" v-text="e.name" @click.stop="choose"></li>
+              <li
+                v-for="e in dynasties"
+                :key="e.name"
+                :val="e.value"
+                v-text="e.name"
+                @click.stop="choose"
+              ></li>
             </ul>
           </div>
         </div>
-        <div class="filter" id="document_type" @click="showFilterOptions($event)">
+        <div
+          class="filter"
+          id="document_type"
+          @click="showFilterOptions($event)"
+        >
           <p class="name">文獻類型</p>
           <p class="value" val="">不限</p>
           <div class="down-arrow"></div>
           <div class="options">
             <ul>
-              <li v-for="e in document_types" :key="e.name" :val="e.value" v-text="e.name" @click.stop="choose"></li>
+              <li
+                v-for="e in document_types"
+                :key="e.name"
+                :val="e.value"
+                v-text="e.name"
+                @click.stop="choose"
+              ></li>
             </ul>
           </div>
         </div>
@@ -53,7 +85,13 @@
           <div class="down-arrow"></div>
           <div class="options">
             <ul>
-              <li v-for="e in editions" :key="e.name" :val="e.value" v-text="e.name" @click.stop="choose"></li>
+              <li
+                v-for="e in editions"
+                :key="e.name"
+                :val="e.value"
+                v-text="e.name"
+                @click.stop="choose"
+              ></li>
             </ul>
           </div>
         </div>
@@ -86,25 +124,48 @@
           </tr>
           <tr v-for="item in curr_d" :key="item.id" class="item-block">
             <td>
-              <router-link v-text="item.id" :to="'/book-detail/' + item.id"></router-link>
+              <router-link
+                v-text="item.id"
+                :to="'/book-detail/' + item.id"
+              ></router-link>
             </td>
             <td>
-              <router-link v-text="item.content.split('　')[0]" :to="'/book-detail/' + item.id"></router-link>
+              <router-link
+                v-text="item.content.split('　')[0]"
+                :to="'/book-detail/' + item.id"
+              ></router-link>
             </td>
             <td>
-              <router-link v-text="item.content" :to="'/book-detail/' + item.id"></router-link>
+              <router-link
+                v-text="item.content"
+                :to="'/book-detail/' + item.id"
+              ></router-link>
             </td>
             <td v-text="item.document_type"></td>
             <td v-text="item.language"></td>
             <td v-text="item.institution"></td>
           </tr>
         </table>
-        <PageDivider @turnTo="alterPage" :items_sum="items_sum" :each_page_items="each_page_items" />
+        <PageDivider
+          @turnTo="alterPage"
+          :items_sum="items_sum"
+          :each_page_items="each_page_items"
+        />
       </div>
       <div class="results results-relation" v-if="relationship_mode"></div>
       <div class="toggle-view">
-        <div @click="relationship_mode = false" :class="{ inactive: relationship_mode }">古籍检索</div>
-        <div @click="relationship_mode = true" :class="{ inactive: !relationship_mode }">关系发现</div>
+        <div
+          @click="relationship_mode = false"
+          :class="{ inactive: relationship_mode }"
+        >
+          古籍检索
+        </div>
+        <div
+          @click="relationship_mode = true"
+          :class="{ inactive: !relationship_mode }"
+        >
+          关系发现
+        </div>
       </div>
     </div>
   </div>
@@ -190,7 +251,10 @@ export default {
         { name: "不限", value: "" },
         { name: "刻本", children: [{ name: "木刻" }, { name: "石刻" }] },
         { name: "稿本" },
-        { name: "拓本", children: [{ name: "拓東庫本" }, { name: "拓泉州本" }] },
+        {
+          name: "拓本",
+          children: [{ name: "拓東庫本" }, { name: "拓泉州本" }],
+        },
         {
           name: "印本",
           children: [
@@ -232,7 +296,14 @@ export default {
             { name: "彩色絹繪本" },
           ],
         },
-        { name: "活字本", children: [{ name: "銅活字本" }, { name: "木活字本" }, { name: "泥活字本" }] },
+        {
+          name: "活字本",
+          children: [
+            { name: "銅活字本" },
+            { name: "木活字本" },
+            { name: "泥活字本" },
+          ],
+        },
         { name: "修補本" },
         { name: "集配本" },
         { name: "印刷本" },
@@ -288,27 +359,48 @@ export default {
     // 开始搜索。根据检索词及筛选条件
     search() {
       let batch = document.querySelector("#batch>.value").getAttribute("val"),
-        language = document.querySelector("#language>.value").getAttribute("val"),
-        document_type = document.querySelector("#document_type>.value").getAttribute("val");
+        language = document
+          .querySelector("#language>.value")
+          .getAttribute("val"),
+        document_type = document
+          .querySelector("#document_type>.value")
+          .getAttribute("val");
 
-      axios.get(`/data/text?query=${this.$refs.text.value}&batch=${batch}&language=${language}&document_type=${document_type}`).then((d) => {
-        this.search_result = d.data;
-        this.items_sum = d.data.length;
-        this.curr_d = this.search_result.slice(0, this.each_page_items); // 当前页数据
-      });
+      axios
+        .get(
+          `/data/text?query=${this.$refs.text.value}&batch=${batch}&language=${language}&document_type=${document_type}`
+        )
+        .then((d) => {
+          this.search_result = d.data;
+          this.items_sum = d.data.length;
+          this.curr_d = this.search_result.slice(0, this.each_page_items); // 当前页数据
+        });
     },
     alterPage(page_index) {
-      this.curr_d = this.search_result.slice(this.each_page_items * (page_index - 1), this.each_page_items * page_index); // 当前页码的文件
+      this.curr_d = this.search_result.slice(
+        this.each_page_items * (page_index - 1),
+        this.each_page_items * page_index
+      ); // 当前页码的文件
     },
     showFilterOptions(e) {
-      let b = e.currentTarget.querySelector(".options").style.display == "block";
-      document.querySelectorAll(".options").forEach((e) => (e.style.display = "none"));
-      e.currentTarget.querySelector(".options").style.display = b ? "none" : "block";
+      let b =
+        e.currentTarget.querySelector(".options").style.display == "block";
+      document
+        .querySelectorAll(".options")
+        .forEach((e) => (e.style.display = "none"));
+      e.currentTarget.querySelector(".options").style.display = b
+        ? "none"
+        : "block";
     },
     choose(e) {
-      document.querySelectorAll(".options").forEach((e) => (e.style.display = "none"));
+      document
+        .querySelectorAll(".options")
+        .forEach((e) => (e.style.display = "none"));
       let parent_filter_value = e.path[3].querySelector(".value");
-      parent_filter_value.setAttribute("val", e.currentTarget.getAttribute("val"));
+      parent_filter_value.setAttribute(
+        "val",
+        e.currentTarget.getAttribute("val")
+      );
       parent_filter_value.innerText = e.currentTarget.innerText;
     },
   },
