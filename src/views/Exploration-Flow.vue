@@ -9,7 +9,7 @@
     <Flow class="flow" 
           :rate="rate"
           :canvasWidth="toWidth(1)" 
-          :canvasHeight="toHeight(0.8)">
+          :canvasHeight="toHeight(0.75)">
     </Flow>
   </div>
 </template>
@@ -79,10 +79,10 @@ export default {
     width: 100vw;
     height: 100vh;
     .flow {
-      // position: fixed;
-      // top: 30vh;
+      position: fixed;
+      top: 20vh;
       width: 100vw;
-      height: 60vh;
+      height: 65vh;
     }
     .scroll-bar {
       position: fixed;

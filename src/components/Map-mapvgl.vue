@@ -6,9 +6,10 @@
             <li v-for="(city, index) in province_info"
                 :key="index"
                 :id="`list-${index}`"
-                :show="false"
-                @click="clickProvince(city, index)">
-                {{city.name}} - 藏书数: {{city.count}}
+                :show="false">
+                <p @click="clickProvince(city, index)">
+                    {{city.name}} - 藏书数: {{city.count}}
+                </p>
             </li>
         </ul>
     </div>
@@ -298,13 +299,14 @@ export default {
                 this.showSublist(d, list)
             }
             else { // remove
-                list.removeChild(list.children[0])
+                list.removeChild(list.children[1])
                 list.setAttribute("show", false)
                 this.map.reset()
             }
         },
         showSublist(d, list) {
             let sublist = document.createElement("ul")
+            let self = this
             sublist.setAttribute("id", "sublist")
             for (let i in d.child) {
                 let child_id = d.child[i]
@@ -315,6 +317,11 @@ export default {
                 }
                 let li = document.createElement("li")
                 li.innerHTML = `${child.name} - 藏书数: ${child.count}`
+                li.onclick = function(e) {
+                    console.log(e)
+                    self.zoom = 10
+                    self.map.flyTo(child.pos, 10)
+                }
                 sublist.appendChild(li)
             }
             list.appendChild(sublist)
@@ -328,7 +335,7 @@ export default {
             for (let i in this.province_info) {
                 let list = document.getElementById("list-"+i)
                 if (list.getAttribute("show")=="true") {
-                    list.removeChild(list.children[0])
+                    list.removeChild(list.children[1])
                     list.setAttribute("show", false)
                 }
             }

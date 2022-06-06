@@ -204,7 +204,7 @@ export default {
                     let r=this.randomNormal({
                         mean: this.PARTICLE_SIZE,
                         dev: this.PARTICLE_SIZE / 2,
-                    })/2
+                    })
                     return Math.max(0,r)*self.vh
                 })
                 .attr('cx', width+10)
@@ -220,10 +220,6 @@ export default {
 </script>
 
 <style lang="less" scoped>
-#scroll-bar {
-  width: 100vw;
-  height: 100vh;
-}
 #flow {
   width: 100vw;
   height: 100vh;
