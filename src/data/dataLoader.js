@@ -13,11 +13,13 @@ export async function loadData(){
     let batch_info = await d3.json('/data/batch.json');
     let institution_info = await d3.json('/data/institution.json');
     let province_info = await d3.json('/data/position.json');
+    let stack_info = await d3.json('/data/stack.json');
     Data =  {
         'book_info': book_info,
         'batch_info': batch_info,
         'institution_info': institution_info,
         'province_info': province_info,
+        'stack_info': stack_info,
     };
     
 }
@@ -87,6 +89,28 @@ export function get_statics(displayOrder) {
             if (Data.batch_info[title][dispTitle]!=undefined)
                 len = Object.keys(Data.batch_info[title][dispTitle]).length
             // console.log(title, Data.batch_info[title], len)
+            dict[title]=len
+        }
+        data.push(dict)
+    }
+    // console.log(data)
+    return data
+}
+
+export function get_stack_data(xOrder, yOrder, batchSel) {
+    let data = []
+    for (let i in xOrder) {
+        let dispTitle = xOrder[i] // dynasty
+        let dict = {name: dispTitle}
+        for (let j in yOrder) {
+            let title = yOrder[j] // category
+            let len = 0
+            for (let k in batchSel) {
+                if (batchSel[k]>0) {
+                    if (Data.stack_info[Number(k)+1][dispTitle]!=undefined)
+                        len += Data.stack_info[Number(k)+1][dispTitle][title]
+                }
+            }
             dict[title]=len
         }
         data.push(dict)
