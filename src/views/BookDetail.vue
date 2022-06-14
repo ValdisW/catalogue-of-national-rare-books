@@ -1,5 +1,6 @@
 <template>
   <div class="book-detail">
+    <BackButton />
     <div class="content">
       <div class="img-wrapper">
         <img src="@/assets/placeholder.jpg" alt="" />
@@ -39,10 +40,11 @@
 import axios from "axios";
 import * as d3 from "d3";
 import BookInfoDialog from "@/components/BookInfoDialog";
+import BackButton from "@/components/BackButton";
 
 export default {
   name: "BookDetail",
-  components: { BookInfoDialog },
+  components: { BookInfoDialog, BackButton },
   data() {
     return {
       book_data: { content: "" },
@@ -51,7 +53,8 @@ export default {
         title: "",
         detail: "",
       },
-      person_data: "",
+      person_data: [],
+      seal_data: [],
     };
   },
   computed: {
@@ -65,8 +68,10 @@ export default {
       this.book_data = d.data[0][0];
 
       this.person_data = d.data[2];
+      this.seal_data = d.data[3];
 
       const related_books = d3.select(".related-books");
+      
       related_books
         .selectAll("div")
         .data(d.data[1])
@@ -75,10 +80,27 @@ export default {
         .style("width", "16px")
         .style("height", "16px")
         .style("border-radius", "50%")
-        .style("background", "#4a3300")
+        .style("background", "#4a330066")
         .style("display", "inline-block")
         .style("cursor", "pointer")
         .style("margin", "2px")
+        .style("position", "absolute")
+        .style(
+          "left",
+          (e, i, a) =>
+            `${
+              250 +
+              (200 - e.count * 10) * Math.cos(((Math.PI * 2) / a.length) * i)
+            }px`
+        )
+        .style(
+          "top",
+          (e, i, a) =>
+            `${
+              250 +
+              (200 - e.count * 10) * Math.sin(((Math.PI * 2) / a.length) * i)
+            }px`
+        )
         .on("click", (e, d) => {
           this.$router.push(`/book-detail/${d.名录ID}`);
         })
@@ -102,7 +124,7 @@ export default {
           };
         })
         .on("mouseleave", (ev) => {
-          ev.target.style.background = "#4a3300";
+          ev.target.style.background = "#4a330066";
           this.$refs["book-info-dialog"].$el.style.display = "none";
         });
     });
@@ -112,7 +134,6 @@ export default {
 
 <style lang="less" scoped>
 .book-detail {
-  background-color: #f2e0c4;
   width: 100vw;
   height: 100vh;
   display: flex;
@@ -150,6 +171,26 @@ export default {
       }
       .detail {
         font-size: 0.8rem;
+      }
+      .related-books {
+        position: relative;
+        width: 500px;
+        height: 500px;
+      }
+      .person {
+        position: absolute;
+        right: 100px;
+        bottom: 100px;
+        table {
+          font-size: 0.8rem;
+          tr {
+            td {
+              a {
+                color: #000;
+              }
+            }
+          }
+        }
       }
     }
   }

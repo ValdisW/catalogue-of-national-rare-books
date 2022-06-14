@@ -4,8 +4,8 @@
       <div class="everyday-book">
         <div>
           <p>今日古籍</p>
-          <p>13</p>
-          <p>2022.5</p>
+          <p v-text="now.getDate()"></p>
+          <p v-text="now.getFullYear() + '.' + (now.getMonth() + 1)"></p>
         </div>
         <div>
           <p>01523</p>
@@ -14,7 +14,9 @@
         <img src="@/assets/placeholder.jpg" alt="今日古籍-书影" />
       </div>
       <div class="cover">
-        <h1>国家珍贵古籍名录</h1>
+        <div>
+          <h1>国家珍贵古籍名录</h1>
+        </div>
       </div>
       <div class="slider"></div>
       <router-link to="/exploration">转到检索系统>></router-link>
@@ -43,6 +45,11 @@ export default {
   name: "Introduction",
   components: {
     FlowingParticles,
+  },
+  data() {
+    return {
+      now: new Date(),
+    };
   },
   methods: {
     rowScroll(e) {
@@ -76,13 +83,19 @@ export default {
     width: 20rem;
     height: 90vh;
     box-shadow: 5px 5px 10px 0 #666;
-    h1 {
-      text-align: center;
-      font-size: 3rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    div {
+      background: #ffda99;
       width: 3rem;
-      font-weight: normal;
-      letter-spacing: 0.4rem;
-      margin: 0 0 2rem;
+      h1 {
+        text-align: center;
+        font-size: 2.3rem;
+        font-weight: normal;
+        letter-spacing: 0.4rem;
+        margin: 0 0 2rem;
+      }
     }
   }
   .slider {
@@ -99,10 +112,30 @@ export default {
     margin: 0 3rem 0 0;
     div:nth-child(1) {
       background-color: #ffda99;
+      box-sizing: border-box;
+      padding: 0.5rem;
       text-align: center;
+      p:nth-child(1) {
+        font-size: 0.8rem;
+      }
+      p:nth-child(2) {
+        font-size: 1.8rem;
+      }
     }
     div:nth-child(2) {
       color: #fff;
+      font-size: 0.8rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      p:nth-child(1) {
+        margin: 0.5rem 0 0 0;
+      }
+      p:nth-child(2) {
+        line-height: 0.9rem;
+        width: 0.8rem;
+        margin: 0.5rem 0 1rem;
+      }
     }
     img {
       width: 100%;
