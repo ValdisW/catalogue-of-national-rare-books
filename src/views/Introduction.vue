@@ -23,6 +23,7 @@
     </section>
     <section class="section-2">
       <FlowingParticles />
+
       <!-- <div>
         <p>《国家珍贵古籍名录》是由国务院批准发布的我国现存珍贵古籍目录。</p>
         <p>
@@ -34,17 +35,21 @@
       </div> -->
     </section>
     <section class="section-3"></section>
-    <section class="section-4"></section>
+    <section class="section-4">
+      <BaiduMap />
+    </section>
   </div>
 </template>
 
 <script>
-import FlowingParticles from "@/components/FlowingParticles.vue";
+import FlowingParticles from "@/views/Exploration-Flow.vue";
+import BaiduMap from "@/views/Exploration-BaiduMap.vue";
 
 export default {
   name: "Introduction",
   components: {
     FlowingParticles,
+    BaiduMap,
   },
   data() {
     return {

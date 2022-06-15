@@ -41,6 +41,33 @@ const routes = [
     meta: { title: "机构详情" },
     component: () => import("../views/InstitutionDetail.vue"),
   },
+  {
+    path: "/streamgraph",
+    name: "StreamGraph",
+    component: () => import("../views/Exploration-Stream.vue"),
+  },
+  // {
+  //   path: "/map",
+  //   name: "Map",
+  //   component: () => import("../views/Exploration-BaiduMap.vue"),
+  // },
+  // {
+  //   path: "/flow",
+  //   name: "Flow",
+  //   component: () => import("../views/Exploration-Flow.vue"),
+  // },
+  // {
+  //   path: "/exploration-unit",
+  //   name: "Exploration-Unit",
+  //   component: () =>
+  //     import("../views/Exploration-Unit.vue"),
+  // },
+  // {
+  //   path: "/exploration-map",
+  //   name: "Exploration-Map",
+  //   component: () =>
+  //     import("../views/Exploration-Map.vue"),
+  // },
 ];
 
 const router = createRouter({

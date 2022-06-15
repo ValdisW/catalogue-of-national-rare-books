@@ -71,7 +71,7 @@ export default {
       this.seal_data = d.data[3];
 
       const related_books = d3.select(".related-books");
-      
+
       related_books
         .selectAll("div")
         .data(d.data[1])
