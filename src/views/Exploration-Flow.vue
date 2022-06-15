@@ -1,7 +1,11 @@
 <template>
   <div class="exploration-flow">
     <ScrollBar v-on:changeRate="updateRate" />
-    <FlowingParticles :rate="rate" :canvasWidth="toWidth(1)" :canvasHeight="toHeight(0.75)" />
+    <FlowingParticles
+      :rate="rate"
+      :canvasWidth="toWidth(1)"
+      :canvasHeight="toHeight(0.75)"
+    />
   </div>
 </template>
 

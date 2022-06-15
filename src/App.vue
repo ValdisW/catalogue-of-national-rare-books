@@ -1,5 +1,8 @@
 <template>
-  <nav><router-link to="/">名录介绍</router-link> | <router-link to="/exploration">古籍浏览</router-link></nav>
+  <nav>
+    <router-link to="/">名录介绍</router-link> |
+    <router-link to="/exploration">古籍浏览</router-link>
+  </nav>
   <router-view v-slot="{ Component }" :key="$route.fullPath">
     <keep-alive>
       <component :is="Component" />

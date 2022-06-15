@@ -3,8 +3,15 @@
     <div id="map_container"></div>
     <div id="map-list">
       <ul>
-        <li v-for="(city, index) in province_info" :key="index" :id="`list-${index}`" :show="false">
-          <p @click="clickProvince(city, index)">{{ city.name }} - 藏书数: {{ city.count }}</p>
+        <li
+          v-for="(city, index) in province_info"
+          :key="index"
+          :id="`list-${index}`"
+          :show="false"
+        >
+          <p @click="clickProvince(city, index)">
+            {{ city.name }} - 藏书数: {{ city.count }}
+          </p>
         </li>
       </ul>
     </div>

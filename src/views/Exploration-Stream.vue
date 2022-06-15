@@ -1,6 +1,10 @@
 <template>
   <div class="exploration-stream">
-    <StreamGraph class="streamgraph" :canvasWidth="toWidth(1)" :canvasHeight="toHeight(0.8)"></StreamGraph>
+    <StreamGraph
+      class="streamgraph"
+      :canvasWidth="toWidth(1)"
+      :canvasHeight="toHeight(0.8)"
+    ></StreamGraph>
   </div>
 </template>
 
