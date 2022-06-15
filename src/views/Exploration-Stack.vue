@@ -1,50 +1,54 @@
-
 <template>
-  <div class='exploration-stack'>
-    <Stack class="stack" :canvasWidth="toWidth(0.7)" :canvasHeight="toHeight(0.8)" :batchSel="batchSel"></Stack>
-    <div class='button-batch'>
-      <ButtonBatch v-for="(batch, index) in batchKeys"
+  <div class="exploration-stack">
+    <Stack
+      class="stack"
+      :canvasWidth="toWidth(0.7)"
+      :canvasHeight="toHeight(0.8)"
+      :batchSel="batchSel"
+    ></Stack>
+    <div class="button-batch">
+      <ButtonBatch
+        v-for="(batch, index) in batchKeys"
         :key="index"
         :text="batch"
         :index="index"
         v-on:addBatch="addBatch"
-        v-on:deleteBatch="deleteBatch">
+        v-on:deleteBatch="deleteBatch"
+      >
       </ButtonBatch>
     </div>
   </div>
 </template>
 
 <script>
-import {mapState} from "vuex"
-import global from "@/constants/global"
+import { mapState } from "vuex";
+import global from "@/constants/global";
 
-import Stack from "@/components/Stack.vue"
-import ButtonBatch from "@/components/Button-Batch.vue"
+import Stack from "@/components/Stack.vue";
+import ButtonBatch from "@/components/Button-Batch.vue";
 
-const baseSize = 16
-const batchKeys = [
-    '第1批', '第2批', '第3批', '第4批', '第5批', '第6批'
-]
+const baseSize = 16;
+const batchKeys = ["第1批", "第2批", "第3批", "第4批", "第5批", "第6批"];
 
 export default {
   name: "Exploration-Stream",
   data() {
     return {
       batchSel: null,
-      batchKeys: batchKeys
-    }
+      batchKeys: batchKeys,
+    };
   },
   computed: {
-    ...mapState(['rem']),
+    ...mapState(["rem"]),
   },
   components: {
     Stack,
     ButtonBatch,
   },
   watch: {
-    batchSel: function(newVal, oldVal) {
-      console.log(newVal, oldVal)
-    }
+    batchSel: function (newVal, oldVal) {
+      console.log(newVal, oldVal);
+    },
   },
   methods: {
     toWidth(p) {
@@ -53,39 +57,38 @@ export default {
     toHeight(p) {
       return window.innerHeight * p;
     },
-    setRem() {   
+    setRem() {
       // 用于根据页面大小设定rem，以自适应元素大小
-      let self =this
-      const scale = global.PageSize().width / 1280   
-      let rem = (baseSize * Math.min(scale, 50))
-      self.$store.commit("changeRem", rem)
-      document.documentElement.style.fontSize = rem + 'px' 
-    },
-    init(){
       let self = this;
-      self.setRem()
-      window.onresize = function () { 
+      const scale = global.PageSize().width / 1280;
+      let rem = baseSize * Math.min(scale, 50);
+      self.$store.commit("changeRem", rem);
+      document.documentElement.style.fontSize = rem + "px";
+    },
+    init() {
+      let self = this;
+      self.setRem();
+      window.onresize = function () {
         self.init();
-      }
+      };
     },
     addBatch(index) {
-      let sel = this.batchSel.slice(0)
-      sel[index]=1
-      this.batchSel = sel
+      let sel = this.batchSel.slice(0);
+      sel[index] = 1;
+      this.batchSel = sel;
     },
     deleteBatch(index) {
-      let sel = this.batchSel.slice(0)
-      sel[index]=0
-      this.batchSel = sel
-    }
+      let sel = this.batchSel.slice(0);
+      sel[index] = 0;
+      this.batchSel = sel;
+    },
   },
-  created() {
-  },
+  created() {},
   mounted() {
-    let self = this
-    self.init()
-    this.batchSel = new Array(6).fill(0)
-  }
+    let self = this;
+    self.init();
+    this.batchSel = new Array(6).fill(0);
+  },
 };
 </script>
 
