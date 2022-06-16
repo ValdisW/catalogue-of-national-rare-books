@@ -11,7 +11,10 @@
     "axios": "^0.27.2",
     "core-js": "^3.6.5",
     "d3": "^7.4.4",
+    "jquery": "^3.6.0",
     "vue": "^3.0.0",
+    "vue-baidu-map-3x": "^1.0.15",
+    "vue-jsonp": "^2.0.0",
     "vue-router": "^4.0.0-0",
     "vuex": "^4.0.2"
   },
@@ -27,7 +30,6 @@
     "eslint-plugin-prettier": "^3.3.1",
     "eslint-plugin-vue": "^7.0.0",
     "less": "^3.0.4",
-    "less-loader": "^5.0.0",
-    "prettier": "^2.2.1"
+    "less-loader": "^5.0.0"
   }
 }

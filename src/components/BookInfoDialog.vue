@@ -1,7 +1,7 @@
 <template>
   <div class="book-info-dialog">
     <h4>
-      <span v-text="'#' + id"></span>
+      <span v-text="id"></span>
       <span v-text="title"></span>
     </h4>
     <p v-text="detail"></p>
