@@ -3,15 +3,8 @@
     <div id="map_container"></div>
     <div id="map-list">
       <ul>
-        <li
-          v-for="(city, index) in province_info"
-          :key="index"
-          :id="`list-${index}`"
-          :show="false"
-        >
-          <p @click="clickProvince(city, index)">
-            {{ city.name }} - 藏书数: {{ city.count }}
-          </p>
+        <li v-for="(city, index) in province_info" :key="index" :id="`list-${index}`" :show="false">
+          <p @click="clickProvince(city, index)">{{ city.name }} - {{ city.count }}</p>
         </li>
       </ul>
     </div>
@@ -25,7 +18,6 @@
 import * as Data from "@/data/dataLoader";
 
 export default {
-  components: {},
   data() {
     return {
       zoom: null,
@@ -47,13 +39,10 @@ export default {
       },
     };
   },
-  created() {},
   watch: {
     zoom: function (val) {
-      console.log("zoom", val);
-      if (val > 6) {
-        this.drawInstitutionMap();
-      } else this.drawProvinceMap();
+      if (val > 6) this.drawInstitutionMap();
+      else this.drawProvinceMap();
     },
   },
   methods: {
@@ -123,9 +112,8 @@ export default {
         onClick: (e) => {
           // 点击事件
           let id = e.dataIndex;
-          if (id == -1) {
-            this.map.reset();
-          } else this.clickProvince(this.province_info[id], id);
+          if (id == -1) this.map.reset();
+          else this.clickProvince(this.province_info[id], id);
         },
         onMousemove: (e) => {
           console.log("hover", e);
@@ -177,17 +165,14 @@ export default {
       /* eslint-disable */
       this.institutionLayer = new mapvgl.PointLayer({
         // blend: 'lighter',
-        size: function (data) {
-          return intensity.getSize(data.properties.count);
-        },
-        color: function (data) {
-          return intensity.getColor(data.properties.count);
-        },
+        size: (data) => intensity.getSize(data.properties.count),
+        color: (data) => intensity.getColor(data.properties.count),
         enablePicked: true,
         selectedColor: "#ff0000",
         autoSelect: true,
         onClick: (e) => {
           // 点击事件
+          this.$router.push(`/institution-detail/${e.dataItem.properties.name}`);
           let id = e.dataIndex;
           if (id == -1) {
             this.map.reset();
@@ -196,9 +181,9 @@ export default {
             // this.clickProvince(this.province_info[id], id)
           }
         },
-        onMousemove: (e) => {
-          console.log(e);
-        },
+        // onMousemove: (e) => {
+        //   console.log(e);
+        // },
       });
 
       this.institutionLayer.setData(data);
@@ -319,7 +304,7 @@ export default {
           continue;
         }
         let li = document.createElement("li");
-        li.innerHTML = `${child.name} - 藏书数: ${child.count}`;
+        li.innerHTML = `${child.name} - ${child.count}`;
         li.onclick = function () {
           self.zoom = 10;
           self.map.flyTo(child.pos, 10);
@@ -366,21 +351,24 @@ export default {
 
 <style lang="less">
 .spatialSampling {
+  display: flex;
   position: absolute;
   top: 10vh;
   left: 5vw;
   width: 90vw;
   height: 80vh;
   #map_container {
-    position: fixed;
+    // position: fixed;
     width: 80%;
     height: 100%;
     border: 2px solid rgb(177, 117, 68);
   }
   #tooltip {
-    background-color: antiquewhite;
     #tooltip-box {
-      background-color: antiquewhite;
+      background-color: #333;
+      color: #fff;
+      padding: 0.6rem;
+      font-size: 0.8rem;
       width: auto;
       height: auto;
       position: absolute;
@@ -389,17 +377,23 @@ export default {
     }
   }
   #map-list {
-    position: absolute;
+    // position: absolute;
     width: 20%;
     top: 0%;
     right: 0%;
-    height: auto;
-    border: 2px solid rgb(177, 117, 68);
+    height: 100%;
     cursor: pointer;
-    overflow: scroll;
+    overflow-y: scroll;
+    font-size: 0.7rem;
+    text-align: center;
+    ul {
+      li {
+        padding: 0.3rem 0;
+      }
+    }
     #sublist {
       background-color: antiquewhite;
-      overflow: scroll;
+      // overflow: scroll;
     }
   }
 }
