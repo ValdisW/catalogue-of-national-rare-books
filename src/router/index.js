@@ -46,15 +46,11 @@ const routes = [
     name: "StreamGraph",
     component: () => import("../views/Exploration-Stream.vue"),
   },
-  {
-    path: "/stack",
-    name: "Stack",
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () =>
-      import(/* webpackChunkName: "about" */ "../views/Exploration-Stack.vue"),
-  },
+  // {
+  //   path: "/stack",
+  //   name: "Stack",
+  //   component: () => import("../views/Exploration-Stack.vue"),
+  // },
   // {
   //   path: "/map",
   //   name: "Map",

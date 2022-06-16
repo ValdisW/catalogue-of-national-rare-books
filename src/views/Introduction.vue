@@ -34,7 +34,9 @@
         </p>
       </div> -->
     </section>
-    <section class="section-3"></section>
+    <section class="section-3">
+      <Stack />
+    </section>
     <section class="section-4">
       <BaiduMap />
     </section>
@@ -44,12 +46,14 @@
 <script>
 import FlowingParticles from "@/views/Exploration-Flow.vue";
 import BaiduMap from "@/views/Exploration-BaiduMap.vue";
+import Stack from "@/views/Exploration-Stack.vue";
 
 export default {
   name: "Introduction",
   components: {
     FlowingParticles,
     BaiduMap,
+    Stack,
   },
   data() {
     return {
