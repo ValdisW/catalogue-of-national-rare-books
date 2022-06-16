@@ -97,9 +97,10 @@ export default {
   name: "Stack",
   props: ["canvasWidth", "canvasHeight", "batchSel"],
   data() {
-    return {};
+    return {
+      colors: ["#677885", "#e0a1a5", "#90ccc5"],
+    };
   },
-  computed: {},
   watch: {
     // for interaction
     batchSel: function (newVal, oldVal) {
@@ -125,7 +126,7 @@ export default {
       let self = this;
       self.rectStyle = (rect) => {
         rect
-          .attr("fill", (d, i) => d3.interpolateCool(i))
+          .attr("fill", (d, i) => this.colors[i])
           .attr("fill-opacity", 0.8)
           .style("cursor", "pointer");
       };
@@ -266,6 +267,6 @@ export default {
 
 <style scoped lang="less">
 .container {
-  overflow: scroll;
+  // overflow: scroll;
 }
 </style>

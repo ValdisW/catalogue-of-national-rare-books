@@ -22,13 +22,10 @@
 
 <script>
 import { mapState } from "vuex";
-import global from "@/constants/global";
-
 import Stack from "@/components/Stack.vue";
 import ButtonBatch from "@/components/Button-Batch.vue";
 
-const baseSize = 16;
-const batchKeys = ["第1批", "第2批", "第3批", "第4批", "第5批", "第6批"];
+const batchKeys = ["一", "二", "三", "四", "五", "六"];
 
 export default {
   name: "Exploration-Stream",
@@ -57,21 +54,7 @@ export default {
     toHeight(p) {
       return window.innerHeight * p;
     },
-    setRem() {
-      // 用于根据页面大小设定rem，以自适应元素大小
-      let self = this;
-      const scale = global.PageSize().width / 1280;
-      let rem = baseSize * Math.min(scale, 50);
-      self.$store.commit("changeRem", rem);
-      document.documentElement.style.fontSize = rem + "px";
-    },
-    init() {
-      let self = this;
-      self.setRem();
-      window.onresize = function () {
-        self.init();
-      };
-    },
+
     addBatch(index) {
       let sel = this.batchSel.slice(0);
       sel[index] = 1;
@@ -83,28 +66,24 @@ export default {
       this.batchSel = sel;
     },
   },
-  created() {},
   mounted() {
-    let self = this;
-    self.init();
     this.batchSel = new Array(6).fill(0);
   },
 };
 </script>
 
 <style lang="less" scoped>
-// .about {
-//   width: 100vw;
-//   height: 100vh;
-//   background: linear-gradient(#b8a885, #fff2d9, #fff2d9, #fff2d9, #fff2d9, #fff2d9, #fff2d9, #fff2d9, #fff2d9, #fff2d9, #b8a885);
-// }
-
 .exploration-stack {
-  background-color: rgba(238, 221, 142, 0.651);
   width: 100vw;
   height: 100vh;
+  position: relative;
+  .button-batch {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+  }
   .stack {
-    position: fixed;
+    position: absolute;
     left: 20vw;
     top: 10vh;
   }

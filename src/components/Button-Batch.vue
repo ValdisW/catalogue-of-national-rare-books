@@ -1,20 +1,10 @@
 <template>
-  <div class="container">
-    <svg width="50" height="50">
-      <g @click="clickBatch()">
-        <circle
-          style="cursor: pointer; fill: rgba(177, 44, 11); fill-opacity: 0.4"
-          :id="`button-${index}`"
-          cx="30"
-          cy="30"
-          r="20"
-        ></circle>
-        <text x="18" y="35">
-          {{ text }}
-        </text>
-      </g>
-    </svg>
-  </div>
+  <div
+    :class="{ 'batch-button': true, activated }"
+    :id="`button-${index}`"
+    @click="clickBatch()"
+    v-text="text"
+  ></div>
 </template>
 
 <script>
@@ -24,35 +14,37 @@ export default {
   props: ["index", "text"],
   data() {
     return {
-      show: false,
+      activated: false,
     };
   },
-  computed: {},
-  watch: {},
   methods: {
     clickBatch() {
-      if (this.show == false) {
-        this.show = true;
+      if (this.activated == false) {
+        this.activated = true;
         this.$emit("addBatch", this.index);
-        this.circle.setAttribute(
-          "style",
-          "cursor: pointer; fill: rgba(177, 44, 11); fill-opacity: 0.8"
-        );
       } else {
-        this.show = false;
+        this.activated = false;
         this.$emit("deleteBatch", this.index);
-        this.circle.setAttribute(
-          "style",
-          "cursor: pointer; fill: rgba(177, 44, 11); fill-opacity: 0.4"
-        );
       }
     },
-  },
-  mounted() {
-    this.circle = document.getElementById("button-" + this.index);
-    console.log(this.circle);
   },
 };
 </script>
 
-<style scoped lang="less"></style>
+<style scoped lang="less">
+.batch-button {
+  cursor: pointer;
+  width: 1.8rem;
+  height: 1.8rem;
+  line-height: 1.8rem;
+  border-radius: 50%;
+  border: 1px solid #000;
+  text-align: center;
+  margin: 0.5rem;
+  font-size: 0.8rem;
+}
+.activated {
+  background-color: #000;
+  color: #fff;
+}
+</style>
