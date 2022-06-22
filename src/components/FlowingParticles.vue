@@ -7,6 +7,71 @@ const d3 = require("d3");
 import * as Data from "@/data/dataLoader";
 import * as Tooltip from "@/utils/Tooltip";
 
+const dynasty_map = [
+  { 戰國: 0 },
+  { 秦: 1 },
+  { 西漢: 2 },
+  { 東漢: 3 },
+  { 大魏: 4 },
+  { 六朝: 5 },
+  { 晉: 6 },
+  { 西晉: 7 },
+  { 東晉: 8 },
+  { 北涼: 9 },
+  { 西涼: 10 },
+  { 高昌: 11 },
+  { 南北朝: 12 },
+  { 齊: 13 },
+  { 梁: 13 },
+  { 北齊: 14 },
+  { 西魏: 14 },
+  { 北魏: 14 },
+  { 隋: 15 },
+  { 唐: 16 },
+  { 武周: 16 },
+  { 晚唐: 17 },
+  { 唐五代: 17 },
+  { 五代: 18 },
+  { 後梁: 18 },
+  { 後周: 18 },
+  { 後唐: 18 },
+  { 五代宋初: 19 },
+  { 宋: 20 },
+  { 宋元明清: 20 },
+  { 北宋: 21 },
+  { 大理國: 21 },
+  { 遼: 21 },
+  { 金: 22 },
+  { 西夏: 22 },
+  { 西夏或元: 22 },
+  { 南宋: 23 },
+  { 宋蜀: 24 },
+  { 蒙古: 25 },
+  { 元: 26 },
+  { 元至清: 27 },
+  { 北元: 28 },
+  { 明: 29 },
+  { 明末: 30 },
+  { 明末清初: 30 },
+  { 南明: 31 },
+  { 清: 32 },
+  { 巴塞爾: 32 },
+  { 威尼斯: 32 },
+  { 日本長崎: 32 },
+  { 安特衛普: 32 },
+  { 佩薩羅: 32 },
+  { 羅馬: 32 },
+  { 奧古斯堡: 32 },
+  { 維也納: 32 },
+  { 米蘭: 32 },
+  { 愛丁堡: 32 },
+  { 倫敦: 32 },
+  { 謄清: 32 },
+  { 太平天國: 33 },
+  { 民國: 34 },
+  { 拉薩: 34 },
+];
+
 export default {
   name: "FlowingParticles",
   props: ["rate", "canvasWidth", "canvasHeight"],
@@ -62,8 +127,8 @@ export default {
           [this.svg.attr("width"), this.svg.attr("height")],
         ])
         .tips(
-          ["名录ID", "图录解说"],
-          ["名录ID: ", "图录解说: "],
+          ["名录ID", "图录版名录内容"],
+          ["名录ID: ", "图录版名录内容: "],
           [null],
           processFunc
         )
@@ -201,7 +266,13 @@ export default {
 
       // self.initializeHoverFunction()
 
-      self.book_list = Object.keys(Data.get_data().book_info);
+      let book_list = Object.keys(Data.get_data().book_info);
+      self.book_list = book_list.sort((a, b) => {
+        let a_ = Data.get_book_info(a)
+        let b_ = Data.get_book_info(b)
+        dynasty_map[a_["版本朝代/国别"]] - dynasty_map[b_["版本朝代/国别"]]
+      })
+      
       self.NUM_PARTICLES = this.book_list.length;
       self.PER_NUM = Math.round(this.NUM_PARTICLES / 10);
 
