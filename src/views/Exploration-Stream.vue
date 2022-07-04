@@ -10,7 +10,6 @@
 
 <script>
 import { mapState } from "vuex";
-
 import StreamGraph from "@/components/StreamGraph.vue";
 
 export default {
@@ -41,7 +40,6 @@ export default {
 // }
 
 .streamgraph {
-  background-color: rgba(238, 221, 142, 0.651);
   width: 100vw;
   height: 100vh;
 }

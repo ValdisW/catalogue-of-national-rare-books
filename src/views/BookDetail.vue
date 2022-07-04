@@ -115,10 +115,10 @@ export default {
           this.$refs["book-info-dialog"].$el.style.display = "block";
           this.hover_data = {
             id: data.名录ID,
-            title: this.$store.getters.getData.data
+            title: this.$store.state.allData
               .find((elem) => elem.id == data.名录ID)
               .content.split("　")[0],
-            detail: this.$store.getters.getData.data.find(
+            detail: this.$store.state.allData.find(
               (elem) => elem.id == data.名录ID
             ).detail,
           };

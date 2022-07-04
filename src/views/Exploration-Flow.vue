@@ -11,7 +11,6 @@
 
 <script>
 import { mapState } from "vuex";
-
 import FlowingParticles from "@/components/FlowingParticles.vue";
 import ScrollBar from "@/components/ScrollBar.vue";
 

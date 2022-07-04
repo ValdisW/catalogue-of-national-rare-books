@@ -11,7 +11,10 @@
       </div>
       <ul class="books">
         <li v-for="t in books" :key="t">
-          <router-link v-text="t.id + ' ' + t.content" :to="'/book-detail/' + t.id"></router-link>
+          <router-link
+            v-text="t.id + ' ' + t.content"
+            :to="'/book-detail/' + t.id"
+          ></router-link>
         </li>
       </ul>
       <div class="statistics"></div>
@@ -34,49 +37,76 @@ export default {
     };
   },
   mounted() {
-    axios.get(`/data/institution-detail/${this.$route.params.institutionID}`).then((d) => {
-      this.books = d.data;
-      this.books.forEach((e) => {
-        this.batches[e.batch - 1].push(e);
+    axios
+      .get(`/data/institution-detail/${this.$route.params.institutionID}`)
+      .then((d) => {
+        this.books = d.data;
+        this.books.forEach((e) => {
+          this.batches[e.batch - 1].push(e);
+        });
+
+        let statistics_chart = d3
+          .select(".statistics")
+          .append("svg")
+          .attr("width", "350");
+
+        let batches_data = [];
+        this.batches.forEach((e) => {
+          batches_data.push(e.length);
+        });
+
+        const xScale = d3.scaleLinear([0, d3.max(batches_data)], [30, 300]); // x轴的数值和渲染范围
+        const yScale = d3
+          .scaleBand(
+            new d3.InternSet(d3.map(batches_data, (d, i) => i)),
+            [10, 100]
+          )
+          .padding(0.1);
+        const xAxis = d3.axisTop(xScale).ticks(5);
+        const yAxis = d3.axisLeft(yScale).tickSizeOuter(0);
+
+        statistics_chart
+          .append("g")
+          .attr("transform", `translate(0,${20})`)
+          .call(xAxis)
+          .call((g) => g.select(".domain").remove())
+          .call((g) =>
+            g
+              .selectAll(".tick line")
+              .clone()
+              .attr("y2", 100)
+              .attr("stroke-opacity", 0.1)
+          )
+          .call((g) =>
+            g
+              .append("text")
+              .attr("x", 100)
+              .attr("y", -22)
+              .attr("fill", "currentColor")
+              .attr("text-anchor", "end")
+              .text("xLabel")
+          );
+
+        statistics_chart
+          .append("g")
+          .attr("transform", `translate(${30},0)`)
+          .call(yAxis);
+
+        statistics_chart
+          .append("g")
+          .attr("fill", "#333")
+          .selectAll("rect")
+          .data(batches_data)
+          .join("rect")
+          .attr("x", xScale(0))
+          .attr("y", (d, i) => {
+            return yScale(i);
+          })
+          .attr("width", (d) => {
+            return xScale(d) - xScale(0);
+          })
+          .attr("height", yScale.bandwidth());
       });
-
-      let statistics_chart = d3.select(".statistics").append("svg").attr("width", "350");
-
-      let batches_data = [];
-      this.batches.forEach((e) => {
-        batches_data.push(e.length);
-      });
-
-      const xScale = d3.scaleLinear([0, d3.max(batches_data)], [30, 300]);
-      const yScale = d3.scaleBand(new d3.InternSet(d3.map(batches_data, (d, i) => i)), [10, 100]).padding(0.1);
-      const xAxis = d3.axisTop(xScale).ticks(5);
-      const yAxis = d3.axisLeft(yScale).tickSizeOuter(0);
-
-      statistics_chart
-        .append("g")
-        .attr("transform", `translate(0,${20})`)
-        .call(xAxis)
-        .call((g) => g.select(".domain").remove())
-        .call((g) => g.selectAll(".tick line").clone().attr("y2", 100).attr("stroke-opacity", 0.1))
-        .call((g) => g.append("text").attr("x", 100).attr("y", -22).attr("fill", "currentColor").attr("text-anchor", "end").text("xLabel"));
-
-      statistics_chart.append("g").attr("transform", `translate(${30},0)`).call(yAxis);
-
-      statistics_chart
-        .append("g")
-        .attr("fill", "#333")
-        .selectAll("rect")
-        .data(batches_data)
-        .join("rect")
-        .attr("x", xScale(0))
-        .attr("y", (d, i) => {
-          return yScale(i);
-        })
-        .attr("width", (d) => {
-          return xScale(d) - xScale(0);
-        })
-        .attr("height", yScale.bandwidth());
-    });
   },
 };
 </script>

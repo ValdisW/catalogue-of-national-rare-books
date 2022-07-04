@@ -1,5 +1,4 @@
 import { createStore } from "vuex";
-import axios from "axios";
 
 export default createStore({
   state: {
@@ -11,10 +10,8 @@ export default createStore({
     getData: (state) => state.allData,
   },
   mutations: {
-    loadData(state) {
-      axios.get("/data/").then((res) => {
-        state.allData = res;
-      });
+    loadData(state, _data) {
+      state.allData = _data;
     },
     changeRem(state, payload) {
       state.rem = payload;

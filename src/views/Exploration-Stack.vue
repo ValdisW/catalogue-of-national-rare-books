@@ -80,6 +80,7 @@ export default {
   .button-batch {
     position: absolute;
     top: 50%;
+    left: 5rem;
     transform: translateY(-50%);
   }
   .stack {
