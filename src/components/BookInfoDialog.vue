@@ -27,6 +27,7 @@ export default {
   position: absolute;
   color: #fff;
   display: none;
+  z-index: 1000;
   h4 {
     font-size: 0.9rem;
     span {

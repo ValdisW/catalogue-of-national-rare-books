@@ -14,12 +14,14 @@ export async function loadData() {
   let institution_info = await d3.json("/data/institution.json");
   let province_info = await d3.json("/data/position.json");
   let stack_info = await d3.json("/data/stack.json");
+  let relationship_info = await d3.json("/data/relationship.json");
   Data = {
-    book_info: book_info,
-    batch_info: batch_info,
-    institution_info: institution_info,
-    province_info: province_info,
-    stack_info: stack_info,
+    book_info,
+    batch_info,
+    institution_info,
+    province_info,
+    stack_info,
+    relationship_info,
   };
 }
 
@@ -85,8 +87,7 @@ export function get_statics(displayOrder) {
     for (let j in bacthTitle) {
       let title = bacthTitle[j];
       let len = 0;
-      if (Data.batch_info[title][dispTitle] != undefined)
-        len = Object.keys(Data.batch_info[title][dispTitle]).length;
+      if (Data.batch_info[title][dispTitle] != undefined) len = Object.keys(Data.batch_info[title][dispTitle]).length;
       // console.log(title, Data.batch_info[title], len)
       dict[title] = len;
     }
@@ -120,4 +121,8 @@ export function get_stack_data(xOrder, yOrder, batchSel) {
 
 export function get_province_list() {
   return Data.province_info;
+}
+
+export function get_relationship_list() {
+  return Data.relationship_info;
 }

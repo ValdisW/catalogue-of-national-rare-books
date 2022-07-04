@@ -1,21 +1,32 @@
 <template>
-  <nav>
-    <router-link to="/">名录介绍</router-link> |
-    <router-link to="/exploration">古籍浏览</router-link>
-  </nav>
-  <router-view v-slot="{ Component }" :key="$route.fullPath">
-    <keep-alive>
-      <component :is="Component" />
-    </keep-alive>
-  </router-view>
+  <Loading :complete="complete" />
+  <div id="main-container" v-if="complete">
+    <nav>
+      <router-link to="/">名录介绍</router-link> |
+      <router-link to="/exploration">古籍浏览</router-link>
+    </nav>
+    <router-view v-slot="{ Component }" :key="$route.fullPath">
+      <keep-alive>
+        <component :is="Component" />
+      </keep-alive>
+    </router-view>
+  </div>
 </template>
 
 <script>
+import axios from "axios";
+import Loading from "@/components/Loading";
+
 const baseSize = 20;
 
 export default {
   name: "App",
-
+  components: { Loading },
+  data() {
+    return {
+      complete: false,
+    };
+  },
   methods: {
     PageSize() {
       let width = window.innerWidth;
@@ -32,16 +43,21 @@ export default {
       this.$store.commit("changeRem", rem);
       document.documentElement.style.fontSize = rem + "px";
     },
+    loadData() {
+      axios.get("/data/").then((res) => {
+        this.$store.commit("loadData", res.data);
+        this.complete = true;
+      });
+    },
     init() {
       this.setRem();
       window.onresize = () => {
         this.init();
       };
+      this.loadData();
     },
   },
   mounted() {
-    this.$store.commit("loadData");
-
     this.init();
   },
 };
@@ -55,10 +71,12 @@ export default {
 html {
   // font-size: 20px;
   overflow-y: hidden;
-  background-color: #f2e0c4;
 }
 nav {
   position: fixed;
   z-index: 100;
+}
+#main-container {
+  background-color: #f2e0c4;
 }
 </style>

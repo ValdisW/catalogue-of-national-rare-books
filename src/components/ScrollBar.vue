@@ -1,7 +1,11 @@
 <template>
   <div class="scroll-bar" @mouseup="up">
     <div class="bar-axis"></div>
-    <div class="bar-block" @mousedown="down" @mousemove="move"></div>
+    <div
+      class="bar-block"
+      @mousedown.prevent="handleDown"
+      ref="bar-block"
+    ></div>
   </div>
 </template>
 
@@ -12,7 +16,8 @@ export default {
   props: ["canvasWidth", "canvasHeight"],
   data() {
     return {
-      rate: -0.1,
+      // rate: -0.1,
+      rate: 0,
       width: this.$store.state.rem * 20,
       height: window.innerHeight * 0.1,
       isMouseDown: false,
@@ -26,7 +31,7 @@ export default {
     },
   },
   methods: {
-    down(e) {
+    handleDown(e) {
       this.isMouseDown = true;
       this.startX = e.offsetX;
       // let x = e.offsetX - this.bar_width / 2;
@@ -34,18 +39,19 @@ export default {
       // if (x + this.bar_width >= this.width) x = this.width - this.bar_width;
       // e.target.style.left = x + "px";
       // this.rate = x / this.width;
+      window.addEventListener("mousemove", this.handleMove);
     },
-    move(e) {
+    handleMove(e) {
       if (this.isMouseDown) {
         this.currentX += e.offsetX - this.startX;
         if (this.currentX < 0) this.currentX = 0;
         if (this.currentX > this.width) this.currentX = this.width;
-        e.target.style.left = this.currentX + "px";
-        this.rate = (this.currentX / this.width) * 1.2 - 0.1;
+        this.$refs["bar-block"].style.left = this.currentX + "px";
+        // this.rate = (this.currentX / this.width) * 1.2 - 0.1;
+        this.rate = this.currentX / this.width;
       }
     },
     up() {
-      console.log("mouseup");
       this.isMouseDown = false;
     },
   },

@@ -15,10 +15,13 @@
       </div>
       <div class="cover">
         <div>
-          <h1>国家珍贵古籍名录</h1>
+          <div>
+            <h1>国<br />家<br />珍<br />贵<br />古<br />籍<br />名<br />录</h1>
+          </div>
         </div>
       </div>
-      <div class="slider"></div>
+      <div class="slider" @click="toNextPage()"></div>
+      <div class="mouse-tip"></div>
       <router-link to="/exploration">转到检索系统>></router-link>
     </section>
     <section class="section-2">
@@ -58,12 +61,55 @@ export default {
   data() {
     return {
       now: new Date(),
+      everyday_book_list: ["01523", "01524", "01525", "01526"],
+      scrolling: false,
+      current_page: 1,
+      page_width: Number,
     };
   },
   methods: {
     rowScroll(e) {
-      this.$refs.introduction.scrollLeft += e.deltaY;
+      // this.$refs.introduction.scrollLeft += e.deltaY; // 普通滚动
+      if (!this.scrolling)
+        if (e.deltaY > 0) this.toNextPage();
+        else this.toPrevPage();
     },
+    toNextPage() {
+      if (this.current_page < 4) {
+        this.moveToPage(this.current_page + 1);
+      }
+    },
+    toPrevPage() {
+      if (this.current_page > 1) {
+        this.moveToPage(this.current_page - 1);
+      }
+    },
+    moveToPage(target_page) {
+      if (target_page > this.current_page) {
+        let t = setInterval(() => {
+          this.scrolling = true;
+          this.$refs.introduction.scrollLeft += (this.page_width / 200) * (target_page - this.current_page);
+          if (this.$refs.introduction.scrollLeft >= (target_page - 1) * this.page_width) {
+            this.scrolling = false;
+            this.current_page = target_page;
+            clearInterval(t);
+          }
+        }, 1);
+      } else {
+        let t = setInterval(() => {
+          this.scrolling = true;
+          this.$refs.introduction.scrollLeft += (this.page_width / 200) * (target_page - this.current_page);
+          if (this.$refs.introduction.scrollLeft <= (target_page - 1) * this.page_width) {
+            this.scrolling = false;
+            this.current_page = target_page;
+            clearInterval(t);
+          }
+        }, 1);
+      }
+    },
+  },
+  mounted() {
+    this.page_width = this.$refs.introduction.clientWidth;
   },
 };
 </script>
@@ -87,8 +133,9 @@ export default {
   align-items: center;
   // padding: 5rem 0 0;
   box-sizing: border-box;
+  background: url(../assets/book-bg.png);
   .cover {
-    background-color: #333;
+    background-color: #111;
     width: 20rem;
     height: 90vh;
     box-shadow: 5px 5px 10px 0 #666;
@@ -97,13 +144,20 @@ export default {
     align-items: center;
     div {
       background: #ffda99;
-      width: 3rem;
-      h1 {
-        text-align: center;
-        font-size: 2.3rem;
-        font-weight: normal;
-        letter-spacing: 0.4rem;
-        margin: 0 0 2rem;
+      padding: 10px;
+      div {
+        border: 4px solid #111;
+        padding: 3px;
+        h1 {
+          border: 2px solid #111;
+          padding: 12px 6px;
+          font-family: "华文楷体";
+          text-align: center;
+          font-size: 2.3rem;
+          line-height: 2.8rem;
+          font-weight: normal;
+          letter-spacing: 0.4rem;
+        }
       }
     }
   }
@@ -112,6 +166,28 @@ export default {
     width: 7rem;
     height: 2rem;
     cursor: pointer;
+  }
+
+  @keyframes mousetip1 {
+    0% {
+      left: 70vw;
+    }
+    70% {
+      left: 80vw;
+    }
+    100% {
+      left: 80vw;
+      opacity: 0;
+    }
+  }
+  .mouse-tip {
+    background: url(../assets/icons/mouse.svg) no-repeat;
+    position: absolute;
+    top: 55vh;
+    left: 70vw;
+    width: 2rem;
+    height: 3rem;
+    animation: mousetip1 4s ease-out infinite;
   }
   .everyday-book {
     width: 5rem;

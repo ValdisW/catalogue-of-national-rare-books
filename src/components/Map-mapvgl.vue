@@ -1,6 +1,6 @@
 <template>
   <div class="spatialSampling">
-    <div id="map_container"></div>
+    <div id="map_container" @wheel.stop=""></div>
     <div id="map-list">
       <ul>
         <li v-for="(city, index) in province_info" :key="index" :id="`list-${index}`" :show="false">
@@ -243,12 +243,10 @@ export default {
         }
         self.showTooltip(e, index.dataItem.properties);
       });
-      console.log(map);
       return map;
     },
     initTooltip() {
       this.tooltipBox = document.getElementById("tooltip-box");
-      console.log(this.tooltipBox);
       // let tooltip = document.getElementById("tooltip")
       // let toolTipBox = document.createElement("div")
       // toolTipBox.className = "tooltip-box"
