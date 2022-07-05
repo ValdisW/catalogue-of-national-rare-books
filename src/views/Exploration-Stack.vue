@@ -5,7 +5,7 @@
       :canvasWidth="toWidth(0.7)"
       :canvasHeight="toHeight(0.8)"
       :batchSel="batchSel"
-    ></Stack>
+    />
     <div class="button-batch">
       <ButtonBatch
         v-for="(batch, index) in batchKeys"

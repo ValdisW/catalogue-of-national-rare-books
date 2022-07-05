@@ -10,7 +10,13 @@
           <div class="down-arrow"></div>
           <div class="options">
             <ul>
-              <li v-for="e in batches" :key="e.name" :val="e.value" v-text="e.name" @click.stop="choose"></li>
+              <li
+                v-for="e in batches"
+                :key="e.name"
+                :val="e.value"
+                v-text="e.name"
+                @click.stop="choose"
+              ></li>
             </ul>
           </div>
         </div>
@@ -20,30 +26,56 @@
           <div class="down-arrow"></div>
           <div class="options">
             <ul>
-              <li v-for="e in languages" :key="e.name" :val="e.value" v-text="e.name" @click.stop="choose"></li>
+              <li
+                v-for="e in languages"
+                :key="e.name"
+                :val="e.value"
+                v-text="e.name"
+                @click.stop="choose"
+              ></li>
             </ul>
             <!-- <ul v-if="e.children" class="sub-list">
               <li v-for="ee in e.children" :key="ee.name" v-text="ee.name"></li>
             </ul> -->
           </div>
         </div>
-        <div class="filter" id="dynasty_or_nation" @click="showFilterOptions($event)">
+        <div
+          class="filter"
+          id="dynasty_or_nation"
+          @click="showFilterOptions($event)"
+        >
           <p class="name">版本年代/国别</p>
           <p class="value" val="">不限</p>
           <div class="down-arrow"></div>
           <div class="options">
             <ul>
-              <li v-for="e in dynasties" :key="e.name" :val="e.value" v-text="e.name" @click.stop="choose"></li>
+              <li
+                v-for="e in dynasties"
+                :key="e.name"
+                :val="e.value"
+                v-text="e.name"
+                @click.stop="choose"
+              ></li>
             </ul>
           </div>
         </div>
-        <div class="filter" id="document_type" @click="showFilterOptions($event)">
+        <div
+          class="filter"
+          id="document_type"
+          @click="showFilterOptions($event)"
+        >
           <p class="name">文獻類型</p>
           <p class="value" val="">不限</p>
           <div class="down-arrow"></div>
           <div class="options">
             <ul>
-              <li v-for="e in document_types" :key="e.name" :val="e.value" v-text="e.name" @click.stop="choose"></li>
+              <li
+                v-for="e in document_types"
+                :key="e.name"
+                :val="e.value"
+                v-text="e.name"
+                @click.stop="choose"
+              ></li>
             </ul>
           </div>
         </div>
@@ -53,7 +85,13 @@
           <div class="down-arrow"></div>
           <div class="options">
             <ul>
-              <li v-for="e in editions" :key="e.name" :val="e.value" v-text="e.name" @click.stop="choose"></li>
+              <li
+                v-for="e in editions"
+                :key="e.name"
+                :val="e.value"
+                v-text="e.name"
+                @click.stop="choose"
+              ></li>
             </ul>
           </div>
         </div>
@@ -86,31 +124,59 @@
           </tr>
           <tr v-for="item in curr_d" :key="item.id" class="item-block">
             <td>
-              <router-link v-text="item.id" :to="'/book-detail/' + item.id"></router-link>
+              <router-link
+                v-text="item.id"
+                :to="'/book-detail/' + item.id"
+              ></router-link>
             </td>
             <td>
-              <router-link v-text="item.content.split('　')[0]" :to="'/book-detail/' + item.id"></router-link>
+              <router-link
+                v-text="item.content.split('　')[0]"
+                :to="'/book-detail/' + item.id"
+              ></router-link>
             </td>
             <td>
-              <router-link v-text="item.content" :to="'/book-detail/' + item.id"></router-link>
+              <router-link
+                v-text="item.content"
+                :to="'/book-detail/' + item.id"
+              ></router-link>
             </td>
             <td v-text="item.document_type"></td>
             <td v-text="item.language"></td>
             <td v-text="item.institution"></td>
           </tr>
         </table>
-        <PageDivider @turnTo="alterPage" :items_sum="items_sum" :each_page_items="each_page_items" />
+        <PageDivider
+          @turnTo="alterPage"
+          :items_sum="items_sum"
+          :each_page_items="each_page_items"
+        />
       </div>
       <div class="results results-relation" v-show="relationship_mode">
         <!-- 关系发现 -->
         <div class="graph" ref="graph-chart"></div>
       </div>
       <div class="toggle-view">
-        <div @click="toggleRelationshipMode" :class="{ inactive: relationship_mode }">古籍检索</div>
-        <div @click="toggleRelationshipMode" :class="{ inactive: !relationship_mode }">关系发现</div>
+        <div
+          @click="toggleRelationshipMode"
+          :class="{ inactive: relationship_mode }"
+        >
+          古籍检索
+        </div>
+        <div
+          @click="toggleRelationshipMode"
+          :class="{ inactive: !relationship_mode }"
+        >
+          关系发现
+        </div>
       </div>
     </div>
-    <BookInfoDialog ref="book-info-dialog" :id="hover_data.id" :title="hover_data.title" :detail="hover_data.detail" />
+    <BookInfoDialog
+      ref="book-info-dialog"
+      :id="hover_data.id"
+      :title="hover_data.title"
+      :detail="hover_data.detail"
+    />
   </div>
 </template>
 
@@ -244,7 +310,11 @@ export default {
         },
         {
           name: "活字本",
-          children: [{ name: "銅活字本" }, { name: "木活字本" }, { name: "泥活字本" }],
+          children: [
+            { name: "銅活字本" },
+            { name: "木活字本" },
+            { name: "泥活字本" },
+          ],
         },
         { name: "修補本" },
         { name: "集配本" },
@@ -308,9 +378,15 @@ export default {
     // 开始搜索。根据检索词及筛选条件
     search() {
       let batch = document.querySelector("#batch>.value").getAttribute("val"),
-        language = document.querySelector("#language>.value").getAttribute("val"),
-        document_type = document.querySelector("#document_type>.value").getAttribute("val"),
-        edition_dynasty = document.querySelector("#dynasty_or_nation>.value").getAttribute("val");
+        language = document
+          .querySelector("#language>.value")
+          .getAttribute("val"),
+        document_type = document
+          .querySelector("#document_type>.value")
+          .getAttribute("val"),
+        edition_dynasty = document
+          .querySelector("#dynasty_or_nation>.value")
+          .getAttribute("val");
       axios
         .get(
           `/data/text?query=${this.$refs.text.value}&batch=${batch}&language=${language}&document_type=${document_type}&edition_dynasty=${edition_dynasty}`
@@ -333,14 +409,24 @@ export default {
       ); // 当前页码的文件
     },
     showFilterOptions(e) {
-      let b = e.currentTarget.querySelector(".options").style.display == "block";
-      document.querySelectorAll(".options").forEach((e) => (e.style.display = "none"));
-      e.currentTarget.querySelector(".options").style.display = b ? "none" : "block";
+      let b =
+        e.currentTarget.querySelector(".options").style.display == "block";
+      document
+        .querySelectorAll(".options")
+        .forEach((e) => (e.style.display = "none"));
+      e.currentTarget.querySelector(".options").style.display = b
+        ? "none"
+        : "block";
     },
     choose(e) {
-      document.querySelectorAll(".options").forEach((e) => (e.style.display = "none"));
+      document
+        .querySelectorAll(".options")
+        .forEach((e) => (e.style.display = "none"));
       let parent_filter_value = e.path[3].querySelector(".value");
-      parent_filter_value.setAttribute("val", e.currentTarget.getAttribute("val"));
+      parent_filter_value.setAttribute(
+        "val",
+        e.currentTarget.getAttribute("val")
+      );
       parent_filter_value.innerText = e.currentTarget.innerText;
     },
     toggleRelationshipMode() {
@@ -399,9 +485,14 @@ export default {
         const LT = d3.map(links, linkTarget).map(intern);
         if (nodeTitle === undefined) nodeTitle = (_, i) => N[i];
         // const T = nodeTitle == null ? null : d3.map(nodes, nodeTitle);
-        const G = nodeGroup == null ? null : d3.map(nodes, nodeGroup).map(intern);
-        const W = typeof linkStrokeWidth !== "function" ? null : d3.map(links, linkStrokeWidth);
-        const L = typeof linkStroke !== "function" ? null : d3.map(links, linkStroke);
+        const G =
+          nodeGroup == null ? null : d3.map(nodes, nodeGroup).map(intern);
+        const W =
+          typeof linkStrokeWidth !== "function"
+            ? null
+            : d3.map(links, linkStrokeWidth);
+        const L =
+          typeof linkStroke !== "function" ? null : d3.map(links, linkStroke);
 
         // Replace the input nodes and links with mutable objects for the simulation.
         nodes = d3.map(nodes, (_, i) => ({ id: N[i] }));
@@ -411,7 +502,8 @@ export default {
         if (G && nodeGroups === undefined) nodeGroups = d3.sort(G);
 
         // Construct the scales.
-        const color = nodeGroup == null ? null : d3.scaleOrdinal(nodeGroups, colors);
+        const color =
+          nodeGroup == null ? null : d3.scaleOrdinal(nodeGroups, colors);
 
         // Construct the forces.
         const forceNode = d3.forceManyBody();
@@ -437,7 +529,10 @@ export default {
           .append("g")
           .attr("stroke", typeof linkStroke !== "function" ? linkStroke : null)
           .attr("stroke-opacity", linkStrokeOpacity)
-          .attr("stroke-width", typeof linkStrokeWidth !== "function" ? linkStrokeWidth : null)
+          .attr(
+            "stroke-width",
+            typeof linkStrokeWidth !== "function" ? linkStrokeWidth : null
+          )
           .attr("stroke-linecap", linkStrokeLinecap)
           .selectAll("line")
           .data(links)
@@ -460,14 +555,19 @@ export default {
           .on("mouseenter", (e, d) => {
             self.hover_data = {
               id: d.id,
-              title: self.$store.state.allData.find((elem) => elem.id == d.id).content.split("　")[0],
-              detail: self.$store.state.allData.find((elem) => elem.id == d.id).detail,
+              title: self.$store.state.allData
+                .find((elem) => elem.id == d.id)
+                .content.split("　")[0],
+              detail: self.$store.state.allData.find((elem) => elem.id == d.id)
+                .detail,
             };
             self.$refs["book-info-dialog"].$el.style.display = "block";
           })
           .on("mousemove", (e) => {
-            self.$refs["book-info-dialog"].$el.style.left = e.clientX + 10 + "px";
-            self.$refs["book-info-dialog"].$el.style.top = e.clientY + 30 + "px";
+            self.$refs["book-info-dialog"].$el.style.left =
+              e.clientX + 10 + "px";
+            self.$refs["book-info-dialog"].$el.style.top =
+              e.clientY + 30 + "px";
           })
           .on("mouseleave", () => {
             self.$refs["book-info-dialog"].$el.style.display = "none";
@@ -481,7 +581,9 @@ export default {
         if (invalidation != null) invalidation.then(() => simulation.stop());
 
         function intern(value) {
-          return value !== null && typeof value === "object" ? value.valueOf() : value;
+          return value !== null && typeof value === "object"
+            ? value.valueOf()
+            : value;
         }
 
         function ticked() {
@@ -512,7 +614,11 @@ export default {
             event.subject.fy = null;
           }
 
-          return d3.drag().on("start", dragstarted).on("drag", dragged).on("end", dragended);
+          return d3
+            .drag()
+            .on("start", dragstarted)
+            .on("drag", dragged)
+            .on("end", dragended);
         }
 
         return Object.assign(svg.node(), { scales: { color } });

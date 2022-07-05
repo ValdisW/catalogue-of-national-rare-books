@@ -33,7 +33,10 @@ export default {
       } while (r < 100);
     },
     randomNormal(o) {
-      if (((o = Object.assign({ mean: 0, dev: 1, pool: [] }, o)), Array.isArray(o.pool) && o.pool.length > 0))
+      if (
+        ((o = Object.assign({ mean: 0, dev: 1, pool: [] }, o)),
+        Array.isArray(o.pool) && o.pool.length > 0)
+      )
         return this.normalPool(o);
       var r,
         a,
@@ -58,7 +61,12 @@ export default {
           [0, 0],
           [this.svg.attr("width"), this.svg.attr("height")],
         ])
-        .tips(["名录ID", "图录解说"], ["名录ID: ", "图录解说: "], [null], processFunc)
+        .tips(
+          ["名录ID", "图录解说"],
+          ["名录ID: ", "图录解说: "],
+          [null],
+          processFunc
+        )
         .fontSize(16)
         .padding([8, 4])
         .margin([10, 10]);
@@ -197,7 +205,11 @@ export default {
       this.initializePointAttribute();
 
       d3.select(this.$el).selectAll("svg").remove();
-      this.svg = d3.select(this.$el).append("svg").attr("width", width).attr("height", height);
+      this.svg = d3
+        .select(this.$el)
+        .append("svg")
+        .attr("width", width)
+        .attr("height", height);
 
       this.flow = this.svg.append("g").attr("id", "points");
 

@@ -3,8 +3,15 @@
     <div id="map_container" @wheel.stop=""></div>
     <div id="map-list">
       <ul>
-        <li v-for="(city, index) in province_info" :key="index" :id="`list-${index}`" :show="false">
-          <p @click="clickProvince(city, index)">{{ city.name }} - {{ city.count }}</p>
+        <li
+          v-for="(city, index) in province_info"
+          :key="index"
+          :id="`list-${index}`"
+          :show="false"
+        >
+          <p @click="clickProvince(city, index)">
+            {{ city.name }} - {{ city.count }}
+          </p>
         </li>
       </ul>
     </div>

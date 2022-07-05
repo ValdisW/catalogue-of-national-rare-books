@@ -87,7 +87,8 @@ export function get_statics(displayOrder) {
     for (let j in bacthTitle) {
       let title = bacthTitle[j];
       let len = 0;
-      if (Data.batch_info[title][dispTitle] != undefined) len = Object.keys(Data.batch_info[title][dispTitle]).length;
+      if (Data.batch_info[title][dispTitle] != undefined)
+        len = Object.keys(Data.batch_info[title][dispTitle]).length;
       // console.log(title, Data.batch_info[title], len)
       dict[title] = len;
     }

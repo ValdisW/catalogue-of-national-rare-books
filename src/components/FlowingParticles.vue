@@ -1,6 +1,11 @@
 <template>
   <div id="flow">
-    <BookInfoDialog ref="book-info-dialog" :id="hover_data.id" :title="hover_data.title" :detail="hover_data.detail" />
+    <BookInfoDialog
+      ref="book-info-dialog"
+      :id="hover_data.id"
+      :title="hover_data.title"
+      :detail="hover_data.detail"
+    />
   </div>
 </template>
 
@@ -40,7 +45,10 @@ export default {
       } while (r < 100);
     },
     randomNormal(o) {
-      if (((o = Object.assign({ mean: 0, dev: 1, pool: [] }, o)), Array.isArray(o.pool) && o.pool.length > 0))
+      if (
+        ((o = Object.assign({ mean: 0, dev: 1, pool: [] }, o)),
+        Array.isArray(o.pool) && o.pool.length > 0)
+      )
         return this.normalPool(o);
       var r,
         a,
@@ -114,12 +122,14 @@ export default {
         .attr("fill", (d) => d.color)
         .attr("r", (d) => d.radius)
         .attr("cx", (d, i) => {
-          const progress = ((i + rate * this.NUM_PARTICLES) % this.PER_NUM) / this.PER_NUM;
+          const progress =
+            ((i + rate * this.NUM_PARTICLES) % this.PER_NUM) / this.PER_NUM;
           return progress * width;
         })
         .attr("cy", (d, i) => {
           let attr = this.point_attribute[i];
-          const progress = ((i + rate * this.NUM_PARTICLES) % this.PER_NUM) / this.PER_NUM;
+          const progress =
+            ((i + rate * this.NUM_PARTICLES) % this.PER_NUM) / this.PER_NUM;
           let y = Math.sin(progress * attr.arc) * attr.amplitude + attr.offsetY;
           return y * this.vh + height / 2;
         });
@@ -132,16 +142,21 @@ export default {
         })
         // .on("mouseenter", () => (this.$refs["book-info-dialog"].$el.style.display = "block"))
         .on("mousemove", (ev) => {
-          this.$refs["book-info-dialog"].$el.style.left = ev.clientX + 10 + "px";
-          this.$refs["book-info-dialog"].$el.style.top = ev.clientY - 120 + "px";
+          this.$refs["book-info-dialog"].$el.style.left =
+            ev.clientX + 10 + "px";
+          this.$refs["book-info-dialog"].$el.style.top =
+            ev.clientY - 120 + "px";
         })
         .on("mouseenter", (ev, data) => {
           this.$refs["book-info-dialog"].$el.style.display = "block";
           console.log(this.$refs["book-info-dialog"]);
           this.hover_data = {
             id: data.id,
-            title: this.$store.state.allData.find((elem) => elem.id == data.id).content.split("　")[0],
-            detail: this.$store.state.allData.find((elem) => elem.id == data.id).detail,
+            title: this.$store.state.allData
+              .find((elem) => elem.id == data.id)
+              .content.split("　")[0],
+            detail: this.$store.state.allData.find((elem) => elem.id == data.id)
+              .detail,
           };
         })
         .on("mouseleave", () => {
@@ -175,7 +190,11 @@ export default {
       this.initializePointAttribute();
 
       d3.select(this.$el).selectAll("svg").remove();
-      this.svg = d3.select(this.$el).append("svg").attr("width", width).attr("height", height);
+      this.svg = d3
+        .select(this.$el)
+        .append("svg")
+        .attr("width", width)
+        .attr("height", height);
 
       this.flow = this.svg.append("g").attr("id", "points");
 
