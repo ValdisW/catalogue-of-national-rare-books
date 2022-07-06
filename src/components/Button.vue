@@ -23,7 +23,6 @@ export default {
   data() {
     return {};
   },
-  computed: {},
   watch: {
     // view(newVal) {
     //     d3.select(this.$el).select(".show").attr("class", "hidden");
@@ -40,7 +39,6 @@ export default {
       this.$emit("changeView", view);
     },
   },
-  mounted() {},
 };
 </script>
 

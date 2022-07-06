@@ -2,8 +2,23 @@
   <Loading :complete="complete" />
   <div id="main-container" v-if="complete">
     <nav>
-      <router-link to="/">名录介绍</router-link> |
-      <router-link to="/exploration">古籍浏览</router-link>
+      <ul>
+        <li @mouseenter="showSub = true" @mouseleave="showSub = false">
+          <router-link to="/">名錄介紹</router-link>
+          <ul v-show="showSub">
+            <li><a href="#particles">首屏</a></li>
+            <li><a href="#particles">粒子</a></li>
+            <li><a href="#particles">統計</a></li>
+            <li><a href="#particles">地點</a></li>
+          </ul>
+        </li>
+        <li>
+          <router-link to="/exploration">古籍瀏覽</router-link>
+        </li>
+        <li>
+          <router-link to="/relationship">關係發現</router-link>
+        </li>
+      </ul>
     </nav>
     <router-view v-slot="{ Component }" :key="$route.fullPath">
       <keep-alive>
@@ -25,6 +40,7 @@ export default {
   data() {
     return {
       complete: false,
+      showSub: false,
     };
   },
   methods: {
@@ -33,7 +49,6 @@ export default {
       let height = Math.min(window.innerHeight, (width * 9) / 16);
       width = (height * 16) / 9;
       let size = { width, height };
-      console.log(size);
       return size;
     },
     setRem() {
@@ -44,8 +59,9 @@ export default {
       document.documentElement.style.fontSize = rem + "px";
     },
     loadData() {
-      axios.get("/data/").then((res) => {
-        this.$store.commit("loadData", res.data);
+      let resources = Promise.all([axios.get("/data/")]);
+      resources.then((res) => {
+        this.$store.commit("loadData", res[0].data);
         this.complete = true;
       });
     },
@@ -67,6 +83,7 @@ export default {
 * {
   margin: 0;
   padding: 0;
+  font-family: "SourceHanSerif";
 }
 html {
   // font-size: 20px;
@@ -74,7 +91,31 @@ html {
 }
 nav {
   position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
   z-index: 100;
+  ul {
+    list-style: none;
+    li {
+      margin: 1rem;
+      position: relative;
+      a {
+        color: #77664b;
+        text-decoration: none;
+        font-family: "SourceHanSerif";
+        font-weight: normal;
+      }
+      ul {
+        position: absolute;
+        left: 3rem;
+        top: 0;
+        transform: translateY(-50%);
+        li {
+          width: 5rem;
+        }
+      }
+    }
+  }
 }
 #main-container {
   background-color: #f2e0c4;

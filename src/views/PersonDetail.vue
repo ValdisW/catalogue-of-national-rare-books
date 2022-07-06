@@ -13,7 +13,14 @@
           </li>
         </ul>
       </div>
-      <div class="related-person"></div>
+      <div class="related-person">
+        <p v-for="b in this.related_person" :key="b">
+          <router-link
+            :to="/person-detail/ + b.责任人姓名"
+            v-text="b.责任人姓名 + ' ' + b.count"
+          ></router-link>
+        </p>
+      </div>
     </div>
     <BookInfoDialog
       ref="book-info-dialog"
@@ -26,7 +33,7 @@
 
 <script>
 import axios from "axios";
-import * as d3 from "d3";
+// import * as d3 from "d3";
 import BookInfoDialog from "@/components/BookInfoDialog";
 import BackButton from "@/components/BackButton";
 
@@ -279,61 +286,62 @@ export default {
         this.relatedBooks = d.data[0];
 
         this.related_person = d.data[1];
+        this.related_person.sort((a, b) => b.count - a.count);
         let max = 0,
           min = Number.POSITIVE_INFINITY;
         for (let p of this.related_person) {
           if (max > p.count) max = p.count;
           if (min < p.count) min = p.count;
         }
-        let rp = d3.select(".related-person");
-        rp.selectAll("div")
-          .data(this.related_person)
-          .enter()
-          .append("div")
-          .style("width", "16px")
-          .style("height", "16px")
-          .style("border-radius", "50%")
-          .style("background", "#4a330066")
-          .style("display", "inline-block")
-          .style("cursor", "pointer")
-          .style("margin", "2px")
-          .style("position", "absolute")
-          .style(
-            "left",
-            (e, i, a) =>
-              `${
-                250 +
-                (200 - e.count * 10) * Math.cos(((Math.PI * 2) / a.length) * i)
-              }px`
-          )
-          .style(
-            "top",
-            (e, i, a) =>
-              `${
-                250 +
-                (200 - e.count * 10) * Math.sin(((Math.PI * 2) / a.length) * i)
-              }px`
-          )
-          .on("click", (e, d) => {
-            this.$router.push(`/person-detail/${d.责任人姓名}`);
-          })
-          .on("mousemove", (ev) => {
-            this.$refs["book-info-dialog"].$el.style.left =
-              ev.clientX + 10 + "px";
-            this.$refs["book-info-dialog"].$el.style.top =
-              ev.clientY + 30 + "px";
-          })
-          .on("mouseenter", (ev, data) => {
-            ev.target.style.background = "#da9f21";
-            this.$refs["book-info-dialog"].$el.style.display = "block";
-            this.hover_data = {
-              title: data.责任人姓名,
-            };
-          })
-          .on("mouseleave", (ev) => {
-            ev.target.style.background = "#4a330066";
-            this.$refs["book-info-dialog"].$el.style.display = "none";
-          });
+        // let rp = d3.select(".related-person");
+        // rp.selectAll("div")
+        //   .data(this.related_person)
+        //   .enter()
+        //   .append("div")
+        //   .style("width", "16px")
+        //   .style("height", "16px")
+        //   .style("border-radius", "50%")
+        //   .style("background", "#4a330066")
+        //   .style("display", "inline-block")
+        //   .style("cursor", "pointer")
+        //   .style("margin", "2px")
+        //   .style("position", "absolute")
+        //   .style(
+        //     "left",
+        //     (e, i, a) =>
+        //       `${
+        //         250 +
+        //         (200 - e.count * 10) * Math.cos(((Math.PI * 2) / a.length) * i)
+        //       }px`
+        //   )
+        //   .style(
+        //     "top",
+        //     (e, i, a) =>
+        //       `${
+        //         250 +
+        //         (200 - e.count * 10) * Math.sin(((Math.PI * 2) / a.length) * i)
+        //       }px`
+        //   )
+        //   .on("click", (e, d) => {
+        //     this.$router.push(`/person-detail/${d.责任人姓名}`);
+        //   })
+        //   .on("mousemove", (ev) => {
+        //     this.$refs["book-info-dialog"].$el.style.left =
+        //       ev.clientX + 10 + "px";
+        //     this.$refs["book-info-dialog"].$el.style.top =
+        //       ev.clientY + 30 + "px";
+        //   })
+        //   .on("mouseenter", (ev, data) => {
+        //     ev.target.style.background = "#da9f21";
+        //     this.$refs["book-info-dialog"].$el.style.display = "block";
+        //     this.hover_data = {
+        //       title: data.责任人姓名,
+        //     };
+        //   })
+        //   .on("mouseleave", (ev) => {
+        //     ev.target.style.background = "#4a330066";
+        //     this.$refs["book-info-dialog"].$el.style.display = "none";
+        //   });
       });
   },
 };
@@ -361,9 +369,14 @@ export default {
     }
   }
   .related-person {
+    a {
+      color: #000;
+    }
     position: relative;
-    width: 500px;
+    font-size: 0.8rem;
+    width: 300px;
     height: 500px;
+    overflow-y: scroll;
   }
 }
 </style>

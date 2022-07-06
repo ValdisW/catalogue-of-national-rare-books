@@ -1,6 +1,6 @@
 <template>
   <div class="exploration-flow">
-    <ScrollBar v-on:changeRate="updateRate" />
+    <Slider v-on:changeRate="updateRate" />
     <FlowingParticles
       :rate="rate"
       :canvasWidth="toWidth(1)"
@@ -12,13 +12,13 @@
 <script>
 import { mapState } from "vuex";
 import FlowingParticles from "@/components/FlowingParticles.vue";
-import ScrollBar from "@/components/ScrollBar.vue";
+import Slider from "@/components/Slider.vue";
 
 export default {
   name: "Exploration-Flow",
   components: {
     FlowingParticles,
-    ScrollBar,
+    Slider,
   },
   data() {
     return {
@@ -35,7 +35,6 @@ export default {
     toHeight(p) {
       return window.innerHeight * p;
     },
-
     updateRate(rate) {
       this.rate = rate;
     },

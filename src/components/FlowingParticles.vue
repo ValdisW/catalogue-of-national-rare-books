@@ -1,7 +1,16 @@
 <template>
   <div id="flow">
-    <BookInfoDialog
-      ref="book-info-dialog"
+    <!-- <div>
+        <p>《国家珍贵古籍名录》是由国务院批准发布的我国现存珍贵古籍目录。</p>
+        <p>
+          2007年，国务院办公厅发布《关于进一步加强古籍保护工作的意见》，启动了“中华古籍保护计划”。其中一项重要任务，就是建立《国家珍贵古籍名录》，实现国家对古籍的分级管理和保护，目的是要建立完备的珍贵古籍档案，确保珍贵古籍的安全。入选典籍为国内存世古籍中具有代表性的精品，且在《国家珍贵古籍名录》评审过程中，一些珍贵古籍的新品种、新版本、新价值被陆续发现。
+        </p>
+        <p>
+          目前，国务院已批准公布六批《国家珍贵古籍名录》，全国487家机构/个人收藏的13026部古籍入选，囊括先秦两汉至明清时期的汉文古籍、少数民族文字古籍和其他文字古籍。
+        </p>
+      </div> -->
+    <BookDetailTooltip
+      ref="book-detail-tooltip"
       :id="hover_data.id"
       :title="hover_data.title"
       :detail="hover_data.detail"
@@ -12,11 +21,11 @@
 <script>
 const d3 = require("d3");
 import * as Data from "@/data/dataLoader";
-import BookInfoDialog from "@/components/BookInfoDialog";
+import BookDetailTooltip from "@/components/BookDetailTooltip";
 
 export default {
   name: "FlowingParticles",
-  components: { BookInfoDialog },
+  components: { BookDetailTooltip },
   props: ["rate", "canvasWidth", "canvasHeight"],
   data() {
     return {
@@ -37,20 +46,17 @@ export default {
   methods: {
     // modified version of random-normal
     normalPool(o) {
-      var r = 0;
+      let r = 0;
       do {
-        var a = Math.round(this.normal({ mean: o.mean, dev: o.dev }));
+        let a = Math.round(this.normal({ mean: o.mean, dev: o.dev }));
         if (a < o.pool.length && a >= 0) return o.pool[a];
         r++;
       } while (r < 100);
     },
     randomNormal(o) {
-      if (
-        ((o = Object.assign({ mean: 0, dev: 1, pool: [] }, o)),
-        Array.isArray(o.pool) && o.pool.length > 0)
-      )
+      if (((o = Object.assign({ mean: 0, dev: 1, pool: [] }, o)), Array.isArray(o.pool) && o.pool.length > 0))
         return this.normalPool(o);
-      var r,
+      let r,
         a,
         n,
         e,
@@ -60,7 +66,6 @@ export default {
       while (r >= 1);
       return (e = a * Math.sqrt((-2 * Math.log(r)) / r)), t * e + l;
     },
-
     getColor() {
       let colour = {
         r: 60,
@@ -83,10 +88,9 @@ export default {
       //     .attr('cy', -2)
       // let size = this.flow.selectAll("circle").size();
 
-      let start_id = Math.round(rate * this.NUM_PARTICLES);
-      let _left = start_id;
-      let _right = start_id > this.PER_NUM ? start_id - this.PER_NUM : 0;
-
+      // let start_id = Math.round(rate * this.NUM_PARTICLES);
+      let index_coming = Math.round(rate * this.NUM_PARTICLES); // rate对应的index，刚刚进入画面的点的index（左端）
+      let index_leaving = index_coming > this.PER_NUM ? index_coming - this.PER_NUM : 0; // 即将离开画面的点的index（右端）
       // let left, right;
       // if (rate > rate_old) {
       //   // 向后
@@ -104,73 +108,52 @@ export default {
 
       this.flow
         .selectAll("circle")
-        .data(this.point_attribute.filter((d, i) => i >= _right && i <= _left))
+        .data(this.point_attribute.filter((d, i) => i >= index_leaving && i <= index_coming))
         .join("circle")
-        .on("mouseenter", (d, i, a) => {
-          this.$refs["book-info-dialog"].style.display = "block";
-          console.log(a[i]);
-          // this.hover_data = {
-          //   id: data.名录ID,
-          //   title: this.$store.state.allData.find((elem) => elem.id == data.名录ID).content.split("　")[0],
-          //   detail: this.$store.state.allData.find((elem) => elem.id == data.名录ID).detail,
-          // };
-        })
-        .attr("class", (d, i) => `point-${i + _left}`)
+        .attr("class", (d, i) => `point-${i + index_leaving}`)
         .style("cursor", "pointer")
         .transition()
         .duration(1e2 * Math.abs(rate - rate_old))
         .attr("fill", (d) => d.color)
         .attr("r", (d) => d.radius)
-        .attr("cx", (d, i) => {
-          const progress =
-            ((i + rate * this.NUM_PARTICLES) % this.PER_NUM) / this.PER_NUM;
+        .attr("cx", (d) => {
+          // console.log(d);
+          // const progress = i / this.PER_NUM;
+          // return (1 - progress) * width;
+          const progress = ((d.index + rate * this.NUM_PARTICLES) % this.PER_NUM) / this.PER_NUM;
           return progress * width;
         })
         .attr("cy", (d, i) => {
           let attr = this.point_attribute[i];
-          const progress =
-            ((i + rate * this.NUM_PARTICLES) % this.PER_NUM) / this.PER_NUM;
+          const progress = ((d.index + rate * this.NUM_PARTICLES) % this.PER_NUM) / this.PER_NUM;
           let y = Math.sin(progress * attr.arc) * attr.amplitude + attr.offsetY;
           return y * this.vh + height / 2;
         });
 
-      this.flow
-        .selectAll("circle")
-        .on("click", (e, d) => {
-          console.log(d);
-          this.$router.push(`/book-detail/${d.id}`);
-        })
-        // .on("mouseenter", () => (this.$refs["book-info-dialog"].$el.style.display = "block"))
-        .on("mousemove", (ev) => {
-          this.$refs["book-info-dialog"].$el.style.left =
-            ev.clientX + 10 + "px";
-          this.$refs["book-info-dialog"].$el.style.top =
-            ev.clientY - 120 + "px";
-        })
-        .on("mouseenter", (ev, data) => {
-          this.$refs["book-info-dialog"].$el.style.display = "block";
-          console.log(this.$refs["book-info-dialog"]);
-          this.hover_data = {
-            id: data.id,
-            title: this.$store.state.allData
-              .find((elem) => elem.id == data.id)
-              .content.split("　")[0],
-            detail: this.$store.state.allData.find((elem) => elem.id == data.id)
-              .detail,
-          };
-        })
-        .on("mouseleave", () => {
-          this.$refs["book-info-dialog"].$el.style.display = "none";
-        });
+      this.flow.selectAll("circle").on("click", (e, d) => {
+        // this.$router.push(`/book-detail/${d.id}`);
+        this.$refs["book-detail-tooltip"].$el.style.left = e.clientX + 30 + "px";
+        this.$refs["book-detail-tooltip"].$el.style.top = e.clientY - 140 + "px";
+        this.$refs["book-detail-tooltip"].$el.style.display = "block";
+        this.hover_data = {
+          id: d.id,
+          // title: this.$store.state.allData.find((elem) => elem.id == d.id).content.split("　")[0],
+          // detail: this.$store.state.allData.find((elem) => elem.id == d.id).detail,
+        };
+      });
+      // .on("mouseleave", () => {
+      //   this.$refs["book-detail-tooltip"].$el.style.display = "none";
+      // });
     },
     initializePointAttribute() {
       this.point_attribute = [];
-      for (let d of this.$store.state.allData) {
+      for (let i in this.$store.state.allData) {
         let offsetY = this.randomNormal({ mean: 0, dev: 10 });
         let amplitude = this.randomNormal({ mean: 16, dev: 2 });
         let arc = Math.PI * 2;
         this.point_attribute.push({
-          id: d.id,
+          index: i,
+          id: this.$store.state.allData[i].id,
           color: this.getColor(),
           radius: this.getRadius(),
           offsetY: offsetY,
@@ -183,23 +166,15 @@ export default {
       this.vh = height / 100;
 
       this.book_list = Object.keys(Data.get_data().book_info);
-      console.log(Data.get_data().book_info);
       this.NUM_PARTICLES = this.$store.state.allData.length;
       this.PER_NUM = Math.round(this.NUM_PARTICLES / 20);
 
       this.initializePointAttribute();
 
       d3.select(this.$el).selectAll("svg").remove();
-      this.svg = d3
-        .select(this.$el)
-        .append("svg")
-        .attr("width", width)
-        .attr("height", height);
+      this.svg = d3.select(this.$el).append("svg").attr("width", width).attr("height", height);
 
       this.flow = this.svg.append("g").attr("id", "points");
-
-      // this.removeTooltip();
-
       // this.points = this.flow.selectAll('circle')
       //     .data(this.book_list)
       //     .join('circle')
@@ -223,8 +198,6 @@ export default {
       //     })
       //     .attr('cx', width+10)
       //     .attr('cy', height/2)
-
-      // this.drawTooltip();
     },
   },
   mounted() {

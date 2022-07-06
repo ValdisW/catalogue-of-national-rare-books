@@ -4,6 +4,7 @@ import router from "./router";
 import store from "./store";
 import * as dataLoader from "@/data/dataLoader";
 import BaiduMap from "vue-baidu-map-3x";
+import "@/assets/fonts/font.css";
 
 async function run() {
   await dataLoader.loadData();

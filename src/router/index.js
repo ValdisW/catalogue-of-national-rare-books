@@ -18,11 +18,17 @@ const routes = [
     component: () => import("../views/Exploration.vue"),
   },
   {
-    path: "/vis-test",
-    name: "VisTest",
-    meta: { title: "可视化测试" },
-    component: () => import("../views/VisTest.vue"),
+    path: "/relationship",
+    name: "Relationship",
+    meta: { title: "古籍流传" },
+    component: () => import("../views/Relationship.vue"),
   },
+  // {
+  //   path: "/vis-test",
+  //   name: "VisTest",
+  //   meta: { title: "可视化测试" },
+  //   component: () => import("../views/VisTest.vue"),
+  // },
   {
     path: "/book-detail/:bookID",
     name: "BookDetail",
@@ -41,11 +47,11 @@ const routes = [
     meta: { title: "机构详情" },
     component: () => import("../views/InstitutionDetail.vue"),
   },
-  {
-    path: "/streamgraph",
-    name: "StreamGraph",
-    component: () => import("../views/Exploration-Stream.vue"),
-  },
+  // {
+  //   path: "/streamgraph",
+  //   name: "StreamGraph",
+  //   component: () => import("../views/Exploration-Stream.vue"),
+  // },
   // {
   //   path: "/stack",
   //   name: "Stack",

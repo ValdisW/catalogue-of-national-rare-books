@@ -22,20 +22,9 @@
       </div>
       <div class="slider" @click="toNextPage()"></div>
       <div class="mouse-tip"></div>
-      <router-link to="/exploration">转到检索系统>></router-link>
     </section>
     <section class="section-2">
       <FlowingParticles />
-
-      <!-- <div>
-        <p>《国家珍贵古籍名录》是由国务院批准发布的我国现存珍贵古籍目录。</p>
-        <p>
-          2007年，国务院办公厅发布《关于进一步加强古籍保护工作的意见》，启动了“中华古籍保护计划”。其中一项重要任务，就是建立《国家珍贵古籍名录》，实现国家对古籍的分级管理和保护，目的是要建立完备的珍贵古籍档案，确保珍贵古籍的安全。入选典籍为国内存世古籍中具有代表性的精品，且在《国家珍贵古籍名录》评审过程中，一些珍贵古籍的新品种、新版本、新价值被陆续发现。
-        </p>
-        <p>
-          目前，国务院已批准公布六批《国家珍贵古籍名录》，全国487家机构/个人收藏的13026部古籍入选，囊括先秦两汉至明清时期的汉文古籍、少数民族文字古籍和其他文字古籍。
-        </p>
-      </div> -->
     </section>
     <section class="section-3">
       <Stack />
@@ -88,12 +77,8 @@ export default {
       if (target_page > this.current_page) {
         let t = setInterval(() => {
           this.scrolling = true;
-          this.$refs.introduction.scrollLeft +=
-            (this.page_width / 200) * (target_page - this.current_page);
-          if (
-            this.$refs.introduction.scrollLeft >=
-            (target_page - 1) * this.page_width
-          ) {
+          this.$refs.introduction.scrollLeft += (this.page_width / 200) * (target_page - this.current_page);
+          if (this.$refs.introduction.scrollLeft >= (target_page - 1) * this.page_width) {
             this.scrolling = false;
             this.current_page = target_page;
             clearInterval(t);
@@ -102,12 +87,8 @@ export default {
       } else {
         let t = setInterval(() => {
           this.scrolling = true;
-          this.$refs.introduction.scrollLeft +=
-            (this.page_width / 200) * (target_page - this.current_page);
-          if (
-            this.$refs.introduction.scrollLeft <=
-            (target_page - 1) * this.page_width
-          ) {
+          this.$refs.introduction.scrollLeft += (this.page_width / 200) * (target_page - this.current_page);
+          if (this.$refs.introduction.scrollLeft <= (target_page - 1) * this.page_width) {
             this.scrolling = false;
             this.current_page = target_page;
             clearInterval(t);
@@ -208,11 +189,16 @@ export default {
       box-sizing: border-box;
       padding: 0.5rem;
       text-align: center;
+      font-weight: bold;
+      line-height: 1.6rem;
       p:nth-child(1) {
         font-size: 0.8rem;
       }
       p:nth-child(2) {
         font-size: 1.8rem;
+      }
+      p:nth-child(3) {
+        font-size: 0.8rem;
       }
     }
     div:nth-child(2) {
@@ -233,12 +219,6 @@ export default {
     img {
       width: 100%;
     }
-  }
-  a {
-    position: absolute;
-    bottom: 3rem;
-    right: 6rem;
-    color: #666;
   }
 }
 </style>
