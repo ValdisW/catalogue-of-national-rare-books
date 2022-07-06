@@ -77,8 +77,12 @@ export default {
       if (target_page > this.current_page) {
         let t = setInterval(() => {
           this.scrolling = true;
-          this.$refs.introduction.scrollLeft += (this.page_width / 200) * (target_page - this.current_page);
-          if (this.$refs.introduction.scrollLeft >= (target_page - 1) * this.page_width) {
+          this.$refs.introduction.scrollLeft +=
+            (this.page_width / 200) * (target_page - this.current_page);
+          if (
+            this.$refs.introduction.scrollLeft >=
+            (target_page - 1) * this.page_width
+          ) {
             this.scrolling = false;
             this.current_page = target_page;
             clearInterval(t);
@@ -87,8 +91,12 @@ export default {
       } else {
         let t = setInterval(() => {
           this.scrolling = true;
-          this.$refs.introduction.scrollLeft += (this.page_width / 200) * (target_page - this.current_page);
-          if (this.$refs.introduction.scrollLeft <= (target_page - 1) * this.page_width) {
+          this.$refs.introduction.scrollLeft +=
+            (this.page_width / 200) * (target_page - this.current_page);
+          if (
+            this.$refs.introduction.scrollLeft <=
+            (target_page - 1) * this.page_width
+          ) {
             this.scrolling = false;
             this.current_page = target_page;
             clearInterval(t);

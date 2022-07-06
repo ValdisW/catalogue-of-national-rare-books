@@ -54,7 +54,10 @@ export default {
       } while (r < 100);
     },
     randomNormal(o) {
-      if (((o = Object.assign({ mean: 0, dev: 1, pool: [] }, o)), Array.isArray(o.pool) && o.pool.length > 0))
+      if (
+        ((o = Object.assign({ mean: 0, dev: 1, pool: [] }, o)),
+        Array.isArray(o.pool) && o.pool.length > 0)
+      )
         return this.normalPool(o);
       let r,
         a,
@@ -90,7 +93,8 @@ export default {
 
       // let start_id = Math.round(rate * this.NUM_PARTICLES);
       let index_coming = Math.round(rate * this.NUM_PARTICLES); // rate对应的index，刚刚进入画面的点的index（左端）
-      let index_leaving = index_coming > this.PER_NUM ? index_coming - this.PER_NUM : 0; // 即将离开画面的点的index（右端）
+      let index_leaving =
+        index_coming > this.PER_NUM ? index_coming - this.PER_NUM : 0; // 即将离开画面的点的index（右端）
       // let left, right;
       // if (rate > rate_old) {
       //   // 向后
@@ -108,7 +112,11 @@ export default {
 
       this.flow
         .selectAll("circle")
-        .data(this.point_attribute.filter((d, i) => i >= index_leaving && i <= index_coming))
+        .data(
+          this.point_attribute.filter(
+            (d, i) => i >= index_leaving && i <= index_coming
+          )
+        )
         .join("circle")
         .attr("class", (d, i) => `point-${i + index_leaving}`)
         .style("cursor", "pointer")
@@ -120,20 +128,26 @@ export default {
           // console.log(d);
           // const progress = i / this.PER_NUM;
           // return (1 - progress) * width;
-          const progress = ((d.index + rate * this.NUM_PARTICLES) % this.PER_NUM) / this.PER_NUM;
+          const progress =
+            ((d.index + rate * this.NUM_PARTICLES) % this.PER_NUM) /
+            this.PER_NUM;
           return progress * width;
         })
         .attr("cy", (d, i) => {
           let attr = this.point_attribute[i];
-          const progress = ((d.index + rate * this.NUM_PARTICLES) % this.PER_NUM) / this.PER_NUM;
+          const progress =
+            ((d.index + rate * this.NUM_PARTICLES) % this.PER_NUM) /
+            this.PER_NUM;
           let y = Math.sin(progress * attr.arc) * attr.amplitude + attr.offsetY;
           return y * this.vh + height / 2;
         });
 
       this.flow.selectAll("circle").on("click", (e, d) => {
         // this.$router.push(`/book-detail/${d.id}`);
-        this.$refs["book-detail-tooltip"].$el.style.left = e.clientX + 30 + "px";
-        this.$refs["book-detail-tooltip"].$el.style.top = e.clientY - 140 + "px";
+        this.$refs["book-detail-tooltip"].$el.style.left =
+          e.clientX + 30 + "px";
+        this.$refs["book-detail-tooltip"].$el.style.top =
+          e.clientY - 140 + "px";
         this.$refs["book-detail-tooltip"].$el.style.display = "block";
         this.hover_data = {
           id: d.id,
@@ -172,7 +186,11 @@ export default {
       this.initializePointAttribute();
 
       d3.select(this.$el).selectAll("svg").remove();
-      this.svg = d3.select(this.$el).append("svg").attr("width", width).attr("height", height);
+      this.svg = d3
+        .select(this.$el)
+        .append("svg")
+        .attr("width", width)
+        .attr("height", height);
 
       this.flow = this.svg.append("g").attr("id", "points");
       // this.points = this.flow.selectAll('circle')

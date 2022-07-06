@@ -71,9 +71,14 @@ export default {
         const LT = d3.map(links, linkTarget).map(intern);
         if (nodeTitle === undefined) nodeTitle = (_, i) => N[i];
         // const T = nodeTitle == null ? null : d3.map(nodes, nodeTitle);
-        const G = nodeGroup == null ? null : d3.map(nodes, nodeGroup).map(intern);
-        const W = typeof linkStrokeWidth !== "function" ? null : d3.map(links, linkStrokeWidth);
-        const L = typeof linkStroke !== "function" ? null : d3.map(links, linkStroke);
+        const G =
+          nodeGroup == null ? null : d3.map(nodes, nodeGroup).map(intern);
+        const W =
+          typeof linkStrokeWidth !== "function"
+            ? null
+            : d3.map(links, linkStrokeWidth);
+        const L =
+          typeof linkStroke !== "function" ? null : d3.map(links, linkStroke);
 
         // Replace the input nodes and links with mutable objects for the simulation.
         nodes = d3.map(nodes, (_, i) => ({ id: N[i] }));
@@ -83,7 +88,8 @@ export default {
         if (G && nodeGroups === undefined) nodeGroups = d3.sort(G);
 
         // Construct the scales.
-        const color = nodeGroup == null ? null : d3.scaleOrdinal(nodeGroups, colors);
+        const color =
+          nodeGroup == null ? null : d3.scaleOrdinal(nodeGroups, colors);
 
         // Construct the forces.
         const forceNode = d3.forceManyBody();
@@ -109,7 +115,10 @@ export default {
           .append("g")
           .attr("stroke", typeof linkStroke !== "function" ? linkStroke : null)
           .attr("stroke-opacity", linkStrokeOpacity)
-          .attr("stroke-width", typeof linkStrokeWidth !== "function" ? linkStrokeWidth : null)
+          .attr(
+            "stroke-width",
+            typeof linkStrokeWidth !== "function" ? linkStrokeWidth : null
+          )
           .attr("stroke-linecap", linkStrokeLinecap)
           .selectAll("line")
           .data(links)
@@ -132,14 +141,19 @@ export default {
           .on("mouseenter", (e, d) => {
             self.hover_data = {
               id: d.id,
-              title: self.$store.state.allData.find((elem) => elem.id == d.id).content.split("　")[0],
-              detail: self.$store.state.allData.find((elem) => elem.id == d.id).detail,
+              title: self.$store.state.allData
+                .find((elem) => elem.id == d.id)
+                .content.split("　")[0],
+              detail: self.$store.state.allData.find((elem) => elem.id == d.id)
+                .detail,
             };
             self.$refs["book-info-dialog"].$el.style.display = "block";
           })
           .on("mousemove", (e) => {
-            self.$refs["book-info-dialog"].$el.style.left = e.clientX + 10 + "px";
-            self.$refs["book-info-dialog"].$el.style.top = e.clientY + 30 + "px";
+            self.$refs["book-info-dialog"].$el.style.left =
+              e.clientX + 10 + "px";
+            self.$refs["book-info-dialog"].$el.style.top =
+              e.clientY + 30 + "px";
           })
           .on("mouseleave", () => {
             self.$refs["book-info-dialog"].$el.style.display = "none";
@@ -153,7 +167,9 @@ export default {
         if (invalidation != null) invalidation.then(() => simulation.stop());
 
         function intern(value) {
-          return value !== null && typeof value === "object" ? value.valueOf() : value;
+          return value !== null && typeof value === "object"
+            ? value.valueOf()
+            : value;
         }
 
         function ticked() {
@@ -184,7 +200,11 @@ export default {
             event.subject.fy = null;
           }
 
-          return d3.drag().on("start", dragstarted).on("drag", dragged).on("end", dragended);
+          return d3
+            .drag()
+            .on("start", dragstarted)
+            .on("drag", dragged)
+            .on("end", dragended);
         }
 
         return Object.assign(svg.node(), { scales: { color } });

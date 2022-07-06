@@ -11,17 +11,30 @@
           <span v-text="normalized_title"></span>
         </div>
         <div class="detail">
-          <p class="edition-dynasty"><span>版本年代：</span><span v-text="book_data.edition_dynasty"></span></p>
-          <p class="document-type"><span>版本類型：</span><span v-text="book_data.document_type"></span></p>
+          <p class="edition-dynasty">
+            <span>版本年代：</span
+            ><span v-text="book_data.edition_dynasty"></span>
+          </p>
+          <p class="document-type">
+            <span>版本類型：</span
+            ><span v-text="book_data.document_type"></span>
+          </p>
           <p><span>語種：</span><span v-text="book_data.language"></span></p>
           <p><span>館藏：</span><span v-text="book_data.institution"></span></p>
-          <p><span>數量：</span><span v-text="book_data.quantity + book_data.measurement"></span></p>
+          <p>
+            <span>數量：</span
+            ><span v-text="book_data.quantity + book_data.measurement"></span>
+          </p>
         </div>
         <div class="related-books">
           <p
             v-for="b in this.related_books"
             :key="b.名录ID"
-            v-text="$store.state.allData.find((elem) => elem.id == b.名录ID).content.split('　')[0]"
+            v-text="
+              $store.state.allData
+                .find((elem) => elem.id == b.名录ID)
+                .content.split('　')[0]
+            "
           ></p>
         </div>
         <div class="person">
@@ -30,10 +43,15 @@
               <td>
                 <router-link
                   v-if="e.责任人姓名"
-                  v-text="'[' + (e.dynasty_or_nation || '？') + ']' + e.责任人姓名"
+                  v-text="
+                    '[' + (e.dynasty_or_nation || '？') + ']' + e.责任人姓名
+                  "
                   :to="'/person-detail/' + e.责任人姓名"
                 ></router-link>
-                <span v-else v-text="'[' + (e.dynasty_or_nation || '？') + ']佚名'"></span>
+                <span
+                  v-else
+                  v-text="'[' + (e.dynasty_or_nation || '？') + ']佚名'"
+                ></span>
               </td>
               <td v-text="e.责任行为"></td>
             </tr>
@@ -41,7 +59,12 @@
         </div>
       </div>
     </div>
-    <BookInfoDialog ref="book-info-dialog" :id="hover_data.id" :title="hover_data.title" :detail="hover_data.detail" />
+    <BookInfoDialog
+      ref="book-info-dialog"
+      :id="hover_data.id"
+      :title="hover_data.title"
+      :detail="hover_data.detail"
+    />
   </div>
 </template>
 
