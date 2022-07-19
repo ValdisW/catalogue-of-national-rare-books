@@ -52,61 +52,128 @@ export default {
       now: new Date(),
       everyday_book_list: ["01523", "01524", "01525", "01526"],
       scrolling: false,
-      current_page: 1,
+      current_page: 0,
       page_width: Number,
+      offsets: [],
     };
   },
   methods: {
+
+    calculateSectionOffsets() {
+      let sections = document.getElementsByTagName("section");
+      let length = sections.length;
+
+      for (let i = 0; i < length; i++) {
+        let sectionOffset = sections[i].offsetRight;
+        this.offsets.push(sectionOffset);
+      }
+    },
+
     rowScroll(e) {
       // this.$refs.introduction.scrollLeft += e.deltaY; // 普通滚动
-      if (!this.scrolling)
-        if (e.deltaY > 0) this.toNextPage();
-        else this.toPrevPage();
+      if (e.deltaY > 0 && !this.scrolling) this.toNextPage();
+      else if (e.deltaY < 0 && !this.scrolling) this.toPrevPage();
     },
+
     toNextPage() {
-      if (this.current_page < 4) {
-        this.moveToPage(this.current_page + 1);
-      }
+      // if (this.current_page < 4) {
+      //   this.current_page++;
+      //   this.scrollToSection(this.current_page,true);
+      //   console.log(this.current_page);
+      //
+      // }
+      this.scrolling = true;
+      this.current_page++;
+
+      if (this.current_page > this.offsets.length - 1) this.current_page = 3;
+
+      this.scrollToSection(this.current_page, true);
     },
     toPrevPage() {
-      if (this.current_page > 1) {
-        this.moveToPage(this.current_page - 1);
-      }
+      // this.current_page--;
+      // if (this.current_page > 0) {
+      //   this.scrollToSection(this.current_page,true);
+
+      this.scrolling = true;
+      this.current_page--;
+
+      if (this.current_page < 0) this.current_page = 1;
+
+      this.scrollToSection(this.current_page, true);
+
     },
-    moveToPage(target_page) {
-      if (target_page > this.current_page) {
-        let t = setInterval(() => {
-          this.scrolling = true;
-          this.$refs.introduction.scrollLeft +=
-            (this.page_width / 200) * (target_page - this.current_page);
-          if (
-            this.$refs.introduction.scrollLeft >=
-            (target_page - 1) * this.page_width
-          ) {
-            this.scrolling = false;
-            this.current_page = target_page;
-            clearInterval(t);
-          }
-        }, 1);
-      } else {
-        let t = setInterval(() => {
-          this.scrolling = true;
-          this.$refs.introduction.scrollLeft +=
-            (this.page_width / 200) * (target_page - this.current_page);
-          if (
-            this.$refs.introduction.scrollLeft <=
-            (target_page - 1) * this.page_width
-          ) {
-            this.scrolling = false;
-            this.current_page = target_page;
-            clearInterval(t);
-          }
-        }, 1);
-      }
+
+
+    scrollToSection(id, force = false) {
+      let timeout;
+      if (this.scrolling && !force) return false;
+
+      this.current_page = id;
+      this.scrolling = true;
+
+      document.getElementsByTagName("section")[id].scrollIntoView({ behavior: "smooth", inline: "nearest" });
+
+      clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        this.scrolling = false;
+      }, 400);
     },
+
+    // moveToPage(target_page) {
+    //   if (target_page > this.current_page) {
+    //     let t = setInterval(() => {
+    //       this.scrolling = true;
+    //       this.$refs.introduction.scrollLeft +=
+    //         (this.page_width / 200) * (target_page - this.current_page);
+    //       if (
+    //         this.$refs.introduction.scrollLeft >=
+    //         (target_page - 1) * this.page_width
+    //       ) {
+    //         this.scrolling = false;
+    //         this.current_page = target_page;
+    //         clearInterval(t);
+    //       }
+    //     }, 1);
+    //   } else {
+    //     let t = setInterval(() => {
+    //       this.scrolling = true;
+    //       this.$refs.introduction.scrollLeft +=
+    //         (this.page_width / 200) * (target_page - this.current_page);
+    //       if (
+    //         this.$refs.introduction.scrollLeft <=
+    //         (target_page - 1) * this.page_width
+    //       ) {
+    //         this.scrolling = false;
+    //         this.current_page = target_page;
+    //         clearInterval(t);
+    //       }
+    //     }, 1);
+    //   }
+    // },
   },
+  // mounted() {
+  //   this.page_width = this.$refs.introduction.clientWidth;
+  // },
+
   mounted() {
-    this.page_width = this.$refs.introduction.clientWidth;
+    this.calculateSectionOffsets();
+
+    window.addEventListener("DOMMouseScroll", this.handleMouseWheelDOM); // Mozilla Firefox
+    window.addEventListener("mousewheel", this.handleMouseWheel, {
+      passive: false,
+    }); // Other browsers
+
+    window.addEventListener("touchstart", this.touchStart, { passive: false }); // mobile devices
+    window.addEventListener("touchmove", this.touchMove, { passive: false }); // mobile devices
+  },
+  unmounted() {
+    window.removeEventListener("mousewheel", this.handleMouseWheel, {
+      passive: false,
+    }); // Other browsers
+    window.removeEventListener("DOMMouseScroll", this.handleMouseWheelDOM); // Mozilla Firefox
+
+    window.removeEventListener("touchstart", this.touchStart); // mobile devices
+    window.removeEventListener("touchmove", this.touchMove); // mobile devices
   },
 };
 </script>
