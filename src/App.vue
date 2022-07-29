@@ -6,10 +6,9 @@
         <li @mouseenter="showSub = true" @mouseleave="showSub = false">
           <router-link to="/">名錄介紹</router-link>
           <ul v-show="showSub">
-            <li><a href="#particles">首屏</a></li>
-            <li><a href="#particles">粒子</a></li>
-            <li><a href="#particles">統計</a></li>
-            <li><a href="#particles">地點</a></li>
+            <li><router-link to="/">粒子</router-link></li>
+            <li><router-link to="/">統計</router-link></li>
+            <li><router-link to="/">地點</router-link></li>
           </ul>
         </li>
         <li>
@@ -17,6 +16,9 @@
         </li>
         <li>
           <router-link to="/relationship">關係發現</router-link>
+        </li>
+        <li>
+          <router-link to="/about">關於我們</router-link>
         </li>
       </ul>
     </nav>
@@ -91,11 +93,12 @@ html {
 }
 nav {
   position: fixed;
-  top: 50%;
-  transform: translateY(-50%);
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 100;
   ul {
     list-style: none;
+    display: flex;
     li {
       margin: 1rem;
       position: relative;
@@ -106,9 +109,10 @@ nav {
         font-weight: normal;
       }
       ul {
+        display: block;
         position: absolute;
-        left: 3rem;
-        top: 0;
+        left: 0;
+        top: 5.5rem;
         transform: translateY(-50%);
         li {
           width: 5rem;

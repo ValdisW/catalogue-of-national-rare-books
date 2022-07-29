@@ -227,7 +227,7 @@ export default {
 <style lang="less" scoped>
 #flow {
   position: absolute;
-  top: 20vh;
+  top: 13vh;
   width: 100vw;
   height: 65vh;
 }

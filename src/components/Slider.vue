@@ -18,7 +18,7 @@ export default {
     return {
       // rate: -0.1,
       rate: 0,
-      width: this.$store.state.rem * 20,
+      width: window.innerWidth * 0.8,
       height: window.innerHeight * 0.1,
       isMouseDown: false,
       startX: null,
@@ -64,11 +64,12 @@ export default {
   // width: 50vw;
   height: 10vh;
   left: 10vw;
-  top: 10vh;
+  bottom: 5vh;
+  z-index: 1000;
   .bar-axis {
-    width: 20rem;
+    width: 80vw;
     height: 1px;
-    background-color: #000;
+    background-color: #666;
     position: absolute;
     top: 50%;
   }

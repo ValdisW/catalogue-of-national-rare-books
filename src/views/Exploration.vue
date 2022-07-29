@@ -118,7 +118,7 @@
             <th>ID</th>
             <th>批次</th>
             <th>規範題名</th>
-            <th>名錄内容</th>
+            <!-- <th>名錄内容</th> -->
             <th>版本年代</th>
             <th>文獻類型</th>
             <th>文種</th>
@@ -138,12 +138,12 @@
                 :to="'/book-detail/' + item.id"
               ></router-link>
             </td>
-            <td>
+            <!-- <td>
               <router-link
                 v-text="item.content"
                 :to="'/book-detail/' + item.id"
               ></router-link>
-            </td>
+            </td> -->
             <td v-text="item.edition_dynasty"></td>
             <td v-text="item.document_type"></td>
             <td v-text="item.language"></td>
@@ -553,6 +553,7 @@ export default {
       height: 60vh;
       overflow-y: scroll;
       table.results-list {
+        width: 100%;
         font-size: 0.7rem;
         border-collapse: collapse;
         .item-block {
@@ -570,15 +571,15 @@ export default {
           td:nth-of-type(3) {
             font-size: 0.8rem;
           }
-          td:nth-of-type(4) {
-            width: 25rem;
-            text-align: left;
+          // td:nth-of-type(4) {
+          //   width: 25rem;
+          //   text-align: left;
 
-            display: -webkit-box;
-            -webkit-box-orient: vertical;
-            -webkit-line-clamp: 3;
-            overflow: hidden;
-          }
+          //   display: -webkit-box;
+          //   -webkit-box-orient: vertical;
+          //   -webkit-line-clamp: 3;
+          //   overflow: hidden;
+          // }
         }
         .item-block:nth-child(2n + 1) {
           background: #42210b12;

@@ -162,7 +162,8 @@ export default {
     justify-content: center;
 
     .img-wrapper {
-      background: #5e524a;
+      background: #dec4a4;
+      // background: #5e524a;
       height: 80vh;
       display: flex;
       align-items: center;

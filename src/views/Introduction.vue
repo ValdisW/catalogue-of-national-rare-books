@@ -24,13 +24,13 @@
       <div class="mouse-tip"></div>
     </section>
     <section class="section-2">
-      <FlowingParticles />
-    </section>
-    <section class="section-3">
       <Stack />
     </section>
-    <section class="section-4">
+    <section class="section-3">
       <BaiduMap />
+    </section>
+    <section class="section-4">
+      <FlowingParticles />
     </section>
   </div>
 </template>
@@ -73,16 +73,16 @@ export default {
         this.moveToPage(this.current_page - 1);
       }
     },
+    jumpToPage(target_page) {
+      this.$refs.introduction.scrollLeft = (target_page - 1) * this.page_width;
+      this.current_page = target_page;
+    },
     moveToPage(target_page) {
       if (target_page > this.current_page) {
         let t = setInterval(() => {
           this.scrolling = true;
-          this.$refs.introduction.scrollLeft +=
-            (this.page_width / 200) * (target_page - this.current_page);
-          if (
-            this.$refs.introduction.scrollLeft >=
-            (target_page - 1) * this.page_width
-          ) {
+          this.$refs.introduction.scrollLeft += (this.page_width / 200) * (target_page - this.current_page);
+          if (this.$refs.introduction.scrollLeft >= (target_page - 1) * this.page_width) {
             this.scrolling = false;
             this.current_page = target_page;
             clearInterval(t);
@@ -91,12 +91,8 @@ export default {
       } else {
         let t = setInterval(() => {
           this.scrolling = true;
-          this.$refs.introduction.scrollLeft +=
-            (this.page_width / 200) * (target_page - this.current_page);
-          if (
-            this.$refs.introduction.scrollLeft <=
-            (target_page - 1) * this.page_width
-          ) {
+          this.$refs.introduction.scrollLeft += (this.page_width / 200) * (target_page - this.current_page);
+          if (this.$refs.introduction.scrollLeft <= (target_page - 1) * this.page_width) {
             this.scrolling = false;
             this.current_page = target_page;
             clearInterval(t);
@@ -105,8 +101,13 @@ export default {
       }
     },
   },
+  created() {
+    console.log("created");
+  },
   mounted() {
+    console.log("mounted");
     this.page_width = this.$refs.introduction.clientWidth;
+    console.log(this.page_width);
   },
 };
 </script>

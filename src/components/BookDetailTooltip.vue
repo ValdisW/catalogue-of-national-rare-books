@@ -11,6 +11,7 @@
         </h4>
         <router-link :to="'/book-detail/' + id">查看詳情</router-link>
         <div class="detail">
+          <button id="test" @click="test">临时按钮</button>
           <p>
             <span>語種：</span>
             <span v-text="detail_data.language"></span>
@@ -47,6 +48,11 @@ export default {
     detail_data() {
       if (!this.id) return { content: "　" };
       else return this.$store.state.allData.find((elem) => elem.id == this.id);
+    },
+  },
+  methods: {
+    test() {
+      console.log("2333");
     },
   },
 };

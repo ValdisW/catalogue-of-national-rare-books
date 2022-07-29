@@ -4,7 +4,6 @@
 
 <script>
 const d3 = require("d3");
-// import $ from 'jquery'
 import * as Data from "@/data/dataLoader";
 import * as Tooltip from "@/utils/Tooltip";
 

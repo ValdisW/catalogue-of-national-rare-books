@@ -23,12 +23,12 @@ const routes = [
     meta: { title: "古籍流传" },
     component: () => import("../views/Relationship.vue"),
   },
-  // {
-  //   path: "/vis-test",
-  //   name: "VisTest",
-  //   meta: { title: "可视化测试" },
-  //   component: () => import("../views/VisTest.vue"),
-  // },
+  {
+    path: "/about",
+    name: "About",
+    meta: { title: "关于我们" },
+    component: () => import("../views/About.vue"),
+  },
   {
     path: "/book-detail/:bookID",
     name: "BookDetail",

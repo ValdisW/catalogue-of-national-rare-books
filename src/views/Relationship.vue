@@ -10,6 +10,7 @@
 <script>
 import * as d3 from "d3";
 import * as Data from "@/data/dataLoader";
+import axios from "axios";
 
 export default {
   name: "Relationship",
@@ -224,6 +225,9 @@ export default {
   },
   mounted() {
     // this.renderGraphChart();
+    axios.get(`/data/person`).then((d) => {
+      console.log(d);
+    });
   },
 };
 </script>
