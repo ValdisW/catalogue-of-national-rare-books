@@ -214,6 +214,8 @@ export default {
       map.enableInertialDragging();
       map.enableContinuousZoom();
 
+      map.setDefaultCursor('default');
+
       // map.setDisplayOptions(options.displayOptions || {
       //         indoor: false,
       //         poi: true,
