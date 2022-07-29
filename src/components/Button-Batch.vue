@@ -1,5 +1,10 @@
 <template>
-  <div :class="{ 'batch-button': true, activated }" :id="`button-${index}`" @click="clickBatch()" v-text="text"></div>
+  <div
+    :class="{ 'batch-button': true, activated }"
+    :id="`button-${index}`"
+    @click="clickBatch()"
+    v-text="text"
+  ></div>
 </template>
 
 <script>

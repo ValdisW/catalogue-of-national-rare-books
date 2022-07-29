@@ -24,7 +24,9 @@ export default {
        */
 
       const xScale = d3.scaleLog([0, d3.max(this.data)], [30, 300]); // x轴的数值和渲染范围
-      const yScale = d3.scaleBand(new d3.InternSet(d3.map(this.data, (d, i) => i)), [10, 100]).padding(0.1);
+      const yScale = d3
+        .scaleBand(new d3.InternSet(d3.map(this.data, (d, i) => i)), [10, 100])
+        .padding(0.1);
       const xAxis = d3.axisTop(xScale).ticks(5);
       const yAxis = d3.axisLeft(yScale).tickSizeOuter(0);
 
@@ -33,7 +35,13 @@ export default {
         .attr("transform", `translate(0,${20})`)
         .call(xAxis)
         .call((g) => g.select(".domain").remove())
-        .call((g) => g.selectAll(".tick line").clone().attr("y2", 100).attr("stroke-opacity", 0.1))
+        .call((g) =>
+          g
+            .selectAll(".tick line")
+            .clone()
+            .attr("y2", 100)
+            .attr("stroke-opacity", 0.1)
+        )
         .call((g) =>
           g
             .append("text")

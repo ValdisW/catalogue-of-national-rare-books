@@ -15,7 +15,9 @@ export default {
   },
   data() {
     return {
-      title: this.$store.state.allData.find((e) => e.id == this.id).content.split("　")[0],
+      title: this.$store.state.allData
+        .find((e) => e.id == this.id)
+        .content.split("　")[0],
     };
   },
 };
