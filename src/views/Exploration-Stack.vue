@@ -24,27 +24,20 @@
       <div class="featured-books">
         <h3>特色古籍</h3>
         <div class="content">
-          <BookItem
-            v-for="b in batchInfo[current_batch].featured_books"
-            :key="b"
-            :id="b"
-          />
+          <BookItem v-for="b in batchInfo[current_batch].featured_books" :key="b" :id="b" />
         </div>
       </div>
-      <p
-        class="batch-description"
-        v-text="batchInfo[current_batch].description"
-      ></p>
+      <p class="batch-description" v-text="batchInfo[current_batch].description"></p>
     </div>
     <div class="col-3">
       <div class="document-types">
-        <BarChart title="文獻類型" />
+        <!-- <BarChart title="文獻類型" /> -->
       </div>
       <div class="edition-types">
-        <BarChart title="版本類型" />
+        <!-- <BarChart title="版本類型" /> -->
       </div>
       <div class="edition-dynasties">
-        <BarChart title="版本年代" />
+        <!-- <BarChart title="版本年代" /> -->
       </div>
     </div>
 
@@ -58,13 +51,20 @@
 import { mapState } from "vuex";
 // import Stack from "@/components/Stack.vue";
 // import ButtonBatch from "@/components/Button-Batch.vue";
-import BarChart from "@/components/BarChart.vue";
+// import BarChart from "@/components/BarChart.vue";
 import BookItem from "@/components/BookItem.vue";
 
 // import BatchInfo from "@/components/BatchInfo.vue";
 
 export default {
   name: "Exploration-Stream",
+  components: {
+    // Stack,
+    // ButtonBatch,
+    BookItem,
+    // BatchInfo,
+    // BarChart,
+  },
   data() {
     return {
       batchSel: null,
@@ -73,79 +73,37 @@ export default {
           name: "一",
           description:
             "第一批《珍贵古籍名录》收入2392部古籍，其中，汉文古籍2282部，包括简帛117种，敦煌遗书72件、古籍2093部，少数民族古籍110部，包括焉耆-龟兹文、于阗文、藏文、回鹘文、西夏文、白文、蒙古文、察合台文、彝文、满文、东巴文、傣文、水文、古壮字等14种文字。特色古籍有：《大般若波罗蜜多经》六百卷等开宝藏、《资治通鉴》465字残稿、《赵城金藏》、《永乐大典》和《四库全书》。",
-          featured_books: [
-            "00118",
-            "00444",
-            "00840",
-            "01928",
-            "01489",
-            "00006",
-          ],
+          featured_books: ["00118", "00444", "00840", "01928", "01489", "00006"],
         },
         {
           name: "二",
           description:
             "第二批《珍贵古籍名录》收入4478部古籍，其中，汉文古籍2282部，包括简帛117种，敦煌遗书72件、古籍2093部，少数民族古籍110部，包括焉耆-龟兹文、于阗文、藏文、回鹘文、西夏文、白文、蒙古文、察合台文、彝文、满文、东巴文、傣文、水文、古壮字等14种文字。特色古籍有：《大般若波罗蜜多经》六百卷等开宝藏、《资治通鉴》465字残稿、《赵城金藏》、《永乐大典》和《四库全书》。",
-          featured_books: [
-            "00118",
-            "00444",
-            "00840",
-            "01928",
-            "01489",
-            "00006",
-          ],
+          featured_books: ["00118", "00444", "00840", "01928", "01489", "00006"],
         },
         {
           name: "三",
           description:
             "第三批《珍贵古籍名录》收入2989部古籍，其中，汉文古籍2282部，包括简帛117种，敦煌遗书72件、古籍2093部，少数民族古籍110部，包括焉耆-龟兹文、于阗文、藏文、回鹘文、西夏文、白文、蒙古文、察合台文、彝文、满文、东巴文、傣文、水文、古壮字等14种文字。特色古籍有：《大般若波罗蜜多经》六百卷等开宝藏、《资治通鉴》465字残稿、《赵城金藏》、《永乐大典》和《四库全书》。",
-          featured_books: [
-            "00118",
-            "00444",
-            "00840",
-            "01928",
-            "01489",
-            "00006",
-          ],
+          featured_books: ["00118", "00444", "00840", "01928", "01489", "00006"],
         },
         {
           name: "四",
           description:
             "第四批《珍贵古籍名录》收入1516部古籍，其中，汉文古籍2282部，包括简帛117种，敦煌遗书72件、古籍2093部，少数民族古籍110部，包括焉耆-龟兹文、于阗文、藏文、回鹘文、西夏文、白文、蒙古文、察合台文、彝文、满文、东巴文、傣文、水文、古壮字等14种文字。特色古籍有：《大般若波罗蜜多经》六百卷等开宝藏、《资治通鉴》465字残稿、《赵城金藏》、《永乐大典》和《四库全书》。",
-          featured_books: [
-            "00118",
-            "00444",
-            "00840",
-            "01928",
-            "01489",
-            "00006",
-          ],
+          featured_books: ["00118", "00444", "00840", "01928", "01489", "00006"],
         },
         {
           name: "五",
           description:
             "第五批《珍贵古籍名录》收入2392部古籍，其中，汉文古籍2282部，包括简帛117种，敦煌遗书72件、古籍2093部，少数民族古籍110部，包括焉耆-龟兹文、于阗文、藏文、回鹘文、西夏文、白文、蒙古文、察合台文、彝文、满文、东巴文、傣文、水文、古壮字等14种文字。特色古籍有：《大般若波罗蜜多经》六百卷等开宝藏、《资治通鉴》465字残稿、《赵城金藏》、《永乐大典》和《四库全书》。",
-          featured_books: [
-            "00118",
-            "00444",
-            "00840",
-            "01928",
-            "01489",
-            "00006",
-          ],
+          featured_books: ["00118", "00444", "00840", "01928", "01489", "00006"],
         },
         {
           name: "六",
           description:
             "第六批《珍贵古籍名录》收入752部古籍，其中，汉文古籍2282部，包括简帛117种，敦煌遗书72件、古籍2093部，少数民族古籍110部，包括焉耆-龟兹文、于阗文、藏文、回鹘文、西夏文、白文、蒙古文、察合台文、彝文、满文、东巴文、傣文、水文、古壮字等14种文字。特色古籍有：《大般若波罗蜜多经》六百卷等开宝藏、《资治通鉴》465字残稿、《赵城金藏》、《永乐大典》和《四库全书》。",
-          featured_books: [
-            "00118",
-            "00444",
-            "00840",
-            "01928",
-            "01489",
-            "00006",
-          ],
+          featured_books: ["00118", "00444", "00840", "01928", "01489", "00006"],
         },
       ],
       current_batch: 0,
@@ -153,13 +111,6 @@ export default {
   },
   computed: {
     ...mapState(["rem"]),
-  },
-  components: {
-    // Stack,
-    // ButtonBatch,
-    BookItem,
-    // BatchInfo,
-    BarChart,
   },
   watch: {
     batchSel: function (newVal, oldVal) {

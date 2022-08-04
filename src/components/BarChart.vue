@@ -15,14 +15,13 @@ export default {
     render() {
       let svg = d3.select(".bar-chart").append("svg");
       /**
-       * 數據樣本：
+       * 數據格式：
        * {
        *    "戰國": 1234,`
        *    "秦": 333,
        *    "漢": 666
        * }
        */
-
       const xScale = d3.scaleLog([0, d3.max(this.data)], [30, 300]); // x轴的数值和渲染范围
       const yScale = d3
         .scaleBand(new d3.InternSet(d3.map(this.data, (d, i) => i)), [10, 100])
