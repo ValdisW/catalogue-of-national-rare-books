@@ -2,7 +2,9 @@
   <div class="book-detail">
     <BackButton />
     <div class="content">
-      <div class="img-wrapper">
+      <div class="img-wrapper"
+          @click="openImageViewer"
+          style="cursor: pointer">
         <img src="@/assets/placeholder.jpg" alt="" />
       </div>
       <div class="info">
@@ -33,6 +35,16 @@
       :title="hover_data.title"
       :detail="hover_data.detail"
     />
+    <div class="imageViewer"
+      v-for="(item, index) in imageviewerArray"
+      :key="index"
+      :index="index">
+      <ImageViewer
+        imageUrl="@/assets/placeholder.jpg"
+        imageText=""
+        @remove="removeImageViewer"
+      />
+    </div>
   </div>
 </template>
 
@@ -41,10 +53,11 @@ import axios from "axios";
 import * as d3 from "d3";
 import BookInfoDialog from "@/components/BookInfoDialog";
 import BackButton from "@/components/BackButton";
+import ImageViewer from "@/components/ImageViewer";
 
 export default {
   name: "BookDetail",
-  components: { BookInfoDialog, BackButton },
+  components: { BookInfoDialog, BackButton, ImageViewer },
   data() {
     return {
       book_data: { content: "" },
@@ -55,6 +68,11 @@ export default {
       },
       person_data: [],
       seal_data: [],
+<<<<<<< Updated upstream
+=======
+      related_books: [],
+      imageviewerArray: [],
+>>>>>>> Stashed changes
     };
   },
   computed: {
@@ -62,6 +80,16 @@ export default {
       // 临时规范题名
       return this.book_data.content.split("　")[0];
     },
+  },
+  methods: {
+    openImageViewer() {
+      this.imageviewerArray.push(1)
+      // console.log("add", this.imageviewerArray)
+    },
+    removeImageViewer() {
+      this.imageviewerArray.splice(0, 1)
+      // console.log("del", this.imageviewerArray)
+    }
   },
   mounted() {
     axios.get(`/data/book-detail/${this.$route.params.bookID}`).then((d) => {
@@ -193,6 +221,12 @@ export default {
         }
       }
     }
+    z-index: 1;
+    position: absolute;
+  }
+  .imageViewer {
+    position: absolute;
+    z-index: 2;
   }
 }
 </style>
