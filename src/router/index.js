@@ -46,6 +46,11 @@ const routes = [
     name: "StreamGraph",
     component: () => import("../views/Exploration-Stream.vue"),
   },
+  {
+    path: "/barchart",
+    name: "Barchart",
+    component: () => import("../views/barchart-test.vue"),
+  },
   // {
   //   path: "/stack",
   //   name: "Stack",
