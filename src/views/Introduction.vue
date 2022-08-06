@@ -109,7 +109,9 @@ export default {
       this.current_page = id;
       this.scrolling = true;
 
-      document.getElementsByTagName("section")[id].scrollIntoView({ behavior: "smooth", inline: "nearest" });
+      document
+        .getElementsByTagName("section")
+        [id].scrollIntoView({ behavior: "smooth", inline: "nearest" });
 
       clearTimeout(timeout);
       timeout = setTimeout(() => {
