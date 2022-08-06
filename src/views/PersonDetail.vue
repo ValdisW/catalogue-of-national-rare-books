@@ -2,25 +2,67 @@
   <div class="person-detail">
     <BackButton />
     <div class="content">
-      <h1 v-text="$route.params.personID"></h1>
+      <div class="person-card">
+        <div class="person-info">
+          <div class="person-brief">
+            <div class="person-name">
+              <h1 v-text="$route.params.personID"></h1>
+            </div>
+            <div class="person-info-list">
+              <div class="person-birth">
+                <p>生卒：
+                  <span>-</span></p>
+              </div>
+              <div class="person-title" >
+                <p>字：
+                  <span>-</span>
+                </p>
+                <p>號：
+                  <span>-</span>
+                </p>
+              </div>
+              <p></p>
+              <span></span>
+            </div>
+          </div>
+          <div class="person-intro">暫無數據</div>
+        </div>
+
+        <div class="related-person">
+          <h2 >相關人員</h2>
+          <div class="person-responsibility">
+            <p v-for="b in this.related_person" :key="b">
+              <router-link
+                :to="/person-detail/ + b.责任人姓名"
+                v-text="b.责任人姓名 + ' ' + b.count"
+              ></router-link>
+
+            </p>
+          </div>
+        </div>
+      </div>
       <div class="related-books">
-        <ul>
-          <li v-for="e in relatedBooks" :key="e">
-            <router-link
-              :to="'/book-detail/' + e.名录ID"
-              v-text="e.名录ID + ' ' + e.题名卷数 + ' ' + e.责任行为"
-            ></router-link>
-          </li>
-        </ul>
+        <div class="responsibility-select">
+          <h2>責任目錄</h2>
+          <button class="responsibility-type">創作</button>
+          <button class="responsibility-type">出版</button>
+          <button class="responsibility-type">批較提拔</button>
+          <button class="responsibility-type">收藏</button>
+
+        </div>
+        <div class="book-responsibility">
+          <ul>
+            <li v-for="e in relatedBooks" :key="e">
+              <router-link
+                :to="'/book-detail/' + e.名录ID"
+                v-text="e.名录ID + ' ' + e.题名卷数 + ' ' + e.责任行为"
+              ></router-link>
+            </li>
+          </ul>
+        </div>
+
       </div>
-      <div class="related-person">
-        <p v-for="b in this.related_person" :key="b">
-          <router-link
-            :to="/person-detail/ + b.责任人姓名"
-            v-text="b.责任人姓名 + ' ' + b.count"
-          ></router-link>
-        </p>
-      </div>
+
     </div>
     <BookInfoDialog
       ref="book-info-dialog"
@@ -356,27 +398,81 @@ export default {
   justify-content: center;
   .content {
     width: 80%;
-    display: flex;
+
     align-items: center;
     justify-content: center;
+    .person-card{
+      margin-bottom: 30px;
+      height: 220px;
+      position: relative;
+      justify-content: center;
+      display: flex;
+      margin-top: 100px;
+      .person-name{
+        width: 150px;
+      }
+      .person-brief{
+        width: 500px;
+        display:flex;
+        .person-info-list{
+          margin-left: 50px;
+        }
+      }
+      .person-intro{
+        margin-top: 20px;
+      }
+      .person-title{
+        display: flex;
+        p{
+          width: 150px;
+        }
+      }
+      .related-person {
+        background: #e7d5bc;
+        a {
+          color: #000;
+        }
+        .person-responsibility {
+          position: relative;
+          font-size: 0.7rem;
+          width: 200px;
+          height: 170px;
+          overflow-y: scroll;
+        }
+      }
+    }
     .related-books {
-      overflow-y: scroll;
+      margin: 0 auto;
+      background: #e7d5bc;
+      align-items: center;
+      width: 700px;
       height: 400px;
-      font-size: 0.8rem;
+
+      .responsibility-select{
+        display: flex;
+        .responsibility-type{
+          background: #5e524a;
+          border: none;
+          width: 80px;
+          color:#ffffff;
+          height: 40px;
+          font-size: 0.7rem;
+          margin: 0.5rem 0 0.5rem 0 ;
+          margin-left: 20px;
+        }
+      }
+      .book-responsibility {
+        overflow-y: scroll;
+        height: 330px;
+        width: 700px;
+
+        font-size: 0.8rem;
+      }
       a {
         color: #000;
       }
     }
   }
-  .related-person {
-    a {
-      color: #000;
-    }
-    position: relative;
-    font-size: 0.8rem;
-    width: 300px;
-    height: 500px;
-    overflow-y: scroll;
-  }
+
 }
 </style>
