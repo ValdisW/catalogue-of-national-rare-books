@@ -2,29 +2,36 @@
   <div class="book-detail">
     <BackButton />
     <div class="content">
-      <div class="img-wrapper">
-        <img src="@/assets/placeholder.jpg" alt="" />
-      </div>
+
       <div class="info">
         <div class="title">
-          <span v-text="$route.params.bookID"></span>
+          <!--          <span v-text="$route.params.bookID"></span>-->
           <span v-text="normalized_title"></span>
         </div>
         <div class="detail">
-          <p class="edition-dynasty">
-            <span>版本年代：</span
-            ><span v-text="book_data.edition_dynasty"></span>
-          </p>
-          <p class="document-type">
-            <span>版本類型：</span
-            ><span v-text="book_data.document_type"></span>
-          </p>
-          <p><span>語種：</span><span v-text="book_data.language"></span></p>
-          <p><span>館藏：</span><span v-text="book_data.institution"></span></p>
-          <p>
-            <span>數量：</span
-            ><span v-text="book_data.quantity + book_data.measurement"></span>
-          </p>
+          <div class="detail-title">
+            <p>文種：</p>
+            <p>文獻類型：</p>
+            <p>版本類型：</p>
+            <p>板框尺寸：</p>
+            <p>裝幀形式：</p>
+            <p>開本尺寸：</p>
+            <p>牌記：</p>
+            <p style="margin-top: 20px">館藏：</p>
+            <p>索書號：</p>
+          </div>
+          <div class="detail-content">
+            <p class="language" v-text="book_data.language"></p>
+            <p class="document-type" v-text="book_data.document_type"></p>
+            <p class="edition-type" >-</p>
+            <p class="frame-size" >-</p>
+            <p class="binding-form" >-</p>
+            <p class="book-size" >-</p>
+            <p class="note" >-</p>
+            <p class="institute" style="margin-top: 20px" v-text="book_data.institution"></p>
+            <p v-text="book_data.call_number" ></p>
+
+          </div>
         </div>
         <div class="related-books">
           <p
@@ -57,6 +64,9 @@
             </tr>
           </table>
         </div>
+      </div>
+      <div class="img-wrapper">
+        <img src="@/assets/placeholder.jpg" alt="" />
       </div>
     </div>
     <BookInfoDialog
@@ -148,6 +158,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
+
 .book-detail {
   width: 100vw;
   height: 100vh;
@@ -162,13 +173,14 @@ export default {
     justify-content: center;
 
     .img-wrapper {
-      background: #5e524a;
-      height: 80vh;
+      background: #dec4a4;
+      // background: #5e524a;
+      height: 75vh;
       display: flex;
       align-items: center;
-      margin: 0 2rem 0 0;
+      margin: 0 0 0 2rem;
       img {
-        width: 300px;
+        width: 500px;
       }
     }
     .info {
@@ -188,6 +200,12 @@ export default {
       }
       .detail {
         font-size: 0.8rem;
+        display: flex;
+        line-height: 2.5;
+        .detail-title{
+          width:30%;
+          font-weight: bold;
+        }
       }
       .related-books {
         font-size: 0.8rem;
