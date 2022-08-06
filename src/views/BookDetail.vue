@@ -2,7 +2,6 @@
   <div class="book-detail">
     <BackButton />
     <div class="content">
-
       <div class="info">
         <div class="title">
           <!--          <span v-text="$route.params.bookID"></span>-->
@@ -23,14 +22,17 @@
           <div class="detail-content">
             <p class="language" v-text="book_data.language"></p>
             <p class="document-type" v-text="book_data.document_type"></p>
-            <p class="edition-type" >-</p>
-            <p class="frame-size" >-</p>
-            <p class="binding-form" >-</p>
-            <p class="book-size" >-</p>
-            <p class="note" >-</p>
-            <p class="institute" style="margin-top: 20px" v-text="book_data.institution"></p>
-            <p v-text="book_data.call_number" ></p>
-
+            <p class="edition-type">-</p>
+            <p class="frame-size">-</p>
+            <p class="binding-form">-</p>
+            <p class="book-size">-</p>
+            <p class="note">-</p>
+            <p
+              class="institute"
+              style="margin-top: 20px"
+              v-text="book_data.institution"
+            ></p>
+            <p v-text="book_data.call_number"></p>
           </div>
         </div>
         <div class="related-books">
@@ -158,7 +160,6 @@ export default {
 </script>
 
 <style lang="less" scoped>
-
 .book-detail {
   width: 100vw;
   height: 100vh;
@@ -202,8 +203,8 @@ export default {
         font-size: 0.8rem;
         display: flex;
         line-height: 2.5;
-        .detail-title{
-          width:30%;
+        .detail-title {
+          width: 30%;
           font-weight: bold;
         }
       }

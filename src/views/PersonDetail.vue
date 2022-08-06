@@ -10,14 +10,15 @@
             </div>
             <div class="person-info-list">
               <div class="person-birth">
-                <p>生卒：
-                  <span>-</span></p>
+                <p>生卒： <span>-</span></p>
               </div>
-              <div class="person-title" >
-                <p>字：
+              <div class="person-title">
+                <p>
+                  字：
                   <span>-</span>
                 </p>
-                <p>號：
+                <p>
+                  號：
                   <span>-</span>
                 </p>
               </div>
@@ -29,14 +30,13 @@
         </div>
 
         <div class="related-person">
-          <h2 >相關人員</h2>
+          <h2>相關人員</h2>
           <div class="person-responsibility">
             <p v-for="b in this.related_person" :key="b">
               <router-link
                 :to="/person-detail/ + b.责任人姓名"
                 v-text="b.责任人姓名 + ' ' + b.count"
               ></router-link>
-
             </p>
           </div>
         </div>
@@ -48,7 +48,6 @@
           <button class="responsibility-type">出版</button>
           <button class="responsibility-type">批較提拔</button>
           <button class="responsibility-type">收藏</button>
-
         </div>
         <div class="book-responsibility">
           <ul>
@@ -60,9 +59,7 @@
             </li>
           </ul>
         </div>
-
       </div>
-
     </div>
     <BookInfoDialog
       ref="book-info-dialog"
@@ -401,29 +398,29 @@ export default {
 
     align-items: center;
     justify-content: center;
-    .person-card{
+    .person-card {
       margin-bottom: 30px;
       height: 220px;
       position: relative;
       justify-content: center;
       display: flex;
       margin-top: 100px;
-      .person-name{
+      .person-name {
         width: 150px;
       }
-      .person-brief{
+      .person-brief {
         width: 500px;
-        display:flex;
-        .person-info-list{
+        display: flex;
+        .person-info-list {
           margin-left: 50px;
         }
       }
-      .person-intro{
+      .person-intro {
         margin-top: 20px;
       }
-      .person-title{
+      .person-title {
         display: flex;
-        p{
+        p {
           width: 150px;
         }
       }
@@ -448,16 +445,16 @@ export default {
       width: 700px;
       height: 400px;
 
-      .responsibility-select{
+      .responsibility-select {
         display: flex;
-        .responsibility-type{
+        .responsibility-type {
           background: #5e524a;
           border: none;
           width: 80px;
-          color:#ffffff;
+          color: #ffffff;
           height: 40px;
           font-size: 0.7rem;
-          margin: 0.5rem 0 0.5rem 0 ;
+          margin: 0.5rem 0 0.5rem 0;
           margin-left: 20px;
         }
       }
@@ -473,6 +470,5 @@ export default {
       }
     }
   }
-
 }
 </style>
