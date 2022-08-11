@@ -46,7 +46,7 @@
           <h2>責任目錄</h2>
           <button class="responsibility-type">創作</button>
           <button class="responsibility-type">出版</button>
-          <button class="responsibility-type">批較提拔</button>
+          <button class="responsibility-type">批校題跋</button>
           <button class="responsibility-type">收藏</button>
         </div>
         <div class="book-responsibility">
@@ -60,6 +60,7 @@
           </ul>
         </div>
       </div>
+
     </div>
     <BookInfoDialog
       ref="book-info-dialog"

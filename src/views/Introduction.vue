@@ -69,7 +69,6 @@ export default {
     },
 
     rowScroll(e) {
-      // console.log(this.current_page);
       // this.$refs.introduction.scrollLeft += e.deltaY; // 普通滚动
       if (e.deltaY > 0 && !this.scrolling) this.toNextPage();
       else if (e.deltaY < 0 && !this.scrolling) this.toPrevPage();
