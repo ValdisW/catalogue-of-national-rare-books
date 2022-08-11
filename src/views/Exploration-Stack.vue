@@ -33,7 +33,7 @@
     </div>
     <div class="col-3">
       <div class="chart-wrapper document-types">
-        <Barchart
+        <BarChart
           title="文獻類型"
           :canvasWidth="500"
           :canvasHeight="150"
@@ -42,7 +42,7 @@
         />
       </div>
       <div class="chart-wrapper edition-types">
-        <Barchart
+        <BarChart
           title="版本朝代"
           :canvasWidth="500"
           :canvasHeight="150"
@@ -58,7 +58,7 @@
 <script>
 import { mapState } from "vuex";
 // import Stack from "@/components/Stack.vue";
-import Barchart from "@/components/Barchart.vue";
+import BarChart from "@/components/BarChart.vue";
 import BookItem from "@/components/BookItem.vue";
 import axios from "axios";
 
@@ -67,7 +67,7 @@ export default {
   components: {
     // Stack,
     BookItem,
-    Barchart,
+    BarChart,
   },
   data() {
     return {
