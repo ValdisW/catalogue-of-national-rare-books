@@ -151,8 +151,8 @@ export default {
         this.$refs["book-detail-tooltip"].$el.style.display = "block";
         this.hover_data = {
           id: d.id,
-          // title: this.$store.state.allData.find((elem) => elem.id == d.id).content.split("　")[0],
-          // detail: this.$store.state.allData.find((elem) => elem.id == d.id).detail,
+          // title: this.$store.state.books.find((elem) => elem.id == d.id).content.split("　")[0],
+          // detail: this.$store.state.books.find((elem) => elem.id == d.id).detail,
         };
       });
       // .on("mouseleave", () => {
@@ -161,13 +161,13 @@ export default {
     },
     initializePointAttribute() {
       this.point_attribute = [];
-      for (let i in this.$store.state.allData) {
+      for (let i in this.$store.state.books) {
         let offsetY = this.randomNormal({ mean: 0, dev: 10 });
         let amplitude = this.randomNormal({ mean: 16, dev: 2 });
         let arc = Math.PI * 2;
         this.point_attribute.push({
           index: i,
-          id: this.$store.state.allData[i].id,
+          id: this.$store.state.books[i].id,
           color: this.getColor(),
           radius: this.getRadius(),
           offsetY: offsetY,
@@ -180,7 +180,7 @@ export default {
       this.vh = height / 100;
 
       this.book_list = Object.keys(Data.get_data().book_info);
-      this.NUM_PARTICLES = this.$store.state.allData.length;
+      this.NUM_PARTICLES = this.$store.state.books.length;
       this.PER_NUM = Math.round(this.NUM_PARTICLES / 20);
 
       this.initializePointAttribute();

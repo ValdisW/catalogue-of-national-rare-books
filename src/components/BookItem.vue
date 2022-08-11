@@ -15,7 +15,7 @@ export default {
   },
   data() {
     return {
-      title: this.$store.state.allData
+      title: this.$store.state.books
         .find((e) => e.id == this.id)
         .content.split("　")[0],
     };

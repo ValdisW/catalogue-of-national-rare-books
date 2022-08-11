@@ -47,7 +47,7 @@ export default {
   computed: {
     detail_data() {
       if (!this.id) return { content: "　" };
-      else return this.$store.state.allData.find((elem) => elem.id == this.id);
+      else return this.$store.state.books.find((elem) => elem.id == this.id);
     },
   },
   methods: {

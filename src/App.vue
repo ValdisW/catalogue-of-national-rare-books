@@ -15,7 +15,7 @@
           <router-link to="/exploration">古籍瀏覽</router-link>
         </li>
         <li>
-          <router-link to="/relationship">關係發現</router-link>
+          <router-link to="/relationship">流傳分析</router-link>
         </li>
         <li>
           <router-link to="/about">關於我們</router-link>
@@ -61,9 +61,8 @@ export default {
       document.documentElement.style.fontSize = rem + "px";
     },
     loadData() {
-      let resources = Promise.all([axios.get("/data/")]);
-      resources.then((res) => {
-        this.$store.commit("loadData", res[0].data);
+      axios.get("/data/").then((res) => {
+        this.$store.commit("loadData", res.data);
         this.complete = true;
       });
     },
@@ -87,6 +86,19 @@ export default {
   padding: 0;
   font-family: "SourceHanSerif";
 }
+::-webkit-scrollbar {
+  width: 12px;
+}
+::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset006pxrgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.632);
+  -webkit-box-shadow: inset006pxrgba(0, 0, 0, 0.5);
+}
+
 html {
   // font-size: 20px;
   overflow-y: hidden;

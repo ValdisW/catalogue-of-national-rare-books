@@ -8,19 +8,14 @@
           v-text="batch.name"
           @click="updateBatch(index)"
         ></button>
-        <!-- <ButtonBatch
-          v-for="(batch, index) in batchKeys"
-          :key="index"
-          :text="batch"
-          :index="index"
-          v-on:addBatch="addBatch"
-          v-on:deleteBatch="deleteBatch"
-        >
-        </ButtonBatch> -->
       </div>
     </div>
     <div class="col-2">
-      <h1 v-text="`國家珍貴古籍名錄 第${batchInfo[current_batch].name}批`"></h1>
+      <h1 v-if="current_batch == 0">國家珍貴古籍名錄</h1>
+      <h1
+        v-else
+        v-text="`國家珍貴古籍名錄 第${batchInfo[current_batch].name}批`"
+      ></h1>
       <div class="featured-books">
         <h3>特色古籍</h3>
         <div class="content">
@@ -37,19 +32,25 @@
       ></p>
     </div>
     <div class="col-3">
-      <div class="document-types">
-        <!-- <BarChart title="文獻類型" /> -->
+      <div class="chart-wrapper document-types">
+        <Barchart
+          title="文獻類型"
+          :canvasWidth="500"
+          :canvasHeight="150"
+          :info="statistics.document_type"
+          ref="document_type"
+        />
       </div>
-      <div class="edition-types">
-        <!-- <BarChart title="版本類型" /> -->
-      </div>
-      <div class="edition-dynasties">
-        <!-- <BarChart title="版本年代" /> -->
+      <div class="chart-wrapper edition-types">
+        <Barchart
+          title="版本朝代"
+          :canvasWidth="500"
+          :canvasHeight="150"
+          :info="statistics.edition_dynasty"
+          ref="edition_dynasty"
+        />
       </div>
     </div>
-
-    <!-- <Stack class="stack" :canvasWidth="toWidth(0.7)" :canvasHeight="toHeight(0.8)" :batchSel="batchSel" /> -->
-
     <!-- <BatchInfo :display="showBatchInfo" rel="batch-info" /> -->
   </div>
 </template>
@@ -57,25 +58,33 @@
 <script>
 import { mapState } from "vuex";
 // import Stack from "@/components/Stack.vue";
-// import ButtonBatch from "@/components/Button-Batch.vue";
-// import BarChart from "@/components/BarChart.vue";
+import Barchart from "@/components/Barchart.vue";
 import BookItem from "@/components/BookItem.vue";
-
-// import BatchInfo from "@/components/BatchInfo.vue";
+import axios from "axios";
 
 export default {
   name: "Exploration-Stream",
   components: {
     // Stack,
-    // ButtonBatch,
     BookItem,
-    // BatchInfo,
-    // BarChart,
+    Barchart,
   },
   data() {
     return {
-      batchSel: null,
       batchInfo: [
+        {
+          name: "全部批次",
+          description:
+            "《国家珍贵古籍名录》是由国务院批准发布的我国现存珍贵古籍目录。\n\n2007年，国务院办公厅发布《关于进一步加强古籍保护工作的意见》，启动了“中华古籍保护计划”。其中一项重要任务，就是建立《国家珍贵古籍名录》，实现国家对古籍的分级管理和保护，目的是要建立完备的珍贵古籍档案，确保珍贵古籍的安全。入选典籍为国内存世古籍中具有代表性的精品，且在《国家珍贵古籍名录》评审过程中，一些珍贵古籍的新品种、新版本、新价值被陆续发现。",
+          featured_books: [
+            "00118",
+            "00444",
+            "00840",
+            "01928",
+            "01489",
+            "00006",
+          ],
+        },
         {
           name: "一",
           description:
@@ -156,15 +165,14 @@ export default {
         },
       ],
       current_batch: 0,
+      statistics: {
+        document_type: [],
+        edition_dynasty: [],
+      },
     };
   },
   computed: {
     ...mapState(["rem"]),
-  },
-  watch: {
-    batchSel: function (newVal, oldVal) {
-      console.log(newVal, oldVal);
-    },
   },
   methods: {
     toWidth(p) {
@@ -175,21 +183,19 @@ export default {
     },
     updateBatch(index) {
       this.current_batch = index;
+      for (let n in this.statistics)
+        axios
+          .get(`/data/batch-data?batch=${this.current_batch}&attr=${n}`)
+          .then((d) => (this.statistics[n] = d.data));
     },
-    // addBatch(index) {
-    //   let sel = this.batchSel.slice(0);
-    //   sel[index] = 1;
-    //   this.batchSel = sel;
-    // },
-    // deleteBatch(index) {
-    //   let sel = this.batchSel.slice(0);
-    //   sel[index] = 0;
-    //   this.batchSel = sel;
-    // },
-    drawCharts() {},
   },
   mounted() {
-    this.batchSel = new Array(6).fill(0);
+    for (let n in this.statistics)
+      axios
+        .get(`/data/batch-data?batch=${this.current_batch}&attr=${n}`)
+        .then((d) => {
+          this.statistics[n] = d.data;
+        });
   },
 };
 </script>
@@ -202,7 +208,7 @@ export default {
   display: flex;
   align-items: center;
   .col-1 {
-    flex: 100px 1 1;
+    flex: auto 1 1;
   }
   .col-2 {
     flex: 100px 1 1;
@@ -222,6 +228,9 @@ export default {
   }
   .col-3 {
     flex: 100px 1 1;
+    .chart-wrapper {
+      position: relative;
+    }
   }
   .batch-buttons {
     position: absolute;
@@ -240,6 +249,10 @@ export default {
       text-align: center;
       margin: 0.5rem;
       font-size: 0.8rem;
+    }
+    button:hover {
+      background: #000;
+      color: #fff;
     }
   }
   .stack {

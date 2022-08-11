@@ -1,5 +1,5 @@
 <template>
-  <div class="image-viewer">
+  <div class="image-viewer" v-show="show">
     <div class="button">
       <div class="scale-to-width" @click="scaleToWidth">适应宽度</div>
       <div class="scale-to-height" @click="scaleToHeight">适应高度</div>
@@ -27,6 +27,7 @@ export default {
   data() {
     return {
       imgScale: 1,
+      show: false,
     };
   },
   computed: {
@@ -53,7 +54,10 @@ export default {
       this.img.style = "width:auto;height:auto;max-height:100%;max-width:100%;";
     },
     close() {
-      this.$emit("remove");
+      this.show = false;
+    },
+    open() {
+      this.show = true;
     },
   },
   directives: {
@@ -92,6 +96,8 @@ export default {
   background: #000000a7;
   width: 100vw;
   height: 100vh;
+  position: absolute;
+
   .img-wrapper {
     width: 100vw;
     // height: 100vh;

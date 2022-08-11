@@ -40,7 +40,7 @@
             v-for="b in this.related_books"
             :key="b.名录ID"
             v-text="
-              $store.state.allData
+              $store.state.books
                 .find((elem) => elem.id == b.名录ID)
                 .content.split('　')[0]
             "
@@ -67,7 +67,7 @@
           </table>
         </div>
       </div>
-      <div class="img-wrapper">
+      <div class="img-wrapper" @click="openImageViewer">
         <img src="@/assets/placeholder.jpg" alt="" />
       </div>
     </div>
@@ -77,6 +77,7 @@
       :title="hover_data.title"
       :detail="hover_data.detail"
     />
+    <ImageViewer ref="image-viewer" @remove="closeImageViewer" />
   </div>
 </template>
 
@@ -85,10 +86,11 @@ import axios from "axios";
 // import * as d3 from "d3";
 import BookInfoDialog from "@/components/BookInfoDialog";
 import BackButton from "@/components/BackButton";
+import ImageViewer from "@/components/ImageViewer";
 
 export default {
   name: "BookDetail",
-  components: { BookInfoDialog, BackButton },
+  components: { BookInfoDialog, BackButton, ImageViewer },
   data() {
     return {
       book_data: { content: "" },
@@ -106,6 +108,15 @@ export default {
     normalized_title() {
       // 临时规范题名
       return this.book_data.content.split("　")[0];
+    },
+  },
+  methods: {
+    openImageViewer() {
+      this.$refs["image-viewer"].open();
+    },
+    closeImageViewer() {
+      console.log(this.$refs["image-viewer"]);
+      this.$refs["image-viewer"].close();
     },
   },
   mounted() {
@@ -146,8 +157,8 @@ export default {
       //     this.$refs["book-info-dialog"].$el.style.display = "block";
       //     this.hover_data = {
       //       id: data.名录ID,
-      //       title: this.$store.state.allData.find((elem) => elem.id == data.名录ID).content.split("　")[0],
-      //       detail: this.$store.state.allData.find((elem) => elem.id == data.名录ID).detail,
+      //       title: this.$store.state.books.find((elem) => elem.id == data.名录ID).content.split("　")[0],
+      //       detail: this.$store.state.books.find((elem) => elem.id == data.名录ID).detail,
       //     };
       //   })
       //   .on("mouseleave", (ev) => {
