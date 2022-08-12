@@ -60,7 +60,6 @@
           </ul>
         </div>
       </div>
-
     </div>
     <BookInfoDialog
       ref="book-info-dialog"

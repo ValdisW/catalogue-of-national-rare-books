@@ -3,7 +3,13 @@
     <p class="title" v-text="title"></p>
     <div class="content">
       <ul>
-        <li v-for="e in attrs" :key="e" :val="e.value" :style="{ width: e.value + 'px' }" @click="toggleSelect">
+        <li
+          v-for="e in attrs"
+          :key="e"
+          :val="e.value"
+          :style="{ width: e.value + 'px' }"
+          @click="toggleSelect"
+        >
           <span v-text="e.name"></span>
           <span v-text="e.value"></span>
         </li>

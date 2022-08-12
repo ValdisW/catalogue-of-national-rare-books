@@ -90,16 +90,33 @@
 
       <div class="book-image">
         <div class="switch_pic" style="text-align: center">
-         <button class="firstBtn" ref="firstBtn" v-on:click="switch_first()"></button>
-         <button class="secondBtn" ref="secondBtn"  v-on:click="switch_second()"></button>
+          <button
+            class="firstBtn"
+            ref="firstBtn"
+            v-on:click="switch_first()"
+          ></button>
+          <button
+            class="secondBtn"
+            ref="secondBtn"
+            v-on:click="switch_second()"
+          ></button>
         </div>
-      <div class="img-wrapper" >
-        <img class="img-1" v-show="firstPic" src="@/assets/placeholder.jpg" alt="" />
-           <!--  test the width-->
-        <img class="img-2" v-show="secPic" src="https://file.szmuseum.com/ThumbCover/%E5%8F%A4%E7%B1%8D%E4%BF%A1%E6%81%AF%E7%AE%A1%E7%90%86/201806141352095MD1WD.jpg" alt="" />
+        <div class="img-wrapper">
+          <img
+            class="img-1"
+            v-show="firstPic"
+            src="@/assets/placeholder.jpg"
+            alt=""
+          />
+          <!--  test the width-->
+          <img
+            class="img-2"
+            v-show="secPic"
+            src="https://file.szmuseum.com/ThumbCover/%E5%8F%A4%E7%B1%8D%E4%BF%A1%E6%81%AF%E7%AE%A1%E7%90%86/201806141352095MD1WD.jpg"
+            alt=""
+          />
+        </div>
       </div>
-      </div>
-
     </div>
     <BookInfoDialog
       ref="book-info-dialog"
@@ -162,14 +179,14 @@ export default {
       this.$refs["switch-detail"].style.color = "#4a3300";
     },
 
-    switch_first(){
+    switch_first() {
       this.firstPic = true;
       this.secPic = false;
       this.$refs["firstBtn"].style.background = "#42230f";
       this.$refs["secondBtn"].style.background = "transparent";
     },
 
-    switch_second(){
+    switch_second() {
       this.secPic = true;
       this.firstPic = false;
       this.$refs["firstBtn"].style.background = "transparent";
@@ -252,12 +269,12 @@ export default {
       font-size: 2.3vh;
       margin-top: 5vh;
     }
-    .book-image{
+    .book-image {
       width: 45%;
       height: 75vh;
       align-items: center;
       justify-content: center;
-      .switch_pic{
+      .switch_pic {
         display: block;
         margin: 0 auto;
         .firstBtn {
@@ -267,7 +284,6 @@ export default {
           background: #42230f;
           border-radius: 50%;
           border: 1px solid #42230f;
-
         }
         .secondBtn {
           margin: 8px;
@@ -294,15 +310,12 @@ export default {
           display: block;
         }
 
-
         .img-2 {
           margin: 0 auto;
           display: block;
-
         }
       }
     }
-
 
     .info {
       margin-right: 5vh;
