@@ -31,7 +31,11 @@
           <table class="results-list">
             <thead>
               <tr>
-                <th v-for="e in display_attrs" :key="e.name" @click="toggleRank(e.value, e.order)">
+                <th
+                  v-for="e in display_attrs"
+                  :key="e.name"
+                  @click="toggleRank(e.value, e.order)"
+                >
                   <span class="attr-title" v-text="e.name"></span>
                   <span class="rank">
                     <span></span>
@@ -43,11 +47,17 @@
             <tbody>
               <tr v-for="item in curr_d" :key="item.id" class="item-block">
                 <td>
-                  <router-link v-text="item.id" :to="'/book-detail/' + item.id"></router-link>
+                  <router-link
+                    v-text="item.id"
+                    :to="'/book-detail/' + item.id"
+                  ></router-link>
                 </td>
                 <td v-text="item.batch"></td>
                 <td>
-                  <router-link v-text="item.content.split('　')[0]" :to="'/book-detail/' + item.id"></router-link>
+                  <router-link
+                    v-text="item.content.split('　')[0]"
+                    :to="'/book-detail/' + item.id"
+                  ></router-link>
                 </td>
                 <td v-text="item.edition_dynasty"></td>
                 <td v-text="item.document_type"></td>
@@ -57,7 +67,12 @@
             </tbody>
           </table>
         </div>
-        <PageDivider @turnTo="alterPage" :items_sum="items_sum" :each_page_items="each_page_items" ref="page-divider" />
+        <PageDivider
+          @turnTo="alterPage"
+          :items_sum="items_sum"
+          :each_page_items="each_page_items"
+          ref="page-divider"
+        />
       </div>
     </div>
   </div>
@@ -112,7 +127,10 @@ export default {
     },
     updateFilter() {
       for (let i in this.filter_data)
-        this.filter_data[i].value = this.getSum(this.search_result, this.filter_data[i].id);
+        this.filter_data[i].value = this.getSum(
+          this.search_result,
+          this.filter_data[i].id
+        );
     },
     filterResult(e) {
       this.filtered_result = this.search_result.filter((ele) => {
@@ -155,7 +173,8 @@ export default {
           return flag;
         });
       }
-      this.display_attrs.find((e) => e.value == attr).order = !this.display_attrs.find((e) => e.value == attr).order;
+      this.display_attrs.find((e) => e.value == attr).order =
+        !this.display_attrs.find((e) => e.value == attr).order;
       this.$refs["page-divider"].turnTo(1);
     },
     alterPage(page_index) {
@@ -165,14 +184,24 @@ export default {
       );
     },
     showFilterOptions(e) {
-      let b = e.currentTarget.querySelector(".options").style.display == "block";
-      document.querySelectorAll(".options").forEach((e) => (e.style.display = "none"));
-      e.currentTarget.querySelector(".options").style.display = b ? "none" : "block";
+      let b =
+        e.currentTarget.querySelector(".options").style.display == "block";
+      document
+        .querySelectorAll(".options")
+        .forEach((e) => (e.style.display = "none"));
+      e.currentTarget.querySelector(".options").style.display = b
+        ? "none"
+        : "block";
     },
     choose(e) {
-      document.querySelectorAll(".options").forEach((e) => (e.style.display = "none"));
+      document
+        .querySelectorAll(".options")
+        .forEach((e) => (e.style.display = "none"));
       let parent_filter_value = e.path[3].querySelector(".value");
-      parent_filter_value.setAttribute("val", e.currentTarget.getAttribute("val"));
+      parent_filter_value.setAttribute(
+        "val",
+        e.currentTarget.getAttribute("val")
+      );
       parent_filter_value.innerText = e.currentTarget.innerText;
     },
   },

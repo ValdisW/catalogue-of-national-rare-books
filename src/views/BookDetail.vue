@@ -7,9 +7,21 @@
           <span v-text="normalized_title"></span>
         </div>
         <div class="switch">
-          <button class="book-content" ref="switch-detail" v-on:click="switch_content()">名錄内容</button>
+          <button
+            class="book-content"
+            ref="switch-detail"
+            v-on:click="switch_content()"
+          >
+            名錄内容
+          </button>
           <div>│</div>
-          <button class="book-display" ref="switch-content" v-on:click="switch_display()">字段顯示</button>
+          <button
+            class="book-display"
+            ref="switch-content"
+            v-on:click="switch_display()"
+          >
+            字段顯示
+          </button>
         </div>
         <div class="display" v-show="isDisplay">
           <p class="document-type" v-text="book_data.content"></p>
@@ -43,11 +55,24 @@
       <!-- 书影 -->
       <div class="book-image">
         <div class="switch_pic" style="text-align: center">
-          <button class="firstBtn" ref="firstBtn" v-on:click="switch_first()"></button>
-          <button class="secondBtn" ref="secondBtn" v-on:click="switch_second()"></button>
+          <button
+            class="firstBtn"
+            ref="firstBtn"
+            v-on:click="switch_first()"
+          ></button>
+          <button
+            class="secondBtn"
+            ref="secondBtn"
+            v-on:click="switch_second()"
+          ></button>
         </div>
         <div class="img-wrapper">
-          <img class="img-1" v-show="firstPic" src="@/assets/placeholder.jpg" alt="" />
+          <img
+            class="img-1"
+            v-show="firstPic"
+            src="@/assets/placeholder.jpg"
+            alt=""
+          />
           <!--  test the width-->
           <img
             class="img-2"

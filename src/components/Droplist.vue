@@ -5,7 +5,12 @@
       <span></span>
     </div>
     <ul class="list" v-show="show_list">
-      <li v-for="attr in attr_list" :key="attr" @click="select" v-text="attr.name"></li>
+      <li
+        v-for="attr in attr_list"
+        :key="attr"
+        @click="select"
+        v-text="attr.name"
+      ></li>
     </ul>
   </div>
 </template>
