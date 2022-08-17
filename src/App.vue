@@ -105,12 +105,16 @@ html {
 }
 nav {
   position: fixed;
-  left: 50%;
-  transform: translateX(-50%);
+  width: 100%;
+  user-select: none;
+  // left: 50%;
+  // transform: translateX(-50%);
   z-index: 100;
+  // background: rgb(202, 185, 167);
   ul {
     list-style: none;
     display: flex;
+    justify-content: center;
     li {
       margin: 1rem;
       position: relative;
@@ -130,6 +134,9 @@ nav {
           width: 5rem;
         }
       }
+    }
+    li:hover {
+      text-decoration: underline;
     }
   }
 }

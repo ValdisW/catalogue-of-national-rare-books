@@ -15,9 +15,7 @@ export default {
   },
   data() {
     return {
-      title: this.$store.state.books
-        .find((e) => e.id == this.id)
-        .content.split("　")[0],
+      title: this.$store.state.books.find((e) => e.id == this.id).content.split("　")[0],
     };
   },
 };
@@ -38,6 +36,9 @@ export default {
   p {
     font-size: 0.7rem;
     text-align: center;
+    a {
+      color: rgb(75, 28, 28);
+    }
   }
 }
 </style>

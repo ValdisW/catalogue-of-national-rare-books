@@ -4,25 +4,12 @@
     <div class="content">
       <div class="info">
         <div class="title">
-          <!--          <span v-text="$route.params.bookID"></span>-->
           <span v-text="normalized_title"></span>
         </div>
         <div class="switch">
-          <button
-            class="book-content"
-            ref="switch-detail"
-            v-on:click="switch_content()"
-          >
-            名錄内容
-          </button>
+          <button class="book-content" ref="switch-detail" v-on:click="switch_content()">名錄内容</button>
           <div>│</div>
-          <button
-            class="book-display"
-            ref="switch-content"
-            v-on:click="switch_display()"
-          >
-            字段顯示
-          </button>
+          <button class="book-display" ref="switch-content" v-on:click="switch_display()">字段顯示</button>
         </div>
         <div class="display" v-show="isDisplay">
           <p class="document-type" v-text="book_data.content"></p>
@@ -36,7 +23,7 @@
             <p>裝幀形式：</p>
             <p>開本尺寸：</p>
             <p>牌記：</p>
-            <p style="margin-top: 20px">館藏：</p>
+            <p>館藏：</p>
             <p>索書號：</p>
           </div>
           <div class="detail-content">
@@ -47,67 +34,20 @@
             <p class="binding-form">-</p>
             <p class="book-size">-</p>
             <p class="note">-</p>
-            <p
-              class="institute"
-              style="margin-top: 20px"
-              v-text="book_data.institution"
-            ></p>
+            <p class="institute" v-text="book_data.institution"></p>
             <p v-text="book_data.call_number"></p>
           </div>
         </div>
-        <!--        <div class="related-books">-->
-        <!--          <p-->
-        <!--            v-for="b in this.related_books"-->
-        <!--            :key="b.名录ID"-->
-        <!--            v-text="-->
-        <!--              $store.state.allData-->
-        <!--                .find((elem) => elem.id == b.名录ID)-->
-        <!--                .content.split('　')[0]-->
-        <!--            "-->
-        <!--          ></p>-->
-        <!--        </div>-->
-        <!--        <div class="person">-->
-        <!--          <table>-->
-        <!--            <tr v-for="e in person_data" :key="e">-->
-        <!--              <td>-->
-        <!--                <router-link-->
-        <!--                  v-if="e.责任人姓名"-->
-        <!--                  v-text="-->
-        <!--                    '[' + (e.dynasty_or_nation || '？') + ']' + e.责任人姓名-->
-        <!--                  "-->
-        <!--                  :to="'/person-detail/' + e.责任人姓名"-->
-        <!--                ></router-link>-->
-        <!--                <span-->
-        <!--                  v-else-->
-        <!--                  v-text="'[' + (e.dynasty_or_nation || '？') + ']佚名'"-->
-        <!--                ></span>-->
-        <!--              </td>-->
-        <!--              <td v-text="e.责任行为"></td>-->
-        <!--            </tr>-->
-        <!--          </table>-->
-        <!--        </div>-->
       </div>
 
+      <!-- 书影 -->
       <div class="book-image">
         <div class="switch_pic" style="text-align: center">
-          <button
-            class="firstBtn"
-            ref="firstBtn"
-            v-on:click="switch_first()"
-          ></button>
-          <button
-            class="secondBtn"
-            ref="secondBtn"
-            v-on:click="switch_second()"
-          ></button>
+          <button class="firstBtn" ref="firstBtn" v-on:click="switch_first()"></button>
+          <button class="secondBtn" ref="secondBtn" v-on:click="switch_second()"></button>
         </div>
         <div class="img-wrapper">
-          <img
-            class="img-1"
-            v-show="firstPic"
-            src="@/assets/placeholder.jpg"
-            alt=""
-          />
+          <img class="img-1" v-show="firstPic" src="@/assets/placeholder.jpg" alt="" />
           <!--  test the width-->
           <img
             class="img-2"
@@ -118,12 +58,7 @@
         </div>
       </div>
     </div>
-    <BookInfoDialog
-      ref="book-info-dialog"
-      :id="hover_data.id"
-      :title="hover_data.title"
-      :detail="hover_data.detail"
-    />
+    <BookInfoDialog ref="book-info-dialog" :id="hover_data.id" :title="hover_data.title" :detail="hover_data.detail" />
     <ImageViewer ref="image-viewer" @remove="closeImageViewer" />
   </div>
 </template>
@@ -207,44 +142,6 @@ export default {
       this.related_books = d.data[1];
       this.person_data = d.data[2];
       this.seal_data = d.data[3];
-
-      // const related_books = d3.select(".related-books");
-      // related_books
-      //   .selectAll("div")
-      //   .data(d.data[1])
-      //   .enter()
-      //   .append("div")
-      //   .style("width", "16px")
-      //   .style("height", "16px")
-      //   .style("border-radius", "50%")
-      //   .style("background", "#4a330066")
-      //   .style("display", "inline-block")
-      //   .style("cursor", "pointer")
-      //   .style("margin", "2px")
-      //   .style("position", "absolute")
-      //   .style("left", (e, i, a) => `${250 + (200 - e.count * 10) * Math.cos(((Math.PI * 2) / a.length) * i)}px`)
-      //   .style("top", (e, i, a) => `${250 + (200 - e.count * 10) * Math.sin(((Math.PI * 2) / a.length) * i)}px`)
-      //   .on("click", (e, d) => {
-      //     this.$router.push(`/book-detail/${d.名录ID}`);
-      //   })
-      //   // .on("mouseenter", () => (this.$refs["book-info-dialog"].$el.style.display = "block"))
-      //   .on("mousemove", (ev) => {
-      //     this.$refs["book-info-dialog"].$el.style.left = ev.clientX + 10 + "px";
-      //     this.$refs["book-info-dialog"].$el.style.top = ev.clientY + 30 + "px";
-      //   })
-      //   .on("mouseenter", (ev, data) => {
-      //     ev.target.style.background = "#da9f21";
-      //     this.$refs["book-info-dialog"].$el.style.display = "block";
-      //     this.hover_data = {
-      //       id: data.名录ID,
-      //       title: this.$store.state.books.find((elem) => elem.id == data.名录ID).content.split("　")[0],
-      //       detail: this.$store.state.books.find((elem) => elem.id == data.名录ID).detail,
-      //     };
-      //   })
-      //   .on("mouseleave", (ev) => {
-      //     ev.target.style.background = "#4a330066";
-      //     this.$refs["book-info-dialog"].$el.style.display = "none";
-      //   });
     });
   },
 };
@@ -353,6 +250,7 @@ export default {
         }
       }
       .detail {
+        display: flex;
         font-size: 0.8rem;
       }
       .related-books {
