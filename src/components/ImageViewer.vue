@@ -24,7 +24,6 @@
         class="image"
         src="@/assets/placeholder.jpg"
         :alt="imageText"
-        :style="scaleImg"
         v-drag
         @mousewheel.prevent="scaleFun"
       />
@@ -42,16 +41,28 @@ export default {
     };
   },
   computed: {
-    scaleImg: function () {
-      return `transform:translate(-50%,-50%) scale(${this.imgScale})`
-    }
+    // scaleImg: function () {
+    //   if (this.img == undefined)
+    //     return `transform:translate(-50%,-50%) scale(${this.imgScale})`
+    //   let translate = this.img.style.transform.split(' ')
+    //   translate = translate[0]+translate[1]
+    //   console.log('trans', translate)
+    //   console.log('left', this.img.style)
+    //   return `transform:${translate} scale(${this.imgScale})`
+    // }
   },
   watch: {
   },
   methods: {
     scaleFun(e) {
       let direction = e.deltaY > 0 ? -0.1:0.1
+      let left = this.img.offsetLeft
+      let top = this.img.offsetTop
+      
       this.imgScale = Math.max(this.imgScale+direction, 0.1)
+      this.img.style.transform = `translate(-50%,-50%) scale(${this.imgScale})`
+      this.img.style.left = left + 'px'
+      this.img.style.top = top + 'px'
     },
     scaleToWidth() {
       this.imgScale = 1
