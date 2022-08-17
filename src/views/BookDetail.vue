@@ -58,7 +58,6 @@
         </div>
       </div>
     </div>
-    <BookInfoDialog ref="book-info-dialog" :id="hover_data.id" :title="hover_data.title" :detail="hover_data.detail" />
     <ImageViewer ref="image-viewer" @remove="closeImageViewer" />
   </div>
 </template>
@@ -66,13 +65,12 @@
 <script>
 import axios from "axios";
 // import * as d3 from "d3";
-import BookInfoDialog from "@/components/BookInfoDialog";
 import BackButton from "@/components/BackButton";
 import ImageViewer from "@/components/ImageViewer";
 
 export default {
   name: "BookDetail",
-  components: { BookInfoDialog, BackButton, ImageViewer },
+  components: { BackButton, ImageViewer },
   data() {
     return {
       isDetail: true,
@@ -276,6 +274,12 @@ export default {
         }
       }
     }
+    z-index: 1;
+    position: absolute;
+  }
+  .imageViewer {
+    position: absolute;
+    z-index: 2;
   }
 }
 </style>

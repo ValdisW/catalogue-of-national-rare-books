@@ -1,18 +1,29 @@
 <template>
-  <div class="image-viewer" v-show="show">
+  <div class="image-viewer">
     <div class="button">
-      <div class="scale-to-width" @click="scaleToWidth">适应宽度</div>
-      <div class="scale-to-height" @click="scaleToHeight">适应高度</div>
-      <div class="scale-to-origin" @click="scaleToOrigin">原始尺寸</div>
+      <div class="scale-to-width"
+        @click="scaleToWidth">
+        适应宽度
+      </div>
+      <div class="scale-to-height"
+        @click="scaleToHeight">
+        适应高度
+      </div>
+      <div class="scale-to-origin"
+        @click="scaleToOrigin">
+        原始尺寸
+      </div>
     </div>
-    <div class="close" @click="close">关闭</div>
+    <div class="close"
+      @click="close">
+      关闭
+    </div>
 
     <div class="img-wrapper">
       <img
         class="image"
         src="@/assets/placeholder.jpg"
         :alt="imageText"
-        :style="scaleImg"
         v-drag
         @mousewheel.prevent="scaleFun"
       />
@@ -27,66 +38,77 @@ export default {
   data() {
     return {
       imgScale: 1,
-      show: false,
     };
   },
   computed: {
-    scaleImg: function () {
-      return `transform:translate(-50%,-50%) scale(${this.imgScale})`;
-    },
+    // scaleImg: function () {
+    //   if (this.img == undefined)
+    //     return `transform:translate(-50%,-50%) scale(${this.imgScale})`
+    //   let translate = this.img.style.transform.split(' ')
+    //   translate = translate[0]+translate[1]
+    //   console.log('trans', translate)
+    //   console.log('left', this.img.style)
+    //   return `transform:${translate} scale(${this.imgScale})`
+    // }
   },
-  watch: {},
+  watch: {
+  },
   methods: {
     scaleFun(e) {
-      let direction = e.deltaY > 0 ? -0.1 : 0.1;
-      this.imgScale = Math.max(this.imgScale + direction, 0.1);
+      let direction = e.deltaY > 0 ? -0.1:0.1
+      let left = this.img.offsetLeft
+      let top = this.img.offsetTop
+      
+      this.imgScale = Math.max(this.imgScale+direction, 0.1)
+      this.img.style.transform = `translate(-50%,-50%) scale(${this.imgScale})`
+      this.img.style.left = left + 'px'
+      this.img.style.top = top + 'px'
     },
     scaleToWidth() {
-      this.imgScale = 1;
-      this.img.style = "width:100%;height:auto;";
+      this.imgScale = 1
+      this.img.style = 'width:100%;height:auto;'
     },
     scaleToHeight() {
-      this.imgScale = 1;
-      this.img.style = "height:100%;width:auto;";
+      this.imgScale = 1
+      this.img.style = 'height:100%;width:auto;'
     },
     scaleToOrigin() {
-      this.imgScale = 1;
-      this.img.style = "width:auto;height:auto;max-height:100%;max-width:100%;";
+      this.imgScale = 1
+      this.img.style = 'width:auto;height:auto;max-height:100%;max-width:100%;'
     },
     close() {
-      this.show = false;
-    },
-    open() {
-      this.show = true;
-    },
+      this.$emit('remove');
+    }
   },
   directives: {
     drag: function (dragItem) {
       document.onmousedown = (e) => {
-        e.preventDefault();
-        let disX = e.pageX - dragItem.offsetLeft;
-        let disY = e.pageY - dragItem.offsetTop;
+        e.preventDefault()
+        let disX = e.pageX - dragItem.offsetLeft
+        let disY = e.pageY - dragItem.offsetTop
         // console.log('down', e.pageX, e.pageY, dragItem.offsetLeft, dragItem.offsetTop)
         document.onmousemove = (e) => {
-          e.preventDefault();
-          let left = e.pageX - disX;
-          let top = e.pageY - disY;
+          e.preventDefault()
+          let left = e.pageX - disX
+          let top = e.pageY - disY
           // console.log('move', e.pageX, e.pageY, left, top)
-          dragItem.style.left = left + "px";
-          dragItem.style.top = top + "px";
-        };
+          dragItem.style.left = left + 'px'
+          dragItem.style.top = top + 'px'
+        }
         document.onmouseup = (e) => {
-          e.preventDefault();
-          document.onmousemove = null;
-          document.onmouseup = null;
-        };
-      };
-    },
+          e.preventDefault()
+          document.onmousemove = null
+          document.onmouseup = null
+        }
+      }
+    }
   },
-  created() {},
+  created() {
+
+  },
   mounted() {
-    this.img = document.getElementsByClassName("image")[0];
-    console.log(this.img.offsetHeight);
+    this.img = document.getElementsByClassName("image")[0]
+    console.log(this.img.offsetHeight)
   },
 };
 </script>
@@ -96,8 +118,6 @@ export default {
   background: #000000a7;
   width: 100vw;
   height: 100vh;
-  position: absolute;
-
   .img-wrapper {
     width: 100vw;
     // height: 100vh;
@@ -106,16 +126,16 @@ export default {
     position: absolute;
     // text-align: center;
     img {
-      width: auto;
-      height: auto;
-      max-width: 100%;
-      max-height: 100%;
+      width:auto;
+      height:auto;
+      max-width:100%;
+      max-height:100%;
       position: absolute;
       // object-fit: cover;
       margin: 0 auto;
       left: 50%;
       top: 50%;
-      transform: translate(-50%, -50%);
+      transform: translate(-50%,-50%);
     }
     z-index: 1;
   }
@@ -131,4 +151,6 @@ export default {
     z-index: 3;
   }
 }
+
+
 </style>
