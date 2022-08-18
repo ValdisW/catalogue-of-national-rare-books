@@ -32,7 +32,10 @@
             <p>文種：</p>
             <p>文獻類型：</p>
             <p>版本類型：</p>
+            <p>版本：</p>
+            <p>數量：</p>
             <p>板框尺寸：</p>
+            <p>版式：</p>
             <p>裝幀形式：</p>
             <p>開本尺寸：</p>
             <p>牌記：</p>
@@ -42,8 +45,11 @@
           <div class="detail-content">
             <p class="language" v-text="book_data.language"></p>
             <p class="document-type" v-text="book_data.document_type"></p>
-            <p class="edition-type">-</p>
+            <p class="edition-type" >-</p>
+            <p class="edition">-</p>
+            <p class="number">-</p>
             <p class="frame-size">-</p>
+            <p class="frame-form">-</p>
             <p class="binding-form">-</p>
             <p class="book-size">-</p>
             <p class="note">-</p>
@@ -86,6 +92,28 @@
         <!--            </tr>-->
         <!--          </table>-->
         <!--        </div>-->
+
+        <ul class="timeline">
+          <li>
+            <div class="actions">撰</div>
+            <div class="test"></div>
+            <b></b>
+            <div class="timestamp">[唐]柳宗元</div>
+          </li>
+          <li>
+            <div class="actions">校正</div>
+            <b></b>
+            <div class="timestamp">[明]廖瑩中</div>
+          </li>
+          <li>
+            <div class="actions">刻</div>
+           <b></b>
+            <div class="timestamp">[明]佚名</div>
+          </li>
+
+        </ul>
+
+
       </div>
 
       <div class="book-image">
@@ -95,7 +123,7 @@
         </div>
       <div class="img-wrapper" >
         <img class="img-1" v-show="firstPic" src="@/assets/placeholder.jpg" alt="" />
-           <!--  test the width-->
+           <!--  circle the width-->
         <img class="img-2" v-show="secPic" src="https://file.szmuseum.com/ThumbCover/%E5%8F%A4%E7%B1%8D%E4%BF%A1%E6%81%AF%E7%AE%A1%E7%90%86/201806141352095MD1WD.jpg" alt="" />
       </div>
       </div>
@@ -244,8 +272,8 @@ export default {
       margin-top: 5vh;
     }
     .book-image{
-      width: 45%;
-      height: 75vh;
+      width: 50%;
+      height: 80vh;
       align-items: center;
       justify-content: center;
       .switch_pic{
@@ -273,10 +301,10 @@ export default {
       .img-wrapper {
         background: #dec4a4;
         // background: #5e524a;
-        height: 60vh;
+        height: 75vh;
         margin: 1rem 0 0 0;
         img {
-          height: 60vh;
+          height: 75vh;
           transition: all 1s ease-in-out;
         }
 
@@ -317,6 +345,55 @@ export default {
           font-size: 2.3vh;
         }
       }
+
+      .timeline {
+        list-style-type: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        li {
+          float: left;
+          min-width: 25%;
+          max-width: 20%;
+          position: relative;
+          text-align: center;
+          padding-top: 10px;
+        }
+
+        .actions {
+          text-align: center;
+          font-weight: bold;
+          font-size: 2.3vh;
+          height: 45px;
+          margin-bottom: 30px;
+          border-bottom: 3px solid #4f4545;
+        }
+
+
+        .timestamp {
+          text-align: center;
+          margin-top: 20px;
+          font-size: 2vh;
+
+        }
+
+      }
+
+      .timeline li b:before {
+        content: '';
+        position: absolute;
+        top: 45px;
+        width: 20px;
+        left: 0%;
+        height: 20px;
+        border: 3px solid #9f6666;
+        border-radius: 50%;
+        background: #ffffff;
+        margin-left: 40%;
+
+       }
+
       .title {
         font-family: "SourceHanSerif";
         font-weight: bold;
@@ -333,11 +410,14 @@ export default {
       .detail {
         font-size: 0.8rem;
         display: flex;
-        line-height: 2.5;
+        line-height: 2;
         .detail-title {
           text-align: right;
           width: 20%;
           font-weight: bold;
+        }
+        .detail-content{
+          margin-left: 25px;
         }
       }
       .related-books {

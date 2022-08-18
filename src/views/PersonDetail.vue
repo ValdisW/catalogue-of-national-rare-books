@@ -398,7 +398,7 @@ export default {
   justify-content: center;
   .content {
     width: 80%;
-
+    color: #3f3937;
     align-items: center;
     justify-content: center;
     .person-card{
