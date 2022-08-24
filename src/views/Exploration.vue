@@ -5,7 +5,7 @@
       <input placeholder="請輸入關鍵詞" type="text" ref="text" />
 
       <!-- 檢索字段 -->
-      <Droplist :attr_list="display_attrs" />
+      <Droplist ref="drop-list" :attr_list="display_attrs" />
 
       <!-- 檢索按鈕 -->
       <button id="search-button" @click="search"></button>
@@ -45,24 +45,59 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="item in curr_d" :key="item.id" class="item-block">
-                <td>
-                  <router-link
-                    v-text="item.id"
-                    :to="'/book-detail/' + item.id"
-                  ></router-link>
-                </td>
+              <tr
+                v-for="item in curr_d"
+                :key="item.id"
+                class="item-block"
+                @click="$emit('openBookDetail', item.id)"
+              >
+                <td v-text="item.id"></td>
                 <td v-text="item.batch"></td>
-                <td>
-                  <router-link
-                    v-text="item.content.split('　')[0]"
-                    :to="'/book-detail/' + item.id"
-                  ></router-link>
-                </td>
-                <td v-text="item.edition_dynasty"></td>
-                <td v-text="item.document_type"></td>
-                <td v-text="item.language"></td>
-                <td v-text="item.institution"></td>
+                <td v-text="item.name"></td>
+                <td
+                  v-text="
+                    $store.state.all_edition_dynasty.find(
+                      (ele) => ele.id == item.edition_dynasty_id
+                    )
+                      ? $store.state.all_edition_dynasty.find(
+                          (ele) => ele.id == item.edition_dynasty_id
+                        ).name
+                      : '-'
+                  "
+                ></td>
+                <td
+                  v-text="
+                    $store.state.all_document_type.find(
+                      (ele) => ele.id == item.document_type_id
+                    )
+                      ? $store.state.all_document_type.find(
+                          (ele) => ele.id == item.document_type_id
+                        ).name
+                      : '-'
+                  "
+                ></td>
+                <td
+                  v-text="
+                    $store.state.all_language.find(
+                      (ele) => ele.id == item.language_id
+                    )
+                      ? $store.state.all_language.find(
+                          (ele) => ele.id == item.language_id
+                        ).name
+                      : '-'
+                  "
+                ></td>
+                <td
+                  v-text="
+                    $store.state.all_institution.find(
+                      (ele) => ele.id == item.institution_id
+                    )
+                      ? $store.state.all_institution.find(
+                          (ele) => ele.id == item.institution_id
+                        ).name
+                      : '-'
+                  "
+                ></td>
               </tr>
             </tbody>
           </table>
@@ -94,51 +129,56 @@ export default {
       curr_d: [], // 当前页的检索结果
       items_sum: 1,
       each_page_items: 50, // 每頁的檢索結果數量
+
+      // 筛选器数据
       filter_data: [
         { id: "language", name: "文種", value: [] },
         { id: "edition_dynasty", name: "版本年代", value: [] },
         { id: "document_type", name: "文獻類型", value: [] },
+        { id: "edition_type", name: "版本類型", value: [] },
       ],
+
+      filtered_result: [], // 筛选后的结果
+
+      // 展示字段与检索字段
       display_attrs: [
-        { name: "ID", value: "id", order: true },
-        { name: "批次", value: "batch", order: true },
-        { name: "題名", value: "", order: true },
-        { name: "版本年代", value: "edition_dynasty", order: true },
-        { name: "文獻類型", value: "document_type", order: true },
-        { name: "文種", value: "language", order: true },
-        { name: "收藏單位", value: "institution", order: true },
+        { name: "ID", value: "id", order: true, byID: false },
+        { name: "批次", value: "batch", order: true, byID: false },
+        { name: "題名", value: "name", order: true, byID: false },
+        { name: "版本年代", value: "edition_dynasty", order: true, byID: true },
+        { name: "文獻類型", value: "document_type", order: true, byID: true },
+        { name: "文種", value: "language", order: true, byID: true },
+        { name: "收藏單位", value: "institution", order: true, byID: true },
       ],
-      filtered_result: [],
     };
   },
   methods: {
     // 开始搜索。根据检索词及筛选条件
     search() {
-      // let batch = document.querySelector("#batch>.value").getAttribute("val"),
-      //   language = document.querySelector("#language>.value").getAttribute("val"),
-      //   document_type = document.querySelector("#document_type>.value").getAttribute("val"),
-      //   edition_dynasty = document.querySelector("#dynasty_or_nation>.value").getAttribute("val");
-      axios.get(`/data/text?query=${this.$refs.text.value}&attr=`).then((d) => {
-        this.search_result = d.data;
-        this.items_sum = d.data.length;
-        this.curr_d = this.search_result.slice(0, this.each_page_items); // 当前页数据
-        this.updateFilter();
-      });
+      axios
+        .get(
+          `/data/text?query=${this.$refs.text.value}&attr=${this.$refs["drop-list"].curr_value}`
+        )
+        .then((d) => {
+          this.search_result = d.data;
+          this.items_sum = d.data.length;
+          this.curr_d = this.search_result.slice(0, this.each_page_items); // 当前页数据
+          this.updateFilter();
+        });
     },
     updateFilter() {
       for (let i in this.filter_data)
         this.filter_data[i].value = this.getSum(
           this.search_result,
-          this.filter_data[i].id
+          this.filter_data[i].id + "_id"
         );
     },
     filterResult(e) {
-      this.filtered_result = this.search_result.filter((ele) => {
-        ele[e.attr] == e.value;
-      });
-      console.log(this.search_result);
-      console.log(this.filtered_result);
-      this.curr_d = this.search_result.slice(0, this.each_page_items); // 当前页数据
+      this.filtered_result = this.search_result.filter(
+        (ele) => ele[e.attr + "_id"] == e.value
+      );
+      this.curr_d = this.filtered_result.slice(0, this.each_page_items); // 当前页数据
+      console.log(e, this.filtered_result);
     },
     getSum(r, attr) {
       let a = {};
@@ -264,30 +304,34 @@ export default {
           width: 100%;
           font-size: 0.7rem;
           border-collapse: collapse;
-          th {
-            cursor: pointer;
-            .attr-title {
-            }
-            .rank {
-              display: inline-block;
-              width: 0.6rem;
-              height: 0.6rem;
-              margin: 0 0 0 0.2rem;
-              span {
-                display: block;
-                border: 0.3rem solid #3333;
-                border-left-color: transparent;
-                border-right-color: transparent;
+          thead {
+            height: 1.5rem;
+            th {
+              cursor: pointer;
+              .attr-title {
               }
-              span:nth-child(1) {
-                border-top-width: 0;
-                margin: 0 0 0.1rem;
-              }
-              span:nth-child(2) {
-                border-bottom-width: 0;
+              .rank {
+                display: inline-block;
+                width: 0.6rem;
+                height: 0.6rem;
+                margin: 0 0 0 0.2rem;
+                span {
+                  display: block;
+                  border: 0.3rem solid #3333;
+                  border-left-color: transparent;
+                  border-right-color: transparent;
+                }
+                span:nth-child(1) {
+                  border-top-width: 0;
+                  margin: 0 0 0.1rem;
+                }
+                span:nth-child(2) {
+                  border-bottom-width: 0;
+                }
               }
             }
           }
+
           tr.item-block {
             td {
               text-align: center;
@@ -308,7 +352,7 @@ export default {
             background: #42210b12;
           }
           .item-block:hover {
-            background-color: #ccc;
+            background: #29150733;
           }
         }
       }

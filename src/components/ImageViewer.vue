@@ -1,5 +1,5 @@
 <template>
-  <div class="image-viewer">
+  <div class="image-viewer" v-show="show">
     <div class="button">
       <div class="scale-to-width" @click="scaleToWidth">适应宽度</div>
       <div class="scale-to-height" @click="scaleToHeight">适应高度</div>
@@ -10,7 +10,7 @@
     <div class="img-wrapper">
       <img
         class="image"
-        src="@/assets/placeholder.jpg"
+        :src="imageUrl"
         :alt="imageText"
         v-drag
         @mousewheel.prevent="scaleFun"
@@ -26,20 +26,9 @@ export default {
   data() {
     return {
       imgScale: 1,
+      show: false,
     };
   },
-  computed: {
-    // scaleImg: function () {
-    //   if (this.img == undefined)
-    //     return `transform:translate(-50%,-50%) scale(${this.imgScale})`
-    //   let translate = this.img.style.transform.split(' ')
-    //   translate = translate[0]+translate[1]
-    //   console.log('trans', translate)
-    //   console.log('left', this.img.style)
-    //   return `transform:${translate} scale(${this.imgScale})`
-    // }
-  },
-  watch: {},
   methods: {
     scaleFun(e) {
       let direction = e.deltaY > 0 ? -0.1 : 0.1;
@@ -63,13 +52,16 @@ export default {
       this.imgScale = 1;
       this.img.style = "width:auto;height:auto;max-height:100%;max-width:100%;";
     },
+    open() {
+      this.show = true;
+    },
     close() {
-      this.$emit("remove");
+      this.show = false;
     },
   },
   directives: {
-    drag: function (dragItem) {
-      document.onmousedown = (e) => {
+    drag: function (dragItem, _, vnode) {
+      vnode.el.parentElement.parentElement.onmousedown = (e) => {
         e.preventDefault();
         let disX = e.pageX - dragItem.offsetLeft;
         let disY = e.pageY - dragItem.offsetTop;
@@ -90,19 +82,22 @@ export default {
       };
     },
   },
-  created() {},
   mounted() {
     this.img = document.getElementsByClassName("image")[0];
-    console.log(this.img.offsetHeight);
   },
 };
 </script>
 
 <style scoped lang="less">
 .image-viewer {
+  overflow: hidden;
   background: #000000a7;
   width: 100vw;
   height: 100vh;
+
+  position: absolute;
+  z-index: 200;
+
   .img-wrapper {
     width: 100vw;
     // height: 100vh;

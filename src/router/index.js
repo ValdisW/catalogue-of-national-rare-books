@@ -29,12 +29,12 @@ const routes = [
     meta: { title: "关于我们" },
     component: () => import("../views/About.vue"),
   },
-  {
-    path: "/book-detail/:bookID",
-    name: "BookDetail",
-    meta: { title: "古籍详情" },
-    component: () => import("../views/BookDetail.vue"),
-  },
+  // {
+  //   path: "/book-detail/:bookID",
+  //   name: "BookDetail",
+  //   meta: { title: "古籍详情" },
+  //   component: () => import("../views/BookDetail.vue"),
+  // },
   {
     path: "/person-detail/:personID",
     name: "PersonDetail",

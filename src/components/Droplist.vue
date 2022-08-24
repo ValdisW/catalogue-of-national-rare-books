@@ -10,6 +10,7 @@
         :key="attr"
         @click="select"
         v-text="attr.name"
+        :name="attr.value"
       ></li>
     </ul>
   </div>
@@ -26,6 +27,7 @@ export default {
       options: [],
       show_list: false,
       default_text: this.attr_list[0].name,
+      curr_value: this.attr_list[0].value,
     };
   },
   methods: {
@@ -33,6 +35,7 @@ export default {
       this.show_list = !this.show_list;
     },
     select(e) {
+      this.curr_value = e.target.getAttribute("name");
       this.toggleShowList();
       this.default_text = e.target.innerText;
     },
@@ -69,9 +72,14 @@ export default {
   .list {
     position: absolute;
     list-style: none;
-    background-color: #ccc;
+    background-color: rgba(184, 164, 119, 0.87);
+    text-align: center;
     z-index: 10;
     width: 4rem;
+    li {
+      height: 1.5rem;
+      line-height: 1.5rem;
+    }
   }
   .list > li:hover {
     background: #333;

@@ -22,23 +22,31 @@
         </li>
       </ul>
     </nav>
-    <router-view v-slot="{ Component }" :key="$route.fullPath">
+
+    <router-view
+      v-slot="{ Component }"
+      :key="$route.fullPath"
+      @openBookDetail="openBookDetail"
+    >
       <keep-alive>
         <component :is="Component" />
       </keep-alive>
     </router-view>
+
+    <BookDetail ref="book-detail" />
   </div>
 </template>
 
 <script>
 import axios from "axios";
 import Loading from "@/components/Loading";
+import BookDetail from "@/views/BookDetail";
 
 const baseSize = 20;
 
 export default {
   name: "App",
-  components: { Loading },
+  components: { Loading, BookDetail },
   data() {
     return {
       complete: false,
@@ -46,6 +54,9 @@ export default {
     };
   },
   methods: {
+    openBookDetail(book_id) {
+      this.$refs["book-detail"].open(book_id);
+    },
     PageSize() {
       let width = window.innerWidth;
       let height = Math.min(window.innerHeight, (width * 9) / 16);
@@ -109,7 +120,7 @@ nav {
   user-select: none;
   // left: 50%;
   // transform: translateX(-50%);
-  z-index: 100;
+  z-index: 10;
   // background: rgb(202, 185, 167);
   ul {
     list-style: none;

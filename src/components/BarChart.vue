@@ -103,7 +103,7 @@ export default {
           .append("g")
           .attr(
             "transform",
-            (d) => `translate(${x(Math.log(d.value))},${y.bandwidth() / 2})`
+            (d) => `translate(${x(Math.log(d.value)) + 3},${y.bandwidth()})`
           )
           .append("text")
           .attr("font-size", "0.6rem")

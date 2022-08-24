@@ -8,7 +8,6 @@ const PageSize = function () {
   let height = Math.min(document.body.clientHeight, (width * 9) / 16);
   width = (height * 16) / 9;
   let size = { width, height };
-  console.log(size);
   return size;
 };
 

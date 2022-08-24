@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        background-color: #f2e0c4;
+        overflow: hidden;
+      }
+    </style>
+  </head>
+  <body>
+    <svg></svg>
+    <script src="https://cdn.bootcdn.net/ajax/libs/d3/7.6.1/d3.min.js"></script>
+    <script>
+      // modified version of random-normal
+      function normalPool(o) {
+        let r = 0;
+        do {
+          let a = Math.round(normal({ mean: o.mean, dev: o.dev }));
+          if (a < o.pool.length && a >= 0) return o.pool[a];
+          r++;
+        } while (r < 100);
+      }
+      function randomNormal(o) {
+        if (((o = Object.assign({ mean: 0, dev: 1, pool: [] }, o)), Array.isArray(o.pool) && o.pool.length > 0))
+          return normalPool(o);
+        let r,
+          a,
+          n,
+          e,
+          l = o.mean,
+          t = o.dev;
+        do r = (a = 2 * Math.random() - 1) * a + (n = 2 * Math.random() - 1) * n;
+        while (r >= 1);
+        return (e = a * Math.sqrt((-2 * Math.log(r)) / r)), t * e + l;
+      }
+
+      function rand(low, high) {
+        return Math.random() * (high - low) + low;
+      }
+
+      const NUM_PARTICLES = 600;
+      const PARTICLE_SIZE = 0.5; // View heights
+      const SPEED = 20000; // 毫秒数
+
+      let particles = [];
+
+      // 生成粒子
+      function generateParticleData() {
+        const colour = {
+          r: 60,
+          g: randomNormal({ mean: 50, dev: 20 }),
+          b: 50,
+          a: rand(0.2, 0.5),
+        };
+        return {
+          x: -2,
+          y: -2,
+          diameter: 0.3 + Math.max(0, randomNormal({ mean: PARTICLE_SIZE, dev: PARTICLE_SIZE / 2 })),
+          duration: randomNormal({ mean: SPEED, dev: SPEED * 0.1 }),
+          amplitude: randomNormal({ mean: 16, dev: 2 }),
+          offsetY: randomNormal({ mean: 0, dev: 10 }),
+          arc: Math.PI * 2,
+          startTime: performance.now() - rand(0, SPEED),
+          colour: `rgba(${colour.r}, ${colour.g}, ${colour.b}, ${colour.a})`,
+        };
+      }
+
+      // 计算粒子的新位置
+      function moveParticle(particle, svg, time) {
+        const progress = ((time - particle.startTime) % particle.duration) / particle.duration;
+
+        svg = document.querySelector("svg");
+        return {
+          ...particle,
+          x: progress,
+          y: Math.sin(progress * particle.arc) * particle.amplitude + particle.offsetY,
+        };
+      }
+
+      function draw(time, svg) {
+        // 更新粒子位置数据
+        particles.forEach((particle, index) => {
+          particles[index] = moveParticle(particle, svg, time);
+        });
+
+        // 根据数据更新粒子位置
+        const vh = d3.select("svg").attr("height") / 100;
+        d3.selectAll("circle")
+          .data(particles)
+          .attr("fill", (e) => e.colour)
+          .attr("cx", (e) => e.x * svg.attr("width"))
+          .attr("cy", (e) => e.y * vh + svg.attr("height") / 2)
+          .attr("r", (e) => e.diameter * vh);
+
+        requestAnimationFrame((time) => draw(time, svg));
+      }
+
+      function start() {
+        let svg = d3.select("svg").attr("width", window.innerWidth).attr("height", window.innerHeight);
+        for (let i = 0; i < NUM_PARTICLES; i++) particles.push(generateParticleData());
+        let circles = svg.selectAll("circle").data(particles).enter().append("circle");
+
+        requestAnimationFrame((time) => draw(time, svg));
+      }
+
+      (function () {
+        if (document.readystate !== "loading") {
+          start();
+        } else {
+          document.addEventListener("DOMContentLoaded", () => {
+            start();
+          });
+        }
+      })();
+    </script>
+  </body>
+</html>

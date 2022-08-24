@@ -1,6 +1,7 @@
 <template>
   <div class="introduction" @wheel.prevent="rowScroll" ref="introduction">
     <section class="section-1">
+      <!-- <FlowingParticles_new /> -->
       <div class="everyday-book">
         <div>
           <p>今日古籍</p>
@@ -11,7 +12,7 @@
           <p>01523</p>
           <p>鲍氏国策十卷</p>
         </div>
-        <img src="@/assets/placeholder.jpg" alt="今日古籍-书影" />
+        <img src="/images/placeholder.jpg" alt="今日古籍-书影" />
       </div>
       <div class="cover">
         <div>
@@ -37,6 +38,7 @@
 
 <script>
 import FlowingParticles from "@/views/Exploration-Flow.vue";
+// import FlowingParticles_new from "@/components/FlowingParticles_new.vue";
 import BaiduMap from "@/views/Exploration-BaiduMap.vue";
 import Stack from "@/views/Exploration-Stack.vue";
 
@@ -44,6 +46,7 @@ export default {
   name: "Introduction",
   components: {
     FlowingParticles,
+    // FlowingParticles_new,
     BaiduMap,
     Stack,
   },
@@ -200,7 +203,8 @@ export default {
   .cover {
     background-color: #111;
     width: 20rem;
-    height: 90vh;
+    height: 87vh;
+    margin: 3vh 0 0;
     box-shadow: 5px 5px 10px 0 #666;
     display: flex;
     justify-content: center;

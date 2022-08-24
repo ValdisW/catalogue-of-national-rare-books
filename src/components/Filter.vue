@@ -4,9 +4,25 @@
     <div class="content">
       <ul>
         <li v-for="e in attrs" :key="e" :val="e.value" @click="toggleSelect(e)">
-          <div class="bar" :style="{ width: e.value + 'px' }"></div>
+          <!-- 条形-->
+          <div
+            class="bar"
+            :style="{
+              width: (Math.log(e.value) / Math.log(max_value)) * 100 + '%',
+            }"
+          ></div>
+
+          <!-- 各属性值及其对应的数量 -->
           <div class="info">
-            <span v-text="e.name"></span>
+            <span
+              v-text="
+                $store.state['all_' + attr_id].find((ele) => ele.id == e.name)
+                  ? $store.state['all_' + attr_id].find(
+                      (ele) => ele.id == e.name
+                    ).name
+                  : '未知'
+              "
+            ></span>
             <span v-text="e.value"></span>
           </div>
         </li>
@@ -20,13 +36,20 @@ export default {
   name: "Filter",
   props: {
     attr_id: String,
-    attr_name: String,
-    attrs: Array,
+    attr_name: String, // 筛选器的标题
+    attrs: Array, // 筛选器展示的内容。键值对，各个属性id及其值 e.g. {name: 12, value: 345}
+  },
+  computed: {
+    max_value() {
+      let max = 0;
+      this.attrs.forEach((e) => {
+        if (max < e.value) max = e.value;
+      });
+      console.log(this.attr_name, max);
+      return max;
+    },
   },
   methods: {
-    update(data) {
-      return data;
-    },
     toggleSelect(e) {
       this.$emit("filter", { attr: this.attr_id, value: e.name });
     },
@@ -36,13 +59,23 @@ export default {
 
 <style lang="less" scoped>
 .filter {
-  background: rgb(153, 135, 105);
-  width: 7rem;
-  height: 6rem;
-  margin: 1rem 0;
-  overflow-y: scroll;
-  overflow-x: hidden;
+  user-select: none;
+  position: relative;
+  .title {
+    position: absolute;
+    font-size: 0.7rem;
+    width: 1rem;
+    left: -1.2rem;
+    top: 50%;
+    transform: translateY(-50%);
+  }
   .content {
+    width: 7rem;
+    height: 6rem;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    background: rgb(153, 135, 105);
+    margin: 1rem 0;
     ul {
       list-style: none;
       li {

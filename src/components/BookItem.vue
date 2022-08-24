@@ -1,9 +1,9 @@
 <template>
-  <div class="book-item">
+  <div class="book-item" @click="$emit('openBookDetail', id)">
     <div>
-      <img src="@/assets/placeholder.jpg" alt="書影" />
+      <img src="/images/placeholder.jpg" alt="書影" />
     </div>
-    <p><router-link :to="'/book-detail/' + id" v-text="title"></router-link></p>
+    <p v-text="title"></p>
   </div>
 </template>
 
@@ -15,9 +15,7 @@ export default {
   },
   data() {
     return {
-      title: this.$store.state.books
-        .find((e) => e.id == this.id)
-        .content.split("　")[0],
+      title: this.$store.state.books.find((e) => e.id == this.id).name,
     };
   },
 };
@@ -25,10 +23,12 @@ export default {
 
 <style lang="less" scoped>
 .book-item {
-  width: 100px;
+  flex: 5rem 1 1;
+  margin: 0.2rem;
   div {
     background: #6666;
-    height: 100px;
+    height: 5rem;
+    width: 100%;
     display: flex;
     justify-content: center;
     img {
@@ -36,10 +36,12 @@ export default {
     }
   }
   p {
-    font-size: 0.7rem;
+    font-size: 0.6rem;
     text-align: center;
+    margin: 0.1rem 0 0;
     a {
       color: rgb(75, 28, 28);
+      text-decoration: none;
     }
   }
 }

@@ -2,14 +2,14 @@
   <div class="book-detail-tooltip">
     <div class="container">
       <div class="img-wrapper">
-        <img src="@/assets/placeholder.jpg" alt="書影" />
+        <img src="/images/placeholder.jpg" alt="書影" />
       </div>
       <div class="content">
         <h4>
           <span v-text="id"></span>
           <span v-text="detail_data.content.split('　')[0]"></span>
         </h4>
-        <router-link :to="'/book-detail/' + id">查看詳情</router-link>
+        <span>查看詳情</span>
         <div class="detail">
           <button id="test" @click="test">临时按钮</button>
           <p>

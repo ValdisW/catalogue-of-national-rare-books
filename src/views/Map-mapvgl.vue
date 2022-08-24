@@ -15,16 +15,24 @@
         </li>
       </ul>
     </div>
+
+    <!-- 悬浮框 -->
     <div id="tooltip">
       <div id="tooltip-box"></div>
     </div>
   </div>
+
+  <InstitutionDetail institutionID="201"></InstitutionDetail>
 </template>
 
 <script>
 import * as Data from "@/data/dataLoader";
+import InstitutionDetail from "@/views/InstitutionDetail";
 
 export default {
+  components: {
+    InstitutionDetail,
+  },
   data() {
     return {
       zoom: null,
@@ -214,7 +222,7 @@ export default {
       map.enableInertialDragging();
       map.enableContinuousZoom();
 
-      map.setDefaultCursor('default');
+      map.setDefaultCursor("default");
 
       // map.setDisplayOptions(options.displayOptions || {
       //         indoor: false,
@@ -299,6 +307,8 @@ export default {
         this.map.reset();
       }
     },
+
+    // 二级菜单
     showSublist(d, list) {
       let sublist = document.createElement("ul");
       let self = this;
@@ -373,6 +383,7 @@ export default {
   #tooltip {
     #tooltip-box {
       background-color: #333;
+      z-index: 10;
       color: #fff;
       padding: 0.6rem;
       font-size: 0.8rem;

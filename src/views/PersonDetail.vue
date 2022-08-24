@@ -1,12 +1,12 @@
 <template>
   <div class="person-detail">
-    <BackButton />
+    <!-- <BackButton /> -->
     <div class="content">
       <div class="person-card">
         <div class="person-info">
           <div class="person-brief">
             <div class="person-name">
-              <h1 v-text="$route.params.personID"></h1>
+              <h1 v-text="person_info.name"></h1>
             </div>
             <div class="person-info-list">
               <div class="person-birth">
@@ -34,8 +34,13 @@
           <div class="person-responsibility">
             <p v-for="b in this.related_person" :key="b">
               <router-link
-                :to="/person-detail/ + b.责任人姓名"
-                v-text="b.责任人姓名 + ' ' + b.count"
+                :to="/person-detail/ + b.person_id"
+                v-text="
+                  $store.state.persons.find((ele) => ele.id == b.person_id)
+                    .name +
+                  ' ' +
+                  b.count
+                "
               ></router-link>
             </p>
           </div>
@@ -52,10 +57,10 @@
         <div class="book-responsibility">
           <ul>
             <li v-for="e in relatedBooks" :key="e">
-              <router-link
-                :to="'/book-detail/' + e.名录ID"
-                v-text="e.名录ID + ' ' + e.题名卷数 + ' ' + e.责任行为"
-              ></router-link>
+              <span
+                v-text="e.book_id + ' ' + e.title + ' '"
+                @click="$emit('openBookDetail', e.book_id)"
+              ></span>
             </li>
           </ul>
         </div>
@@ -74,11 +79,10 @@
 import axios from "axios";
 // import * as d3 from "d3";
 import BookInfoDialog from "@/components/BookInfoDialog";
-import BackButton from "@/components/BackButton";
 
 export default {
   name: "PersonDetail",
-  components: { BookInfoDialog, BackButton },
+  components: { BookInfoDialog },
   data() {
     return {
       catalogue: {
@@ -316,14 +320,20 @@ export default {
         title: "",
         detail: "",
       },
+      person_info: {},
     };
   },
   mounted() {
+    this.person_info = {
+      name: this.$store.state.persons.find(
+        (ele) => ele.id == this.$route.params.personID
+      ).name,
+    };
     axios
       .get(`/data/person-detail/${this.$route.params.personID}`)
       .then((d) => {
         this.relatedBooks = d.data[0];
-
+        console.log(this.relatedBooks, this.$store.state.all_action);
         this.related_person = d.data[1];
         this.related_person.sort((a, b) => b.count - a.count);
         let max = 0,

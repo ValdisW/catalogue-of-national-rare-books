@@ -6,7 +6,7 @@
         <input
           placeholder="默認按全字段檢索"
           type="text"
-          value="朱"
+          value="朱熹"
           ref="text"
         />
         <Droplist :attr_list="display_attrs" />
@@ -40,26 +40,39 @@
           <!-- <li v-for="r in relation_list" :key="r">
             <router-link :to="'/book-detail/' + convertBookId(r.book_id)" v-text="r"></router-link>
           </li> -->
-          <li v-for="r in relation_list" :key="r">
-            <router-link :to="'/book-detail/' + convertBookId(r.book_id)">
-              <div>
-                <span v-text="convertBookId(r.book_id)"></span>
-                <span v-text="getBookNameById(convertBookId(r.book_id))"></span>
-              </div>
-              <div>
-                <span v-text="getPersonNameById(r.person1_id)"></span
-                ><span
-                  v-text="'[' + getActionNameById(r.action1_id) + ']'"
-                ></span
-                >-- <span v-text="getPersonNameById(r.person2_id)"></span
-                ><span
-                  v-text="'[' + getActionNameById(r.action2_id) + ']'"
-                ></span>
-              </div>
-            </router-link>
+          <li
+            v-for="r in relation_list"
+            :key="r"
+            @click="$emit('openBookDetail', convertBookId(r.book_id))"
+          >
+            <!-- 古籍信息 -->
+            <div class="book">
+              <span v-text="convertBookId(r.book_id)"></span>
+              <span v-text="getBookNameById(convertBookId(r.book_id))"></span>
+            </div>
+
+            <!-- 人物信息 -->
+            <div class="person">
+              <span class="name" v-text="getPersonNameById(r.person1_id)"></span
+              ><span
+                class="action"
+                v-text="getActionNameById(r.action1_id)"
+              ></span
+              >&nbsp;&nbsp;&nbsp;&nbsp;
+              <span class="name" v-text="getPersonNameById(r.person2_id)"></span
+              ><span
+                class="action"
+                v-text="getActionNameById(r.action2_id)"
+              ></span>
+            </div>
           </li>
         </ul>
       </div>
+    </div>
+
+    <div ref="tooltip" class="tooltip" v-show="show_tooltip">
+      <h5 v-text="selected_info.name"></h5>
+      <router-link :to="/person-detail/ + selected_info.id">詳情</router-link>
     </div>
   </div>
 </template>
@@ -83,6 +96,9 @@ export default {
         { name: "人名", value: "person_name" },
         { name: "书名", value: "book_name" },
       ],
+      show_tooltip: false,
+      selected_id: 0,
+      selected_info: {},
     };
   },
   computed: {
@@ -111,8 +127,15 @@ export default {
         );
         arr = r;
       }
-      console.log(arr);
+      console.log(this.curr_relation, arr);
       return arr;
+    },
+  },
+  watch: {
+    selected_id(value) {
+      this.selected_info = this.$store.state.persons.find(
+        (ele) => ele.id == value
+      );
     },
   },
   methods: {
@@ -133,11 +156,11 @@ export default {
       let r = this.$store.state.books.find(
         (e) => e.id == this.convertBookId(id)
       );
-      if (r) return r.content.split(`　`)[0];
+      if (r) return r.name;
       else return "未知书名";
     },
     getActionNameById(id) {
-      let r = this.$store.state.actions.find((e) => e.id == id);
+      let r = this.$store.state.all_action.find((e) => e.id == id);
       if (r) return r.name;
       else return "未知行为";
     },
@@ -170,7 +193,6 @@ export default {
         links, // 邊表 (typically [{source, target}, …])
       },
       {
-        nodeId = (d) => d.id, // given d in nodes, returns a unique identifier (string)
         nodeGroup, // given d in nodes, returns an (ordinal) value for color
         nodeGroups, // an array of ordinal values representing the node groups
         nodeTitle, // given d in nodes, a title string
@@ -179,14 +201,14 @@ export default {
         nodeStrokeWidth = 1.2, // 點的描邊寬度
         nodeStrokeOpacity = 1, // 點的描邊的不透明度
         nodeRadius = 10, // 點的直徑
-        nodeStrength = -1.4, // 斥力
         linkSource = ({ source }) => source, // given d in links, returns a node identifier string
         linkTarget = ({ target }) => target, // given d in links, returns a node identifier string
-        linkStroke = "#B8A4A4", // 邊的顔色
+        linkStroke = "#B8A4A499", // 邊的顔色
         linkStrokeOpacity = 1.0, // 邊的不透明度
         linkStrokeWidth = 1.5, // given d in links, returns a stroke width in pixels
         linkStrokeLinecap = "round", // link stroke linecap
-        linkStrength = 0.07, // 連綫的引力
+        nodeStrength = -2, // 斥力
+        linkStrength = 0.02, // 連綫的引力
         colors = ["#93A7A7"], // an array of color strings, for the node groups
         width = 640, // outer width, in pixels
         height = 640, // outer height, in pixels
@@ -195,7 +217,7 @@ export default {
     ) {
       // let self = this;
       // Compute values.
-      const N = d3.map(nodes, nodeId).map(this.intern);
+      const N = d3.map(nodes, (d) => d.id).map(this.intern);
       const LS = d3.map(links, linkSource).map(this.intern);
       const LT = d3.map(links, linkTarget).map(this.intern);
       if (nodeTitle === undefined) nodeTitle = (_, i) => N[i];
@@ -232,6 +254,12 @@ export default {
         .forceSimulation(nodes)
         .force("link", forceLink)
         .force("charge", forceNode)
+        .force(
+          "collide",
+          d3.forceCollide().radius(() => {
+            return 15;
+          })
+        )
         .force("center", d3.forceCenter())
         .on("tick", ticked);
 
@@ -274,7 +302,9 @@ export default {
         .attr("r", typeof nodeRadius != "function" ? nodeRadius : null)
         .attr("cursor", "pointer")
         .attr("class", (d) => `n${d.id}`)
-        .on("mouseenter", (e, d) => {
+        .on("click", (e, d) => {
+          this.$refs.tooltip.style.left = `${e.clientX + 40}px`;
+          this.$refs.tooltip.style.top = `${e.clientY - 40}px`;
           this.nodeHighlight(d.id, true);
         })
         // .on("mousemove", (e) => {
@@ -357,6 +387,8 @@ export default {
     },
 
     nodeHighlight(node_id, scroll) {
+      this.selected_id = node_id;
+      this.show_tooltip = true;
       this.node_list.forEach((e) => (e.active = false));
       this.node_list.find((e) => e.id == node_id).active = true;
       d3.selectAll(`circle`).attr("fill", "#93A7A7");
@@ -418,6 +450,8 @@ export default {
     .results-relation {
       margin: 0.8rem 1.2rem 0 0;
       .graph {
+        height: 31rem;
+        width: 37rem;
         background: #3331;
         border-radius: 0.5rem;
       }
@@ -461,15 +495,45 @@ export default {
         overflow-y: scroll;
         height: 9.3rem;
         li {
+          padding: 0 0 0.5rem;
           cursor: pointer;
-          a {
-            color: #333;
+          .book {
+            font-size: 0.9rem;
+            span:nth-child(1) {
+              color: rgb(168, 124, 79);
+            }
+          }
+          .person {
+            .action {
+              background: rgba(63, 40, 82, 0.413);
+              color: #eee;
+            }
           }
         }
         li:hover {
           background: #3333;
         }
+        li:nth-child(2n + 1) {
+          background: #42210b12;
+        }
       }
+    }
+  }
+
+  .tooltip {
+    position: absolute;
+    background: rgb(196, 178, 163);
+    width: 8rem;
+    height: 5rem;
+    top: 0;
+    left: 0;
+    z-index: 100;
+    box-sizing: border-box;
+    padding: 1rem;
+    border-radius: 0.3rem;
+    a {
+      color: #333;
+      font-size: 0.7rem;
     }
   }
 }
