@@ -7,30 +7,38 @@
       <div class="content">
         <h4>
           <span v-text="id"></span>
-          <span v-text="detail_data.content.split('　')[0]"></span>
+          <span v-text="detail_data.name"></span>
         </h4>
-        <span>查看詳情</span>
+        <span class="to-detail" @click="$emit('openBookDetail', id)"
+          >查看詳情</span
+        >
         <div class="detail">
-          <button id="test" @click="test">临时按钮</button>
+          <!-- <button id="test" @click="test">临时按钮</button> -->
           <p>
             <span>語種：</span>
-            <span v-text="detail_data.language"></span>
+            <span v-text="getLanguageNameById(detail_data.language_id)"></span>
           </p>
           <p>
             <span>版本年代/國別：</span>
-            <span v-text="detail_data.edition_dynasty"></span>
+            <span
+              v-text="getEditionDynastyNameById(detail_data.edition_dynasty_id)"
+            ></span>
           </p>
           <p>
             <span>文獻類型：</span>
-            <span v-text="detail_data.document_type"></span>
+            <span
+              v-text="getDocumentTypeNameById(detail_data.document_type_id)"
+            ></span>
           </p>
           <p>
             <span>批次：</span>
-            <span v-text="detail_data.batch"></span>
+            <span v-text="'第' + detail_data.batch + '批'"></span>
           </p>
           <p>
-            <span>館藏：</span>
-            <span v-text="detail_data.institution"></span>
+            <span>收藏單位：</span>
+            <span
+              v-text="getInstitutionNameById(detail_data.institution_id)"
+            ></span>
           </p>
         </div>
       </div>
@@ -39,22 +47,30 @@
 </template>
 
 <script>
+import Utils from "@/Utils";
+
 export default {
   name: "bookDetailTooltip",
   props: {
     id: String,
   },
+  methods: {
+    ...Utils.methods,
+  },
   computed: {
     detail_data() {
       if (!this.id) return { content: "　" };
-      else return this.$store.state.books.find((elem) => elem.id == this.id);
+      else return this.$store.state.books.find((el) => el.id == this.id);
     },
   },
-  methods: {
-    test() {
-      console.log("2333");
-    },
+  created() {
+    console.log(this);
   },
+  // methods: {
+  //   test() {
+  //     console.log("2333");
+  //   },
+  // },
 };
 </script>
 
@@ -81,10 +97,14 @@ export default {
         font-size: 0.9rem;
         span {
           display: block;
+          color: #fff;
         }
       }
-      a {
+      span.to-detail {
         color: #ccc;
+        font-size: 0.7rem;
+        text-decoration: underline;
+        cursor: pointer;
       }
       .detail {
         font-size: 0.7rem;

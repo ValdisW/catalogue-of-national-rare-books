@@ -7,26 +7,15 @@
           <span v-text="this.book_data.name"></span>
         </div>
         <div class="switch">
-          <button
-            class="book-content"
-            ref="switch-detail"
-            @click="this.show_attrs = false"
-          >
-            字段顯示
-          </button>
+          <button class="book-content" ref="switch-detail" @click="this.show_attrs = false">字段顯示</button>
           <div>│</div>
-          <button
-            class="book-display"
-            ref="switch-content"
-            @click="this.show_attrs = true"
-          >
-            名錄内容
-          </button>
+          <button class="book-display" ref="switch-content" @click="this.show_attrs = true">名錄内容</button>
         </div>
 
         <transition name="fade">
           <div class="detail" v-show="show_attrs">
             <div class="detail-title">
+              <p>题名：</p>
               <p>文種：</p>
               <p>文獻類型：</p>
               <p>版本類型：</p>
@@ -41,41 +30,18 @@
               <p>索書號：</p>
             </div>
             <div class="detail-content">
-              <p
-                class="language"
-                v-text="
-                  id2name(
-                    this.$store.state.all_language,
-                    book_data.language_id,
-                    '-'
-                  )
-                "
-              ></p>
+              <p class="name" v-text="book_data.name || '-'"></p>
+              <p class="language" v-text="id2name(this.$store.state.all_language, book_data.language_id, '-')"></p>
               <p
                 class="document-type"
-                v-text="
-                  id2name(
-                    this.$store.state.all_document_type,
-                    book_data.document_type_id,
-                    '-'
-                  )
-                "
+                v-text="id2name(this.$store.state.all_document_type, book_data.document_type_id, '-')"
               ></p>
               <p
                 class="edition-type"
-                v-text="
-                  id2name(
-                    this.$store.state.all_document_type,
-                    book_data.edition_type_id,
-                    '-'
-                  )
-                "
+                v-text="id2name(this.$store.state.all_document_type, book_data.edition_type_id, '-')"
               ></p>
               <p class="edition" v-text="book_data.edition || '-'"></p>
-              <p
-                class="quantity"
-                v-text="book_data.quantity + book_data.measurement || '-'"
-              ></p>
+              <p class="quantity" v-text="book_data.quantity + book_data.measurement || '-'"></p>
               <p class="frame-size" v-text="book_data.frame_size || '-'"></p>
               <p class="typeset" v-text="book_data.typeset || '-'"></p>
               <p class="binding-form">-</p>
@@ -83,13 +49,7 @@
               <p class="note">-</p>
               <p
                 class="institute"
-                v-text="
-                  id2name(
-                    this.$store.state.all_institution,
-                    book_data.institution_id,
-                    '-'
-                  )
-                "
+                v-text="id2name(this.$store.state.all_institution, book_data.institution_id, '-')"
               ></p>
               <p v-text="book_data.call_number || '-'"></p>
             </div>
@@ -107,11 +67,25 @@
         <!-- 责任者 -->
         <ul class="timeline">
           <li v-for="person in related_person" :key="person">
-            <div class="actions" v-text="person.action"></div>
+            <div
+              class="actions"
+              v-text="
+                $store.state.all_action.find((el) => el.id == person.action_id)
+                  ? $store.state.all_action.find((el) => el.id == person.action_id).name
+                  : '未知行为'
+              "
+            ></div>
             <b></b>
             <div
-              class="timestamp"
-              v-text="`[${person.dynasty_or_nation}]${person.person}`"
+              class="person"
+              v-text="
+                `[${person.dynasty_or_nation}]${
+                  $store.state.persons.find((el) => el.id == person.person_id)
+                    ? $store.state.persons.find((el) => el.id == person.person_id).name
+                    : '佚名'
+                }`
+              "
+              :title="JSON.stringify(person)"
             ></div>
           </li>
         </ul>
@@ -132,10 +106,7 @@
         </div>
       </div>
     </div>
-    <ImageViewer
-      ref="image-viewer"
-      :imageUrl="image_filenames[image_showed_index]"
-    />
+    <ImageViewer ref="image-viewer" :imageUrl="image_filenames[image_showed_index]" />
   </div>
 </template>
 
@@ -221,9 +192,13 @@ export default {
     align-items: center;
     justify-content: center;
     .close-button {
-      width: 1rem;
-      height: 1rem;
-      background: red;
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 2rem;
+      height: 2rem;
+      background: url(../assets/icons/back.svg) center no-repeat;
+      background-size: 100%;
       cursor: pointer;
     }
     .display {
@@ -361,25 +336,25 @@ export default {
         .actions {
           text-align: center;
           font-weight: bold;
-          font-size: 2.3vh;
+          font-size: 0.6rem;
           height: 45px;
-          margin-bottom: 30px;
+          margin-bottom: 0.7rem;
           border-bottom: 3px solid #4f4545;
         }
-        .timestamp {
+        .person {
           text-align: center;
-          margin-top: 20px;
-          font-size: 2vh;
+          margin-top: 0.7rem;
+          font-size: 0.6rem;
         }
       }
       .timeline li b:before {
         content: "";
         position: absolute;
         top: 45px;
-        width: 20px;
+        width: 0.8rem;
         left: 0%;
-        height: 20px;
-        border: 3px solid #9f6666;
+        height: 0.8rem;
+        border: 2px solid #9f6666;
         border-radius: 50%;
         background: #ffffff;
         margin-left: 40%;

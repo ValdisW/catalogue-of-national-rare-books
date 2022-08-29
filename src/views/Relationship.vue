@@ -3,26 +3,21 @@
     <div class="left">
       <!-- 檢索工具 -->
       <div class="search">
-        <input
-          placeholder="默認按全字段檢索"
-          type="text"
-          value="朱熹"
-          ref="text"
-        />
-        <Droplist :attr_list="display_attrs" />
+        <input type="text" value="史記" ref="text" />
+        <Droplist ref="drop-list" :attr_list="display_attrs" />
         <button id="search-button" @click="search"></button>
         <button id="tip-button"></button>
       </div>
 
       <!-- 關係圖 -->
       <div class="results results-relation">
-        <div class="graph" ref="graph-chart"></div>
+        <div class="graph" ref="svg-wrapper"></div>
       </div>
     </div>
 
     <div class="right">
       <div class="list nodes-list">
-        <h4>節點列表</h4>
+        <h4>相關人物</h4>
         <ul ref="nodes-list">
           <li
             v-for="n in node_list"
@@ -35,7 +30,7 @@
         </ul>
       </div>
       <div class="list relationship-detail">
-        <h4>關係内容</h4>
+        <h4>相關古籍</h4>
         <ul>
           <!-- <li v-for="r in relation_list" :key="r">
             <router-link :to="'/book-detail/' + convertBookId(r.book_id)" v-text="r"></router-link>
@@ -79,7 +74,6 @@
 
 <script>
 import * as d3 from "d3";
-// import * as Data from "@/data/dataLoader";
 import axios from "axios";
 import Droplist from "@/components/Droplist";
 
@@ -93,8 +87,8 @@ export default {
       curr_links: [],
       curr_relation: null,
       display_attrs: [
-        { name: "人名", value: "person_name" },
         { name: "书名", value: "book_name" },
+        { name: "人名", value: "person_name" },
       ],
       show_tooltip: false,
       selected_id: 0,
@@ -127,7 +121,6 @@ export default {
         );
         arr = r;
       }
-      console.log(this.curr_relation, arr);
       return arr;
     },
   },
@@ -165,23 +158,42 @@ export default {
       else return "未知行为";
     },
     search() {
-      // 先测试一下，按人名来检索
-      this.draw();
+      // 按书名检索
+      if (this.$refs["drop-list"].curr_value == "book_name")
+        axios
+          .get(`/data/person?text=${this.$refs.text.value}`)
+          .then((d) => {
+            d.data[0].forEach((ele) => {
+              ele.value = 1.5 + Math.sqrt(ele.books); // 点的大小
+            });
+            this.curr_nodes = d.data[0];
+            this.curr_links = d.data[1];
+          })
+          .then(() => {
+            this.renderGraphChart({
+              nodes: this.curr_nodes,
+              links: this.curr_links,
+            });
+          });
+      // 按人名检索
+      else if (this.$refs["drop-list"].curr_value == "person_name")
+        axios
+          .get(`/data/person?text=${this.$refs.text.value}`)
+          .then((d) => {
+            d.data[0].forEach((ele) => {
+              ele.value = 1.5 + Math.sqrt(ele.books); // 点的大小
+            });
+            this.curr_nodes = d.data[0];
+            this.curr_links = d.data[1];
+          })
+          .then(() => {
+            this.renderGraphChart({
+              nodes: this.curr_nodes,
+              links: this.curr_links,
+            });
+          });
     },
 
-    // 计算关系
-    getGraphData() {
-      return new Promise((res) => {
-        axios.get(`/data/person?text=${this.$refs.text.value}`).then((d) => {
-          d.data[0].forEach((ele) => {
-            ele.value = 1.5 + Math.sqrt(ele.books); // 点的大小
-          });
-          this.curr_nodes = d.data[0];
-          this.curr_links = d.data[1];
-          res();
-        });
-      });
-    },
     intern(value) {
       return value !== null && typeof value === "object"
         ? value.valueOf()
@@ -256,9 +268,7 @@ export default {
         .force("charge", forceNode)
         .force(
           "collide",
-          d3.forceCollide().radius(() => {
-            return 15;
-          })
+          d3.forceCollide().radius(() => (2 * height) / nodes.length)
         )
         .force("center", d3.forceCenter())
         .on("tick", ticked);
@@ -268,8 +278,8 @@ export default {
         .create("svg")
         .attr("width", width)
         .attr("height", height)
-        .attr("viewBox", [-width / 2, -height / 2, width, height])
-        .attr("style", "max-width: 100%; height: auto; height: intrinsic;");
+        .attr("viewBox", [-width / 2, -height / 2, width, height]);
+      // .attr("style", "max-width: 100%; height: auto; height: intrinsic;");
 
       // 添加连线
       const link = svg
@@ -303,8 +313,6 @@ export default {
         .attr("cursor", "pointer")
         .attr("class", (d) => `n${d.id}`)
         .on("click", (e, d) => {
-          this.$refs.tooltip.style.left = `${e.clientX + 40}px`;
-          this.$refs.tooltip.style.top = `${e.clientY - 40}px`;
           this.nodeHighlight(d.id, true);
         })
         // .on("mousemove", (e) => {
@@ -333,6 +341,26 @@ export default {
         node.attr("cx", (d) => d.x).attr("cy", (d) => d.y);
       }
 
+      // 滚轮缩放
+      svg.on("wheel", (e) => {
+        this.show_tooltip = false;
+
+        let scale = e.deltaY / 2e3;
+
+        let [x, y, w, h] = svg.attr("viewBox").split(",");
+
+        let nw = Number(w) * scale;
+        let nh = Number(h) * scale;
+
+        x = Number(x) - (e.offsetX / svg.attr("width")) * nw;
+        y = Number(y) - (e.offsetY / svg.attr("height")) * nh;
+        w = Number(w) + nw;
+        h = Number(h) + nh;
+
+        svg.attr("viewBox", [x, y, w, h].toString());
+      });
+
+      // 拖拽交互
       function drag(simulation) {
         function dragstarted(event) {
           if (!event.active) simulation.alphaTarget(0.3).restart();
@@ -363,27 +391,19 @@ export default {
 
     // 绘制关系
     renderGraphChart(graph_data) {
-      let chart = this.forceGraph(graph_data, {
-        nodeId: (d) => d.id,
-        nodeGroup: (d) => d.group,
-        nodeTitle: (d) => `${d.id}\n${d.group}`,
-        nodeRadius: (d) => d.value,
-        linkStrokeWidth: (l) => Math.sqrt(l.value) + 1,
-        width: this.$refs["graph-chart"].parentNode.parentNode.offsetWidth,
-        height: this.$refs["graph-chart"].parentNode.parentNode.offsetHight,
-        // invalidation, // a promise to stop the simulation when the cell is re-run
-      });
-      this.$refs["graph-chart"].innerHTML = "";
-      this.$refs["graph-chart"].append(chart);
-    },
-
-    draw() {
-      this.getGraphData().then(() => {
-        this.renderGraphChart({
-          nodes: this.curr_nodes,
-          links: this.curr_links,
-        });
-      });
+      this.$refs["svg-wrapper"].innerHTML = "";
+      this.$refs["svg-wrapper"].append(
+        this.forceGraph(graph_data, {
+          nodeId: (d) => d.id,
+          nodeGroup: (d) => d.group,
+          nodeTitle: (d) => `${d.id}\n${d.group}`,
+          nodeRadius: (d) => d.value,
+          linkStrokeWidth: (l) => Math.sqrt(l.value) + 1,
+          width: this.$refs["svg-wrapper"].parentNode.parentNode.offsetWidth,
+          height: this.$refs["svg-wrapper"].parentNode.parentNode.offsetHight,
+          // invalidation, // a promise to stop the simulation when the cell is re-run
+        })
+      );
     },
 
     nodeHighlight(node_id, scroll) {
@@ -393,6 +413,13 @@ export default {
       this.node_list.find((e) => e.id == node_id).active = true;
       d3.selectAll(`circle`).attr("fill", "#93A7A7");
       d3.select(`circle.n${node_id}`).attr("fill", "#fc1");
+      let box = document
+        .querySelector(`circle.n${node_id}`)
+        .getBoundingClientRect();
+
+      this.$refs.tooltip.style.left = `${box.x + 40}px`;
+      this.$refs.tooltip.style.top = `${box.y - 40}px`;
+
       if (scroll)
         document
           .querySelector(`li.n${node_id}`)
@@ -495,18 +522,25 @@ export default {
         overflow-y: scroll;
         height: 9.3rem;
         li {
-          padding: 0 0 0.5rem;
+          padding: 0.3rem 0;
           cursor: pointer;
           .book {
             font-size: 0.9rem;
             span:nth-child(1) {
               color: rgb(168, 124, 79);
+              margin: 0 0.2rem 0 0;
             }
+            margin: 0 0 0.1rem;
           }
           .person {
+            .name {
+              margin: 0 0.1rem 0 0;
+            }
             .action {
               background: rgba(63, 40, 82, 0.413);
               color: #eee;
+              padding: 0 0.1rem;
+              border-radius: 0.1rem;
             }
           }
         }
@@ -514,7 +548,10 @@ export default {
           background: #3333;
         }
         li:nth-child(2n + 1) {
-          background: #42210b12;
+          background: #42210b0a;
+        }
+        li:nth-child(2n) {
+          background: #42210b14;
         }
       }
     }
@@ -522,17 +559,18 @@ export default {
 
   .tooltip {
     position: absolute;
-    background: rgb(196, 178, 163);
+    background: #333;
+    color: #fff;
     width: 8rem;
     height: 5rem;
     top: 0;
     left: 0;
-    z-index: 100;
+    z-index: 10;
     box-sizing: border-box;
     padding: 1rem;
     border-radius: 0.3rem;
     a {
-      color: #333;
+      color: #fff;
       font-size: 0.7rem;
     }
   }

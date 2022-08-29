@@ -1,50 +1,96 @@
 <template>
   <div id="flow">
-    <!-- <div>
-        <p>《国家珍贵古籍名录》是由国务院批准发布的我国现存珍贵古籍目录。</p>
-        <p>
-          2007年，国务院办公厅发布《关于进一步加强古籍保护工作的意见》，启动了“中华古籍保护计划”。其中一项重要任务，就是建立《国家珍贵古籍名录》，实现国家对古籍的分级管理和保护，目的是要建立完备的珍贵古籍档案，确保珍贵古籍的安全。入选典籍为国内存世古籍中具有代表性的精品，且在《国家珍贵古籍名录》评审过程中，一些珍贵古籍的新品种、新版本、新价值被陆续发现。
-        </p>
-        <p>
-          目前，国务院已批准公布六批《国家珍贵古籍名录》，全国487家机构/个人收藏的13026部古籍入选，囊括先秦两汉至明清时期的汉文古籍、少数民族文字古籍和其他文字古籍。
-        </p>
-      </div> -->
-    <BookDetailTooltip
-      ref="book-detail-tooltip"
-      :id="hover_data.id"
-      :title="hover_data.title"
-      :detail="hover_data.detail"
-    />
+    <DynastySelector @changeDynastyIDs="test" />
+    <div class="pause" @click="pause">暫停/播放</div>
+
+    <svg id="particles-svg" ref="particles-svg" @click="pause"></svg>
+
+    <BookDetailTooltip ref="book-detail-tooltip" :id="hover_data.id" />
   </div>
 </template>
 
 <script>
-const d3 = require("d3");
-import * as Data from "@/data/dataLoader";
+import * as d3 from "d3";
+import DynastySelector from "@/components/DynastySelector.vue";
 import BookDetailTooltip from "@/components/BookDetailTooltip";
 
 export default {
   name: "FlowingParticles",
-  components: { BookDetailTooltip },
-  props: ["rate", "canvasWidth", "canvasHeight"],
+  components: {
+    DynastySelector,
+    BookDetailTooltip,
+  },
   data() {
     return {
-      NUM_PARTICLES: Number,
-      PARTICLE_SIZE: 0.6,
+      NUM_PARTICLES: 100,
+      PARTICLE_SIZE: 0.5, // View heights
+      SPEED: 20000, // 毫秒数
+      svg: null,
+      particles: [],
+      animation_handler: null,
+
+      playing: true,
+
+      curr_time: 0,
+
+      particles_original_data: [],
+
       hover_data: {
         id: "",
-        title: "",
-        detail: "",
       },
     };
   },
-  watch: {
-    rate: function (newVal, oldVal) {
-      this.drawPoints(newVal, oldVal, this.canvasWidth, this.canvasHeight);
-    },
-  },
   methods: {
-    // modified version of random-normal
+    test(ids) {
+      // 更新粒子数据
+      this.particles_original_data = [];
+      ids.forEach((id) => {
+        this.particles_original_data = this.particles_original_data.concat(
+          this.$store.state.books.filter((el) => el.edition_dynasty_id == id)
+        );
+      });
+
+      // 清零
+      this.svg.html("");
+      this.particles = [];
+      // this.curr_time = 0;
+
+      if (this.particles_original_data.length > 400) {
+        let temp_arr = JSON.parse(JSON.stringify(this.particles_original_data));
+        this.particles_original_data = [];
+        for (let i = 0; i < 400; i++)
+          this.particles_original_data.push(temp_arr.pop());
+      }
+
+      // 生成某数量的粒子
+      for (let e of this.particles_original_data)
+        this.particles.push(this.generateParticleData(e));
+
+      // 绘制
+      this.svg
+        .selectAll("circle")
+        .data(this.particles)
+        .enter()
+        .append("circle");
+
+      this.svg.selectAll("circle").on("click", (e, d) => {
+        event.stopPropagation();
+        this.$refs["book-detail-tooltip"].$el.style.left =
+          e.clientX + 30 + "px";
+        this.$refs["book-detail-tooltip"].$el.style.top =
+          e.clientY - 140 + "px";
+        this.$refs["book-detail-tooltip"].$el.style.display = "block";
+        this.hover_data = {
+          id: d.info.id,
+        };
+      });
+    },
+    pause() {
+      if (this.playing) cancelAnimationFrame(this.animation_handler);
+      else this.animation_handler = requestAnimationFrame(this.draw);
+
+      this.playing = !this.playing;
+    },
     normalPool(o) {
       let r = 0;
       do {
@@ -69,166 +115,131 @@ export default {
       while (r >= 1);
       return (e = a * Math.sqrt((-2 * Math.log(r)) / r)), t * e + l;
     },
-    getColor() {
-      let colour = {
+
+    rand(low, high) {
+      return Math.random() * (high - low) + low;
+    },
+
+    // 根据古籍数据，生成粒子
+    generateParticleData(e) {
+      const colour = {
         r: 60,
         g: this.randomNormal({ mean: 50, dev: 20 }),
         b: 50,
-        a: Math.random(),
+        a: this.rand(0.2, 0.5),
       };
-      return `rgba(${colour.r}, ${colour.g}, ${colour.b}, ${colour.a})`;
+      return {
+        info: e,
+        x: -2,
+        y: -2,
+        diameter:
+          0.3 +
+          Math.max(
+            0,
+            this.randomNormal({
+              mean: this.PARTICLE_SIZE,
+              dev: this.PARTICLE_SIZE / 2,
+            })
+          ),
+        duration: this.randomNormal({
+          mean: this.SPEED,
+          dev: this.SPEED * 0.1,
+        }),
+        amplitude: this.randomNormal({ mean: 16, dev: 2 }),
+        offsetY: this.randomNormal({ mean: 0, dev: 10 }),
+        arc: Math.PI * 2,
+        startTime: performance.now() - this.rand(0, this.SPEED),
+        colour: `rgba(${colour.r}, ${colour.g}, ${colour.b}, ${colour.a})`,
+      };
     },
-    getRadius() {
-      let r = this.randomNormal({
-        mean: this.PARTICLE_SIZE,
-        dev: this.PARTICLE_SIZE / 2,
+
+    // 计算粒子的新位置
+    moveParticle(particle) {
+      const progress =
+        ((this.curr_time - particle.startTime) % particle.duration) /
+        particle.duration;
+
+      return {
+        ...particle,
+        x: progress,
+        y:
+          Math.sin(progress * particle.arc) * particle.amplitude +
+          particle.offsetY,
+      };
+    },
+
+    draw() {
+      this.animation_handler = requestAnimationFrame(this.draw);
+
+      // 更新粒子位置数据
+      this.particles.forEach((particle, index) => {
+        this.particles[index] = this.moveParticle(particle);
       });
-      return (Math.max(0, r) + 0.3) * this.vh;
-    },
-    drawPoints(rate, rate_old, width, height) {
-      // this.flow.selectAll('circle')
-      //     .attr('cx', -2)
-      //     .attr('cy', -2)
-      // let size = this.flow.selectAll("circle").size();
 
-      // let start_id = Math.round(rate * this.NUM_PARTICLES);
-      let index_coming = Math.round(rate * this.NUM_PARTICLES); // rate对应的index，刚刚进入画面的点的index（左端）
-      let index_leaving =
-        index_coming > this.PER_NUM ? index_coming - this.PER_NUM : 0; // 即将离开画面的点的index（右端）
-      // let left, right;
-      // if (rate > rate_old) {
-      //   // 向后
-      //   left = Math.round(rate_old * this.NUM_PARTICLES);
-      //   right = start_id + this.PER_NUM;
-      // } else {
-      //   // 向前
-      //   left = start_id;
-      //   right = Math.round(rate_old * this.NUM_PARTICLES) + this.PER_NUM;
-      // }
-      // left -= this.PER_NUM;
-      // right += this.PER_NUM;
-      // if (left < 0) left = 0;
-      // if (right > this.NUM_PARTICLES) right = this.NUM_PARTICLES;
-
-      this.flow
+      // 根据数据更新粒子位置
+      const vh = this.svg.attr("height") / 100;
+      this.svg
         .selectAll("circle")
-        .data(
-          this.point_attribute.filter(
-            (d, i) => i >= index_leaving && i <= index_coming
-          )
-        )
-        .join("circle")
-        .attr("class", (d, i) => `point-${i + index_leaving}`)
-        .style("cursor", "pointer")
-        .transition()
-        .duration(1e2 * Math.abs(rate - rate_old))
-        .attr("fill", (d) => d.color)
-        .attr("r", (d) => d.radius)
-        .attr("cx", (d) => {
-          // console.log(d);
-          // const progress = i / this.PER_NUM;
-          // return (1 - progress) * width;
-          const progress =
-            ((d.index + rate * this.NUM_PARTICLES) % this.PER_NUM) /
-            this.PER_NUM;
-          return progress * width;
-        })
-        .attr("cy", (d, i) => {
-          let attr = this.point_attribute[i];
-          const progress =
-            ((d.index + rate * this.NUM_PARTICLES) % this.PER_NUM) /
-            this.PER_NUM;
-          let y = Math.sin(progress * attr.arc) * attr.amplitude + attr.offsetY;
-          return y * this.vh + height / 2;
-        });
+        .data(this.particles)
+        .attr("fill", (e) => e.colour)
+        .attr("cx", (e) => e.x * this.svg.attr("width"))
+        .attr("cy", (e) => e.y * vh + this.svg.attr("height") / 2)
+        .attr("r", (e) => e.diameter * vh)
+        .attr("cursor", "pointer");
 
-      this.flow.selectAll("circle").on("click", (e, d) => {
-        // this.$router.push(`/book-detail/${d.id}`);
-        this.$refs["book-detail-tooltip"].$el.style.left =
-          e.clientX + 30 + "px";
-        this.$refs["book-detail-tooltip"].$el.style.top =
-          e.clientY - 140 + "px";
-        this.$refs["book-detail-tooltip"].$el.style.display = "block";
-        this.hover_data = {
-          id: d.id,
-          // title: this.$store.state.books.find((elem) => elem.id == d.id).content.split("　")[0],
-          // detail: this.$store.state.books.find((elem) => elem.id == d.id).detail,
-        };
-      });
-      // .on("mouseleave", () => {
-      //   this.$refs["book-detail-tooltip"].$el.style.display = "none";
-      // });
+      // 计时器
+      this.curr_time += 17;
     },
-    initializePointAttribute() {
-      this.point_attribute = [];
-      for (let i in this.$store.state.books) {
-        let offsetY = this.randomNormal({ mean: 0, dev: 10 });
-        let amplitude = this.randomNormal({ mean: 16, dev: 2 });
-        let arc = Math.PI * 2;
-        this.point_attribute.push({
-          index: i,
-          id: this.$store.state.books[i].id,
-          color: this.getColor(),
-          radius: this.getRadius(),
-          offsetY: offsetY,
-          amplitude: amplitude,
-          arc: arc,
-        });
-      }
-    },
-    initializeFlow(width, height) {
-      this.vh = height / 100;
-
-      this.book_list = Object.keys(Data.get_data().book_info);
-      this.NUM_PARTICLES = this.$store.state.books.length;
-      this.PER_NUM = Math.round(this.NUM_PARTICLES / 20);
-
-      this.initializePointAttribute();
-
-      d3.select(this.$el).selectAll("svg").remove();
+    reset() {},
+    init() {},
+    start() {
+      // 配置画布
       this.svg = d3
-        .select(this.$el)
-        .append("svg")
-        .attr("width", width)
-        .attr("height", height);
+        .select("#particles-svg")
+        .attr("width", window.innerWidth)
+        .attr("height", window.innerHeight);
 
-      this.flow = this.svg.append("g").attr("id", "points");
-      // this.points = this.flow.selectAll('circle')
-      //     .data(this.book_list)
-      //     .join('circle')
-      //     .attr("fill", ()=>{
-      //             let colour = {
-      //                 r: 255,
-      //                 g: this.randomNormal({ mean: 125, dev: 20 }),
-      //                 b: 50,
-      //                 a: this.rand(0, 1),
-      //             };
-      //             return `rgba(${colour.r}, ${colour.g}, ${colour.b}, ${colour.a})`
-      //         })
-      //     .attr("class", (d,i)=>`point-${i}`)
-      //     .style("cursor","pointer")
-      //     .attr('r', ()=>{
-      //         let r=this.randomNormal({
-      //             mean: this.PARTICLE_SIZE,
-      //             dev: this.PARTICLE_SIZE / 2,
-      //         })
-      //         return Math.max(0,r)*self.vh
-      //     })
-      //     .attr('cx', width+10)
-      //     .attr('cy', height/2)
+      // 生成某数量的粒子
+      for (let i = 0; i < this.NUM_PARTICLES; i++)
+        this.particles.push(this.generateParticleData());
+
+      // 绘制
+      this.svg
+        .selectAll("circle")
+        .data(this.particles)
+        .enter()
+        .append("circle");
+
+      // 动画
+      this.draw();
     },
   },
+
   mounted() {
-    this.initializeFlow(this.canvasWidth, this.canvasHeight);
+    if (document.readystate !== "loading") this.start();
+    else
+      document.addEventListener("DOMContentLoaded", () => {
+        this.start();
+      });
+  },
+  unmounted() {
+    cancelAnimationFrame(this.animation_handler);
   },
 };
 </script>
 
 <style lang="less" scoped>
 #flow {
-  position: absolute;
-  top: 13vh;
   width: 100vw;
-  height: 65vh;
+  height: 100vh;
+  position: relative;
+  .pause {
+    user-select: none;
+    background: rgb(108, 108, 108);
+    cursor: pointer;
+    position: absolute;
+    right: 0;
+    top: 5rem;
+  }
 }
 </style>

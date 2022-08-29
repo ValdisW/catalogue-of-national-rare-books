@@ -45,7 +45,6 @@ export default {
       this.attrs.forEach((e) => {
         if (max < e.value) max = e.value;
       });
-      console.log(this.attr_name, max);
       return max;
     },
   },

@@ -25,20 +25,19 @@
       <div class="mouse-tip"></div>
     </section>
     <section class="section-2">
-      <Stack />
+      <Stack @openBookDetail="openBookDetail" />
     </section>
     <section class="section-3">
       <BaiduMap />
     </section>
     <section class="section-4">
-      <FlowingParticles />
+      <FlowingParticles @openBookDetail="openBookDetail" />
     </section>
   </div>
 </template>
 
 <script>
-import FlowingParticles from "@/views/Exploration-Flow.vue";
-// import FlowingParticles_new from "@/components/FlowingParticles_new.vue";
+import FlowingParticles from "@/components/FlowingParticles.vue";
 import BaiduMap from "@/views/Exploration-BaiduMap.vue";
 import Stack from "@/views/Exploration-Stack.vue";
 
@@ -46,7 +45,6 @@ export default {
   name: "Introduction",
   components: {
     FlowingParticles,
-    // FlowingParticles_new,
     BaiduMap,
     Stack,
   },
@@ -61,6 +59,9 @@ export default {
     };
   },
   methods: {
+    openBookDetail(id) {
+      this.$emit("openBookDetail", id);
+    },
     calculateSectionOffsets() {
       let sections = document.getElementsByTagName("section");
       let length = sections.length;

@@ -52,6 +52,7 @@
       const SPEED = 20000; // 毫秒数
 
       let particles = [];
+      let time = 0;
 
       // 生成粒子
       function generateParticleData() {
@@ -94,6 +95,7 @@
 
         // 根据数据更新粒子位置
         const vh = d3.select("svg").attr("height") / 100;
+        console.log(vh);
         d3.selectAll("circle")
           .data(particles)
           .attr("fill", (e) => e.colour)

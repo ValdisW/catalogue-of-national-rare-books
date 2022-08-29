@@ -9,19 +9,19 @@ export function deepcopy(obj) {
 }
 
 export async function loadData() {
-  let book_info = await d3.json("/data/data.json");
-  let batch_info = await d3.json("/data/batch.json");
+  // let book_info = await d3.json("/data/data.json");
+  // let batch_info = await d3.json("/data/batch.json");
   let institution_info = await d3.json("/data/institution.json");
   let province_info = await d3.json("/data/position.json");
-  let stack_info = await d3.json("/data/stack.json");
-  let relationship_info = await d3.json("/data/relationship.json");
+  // let stack_info = await d3.json("/data/stack.json");
+  // let relationship_info = await d3.json("/data/relationship.json");
   Data = {
-    book_info,
-    batch_info,
+    // book_info,
+    // batch_info,
     institution_info,
     province_info,
-    stack_info,
-    relationship_info,
+    // stack_info,
+    // relationship_info,
   };
 }
 
@@ -51,22 +51,22 @@ export function get_data() {
   return Data;
 }
 
-export function get_book_info(id) {
-  return Data.book_info[id];
-}
+// export function get_book_info(id) {
+//   return Data.book_info[id];
+// }
 
-export function get_batch_list(batchNumber = "第1批") {
-  return Data.batch_info[batchNumber];
-}
+// export function get_batch_list(batchNumber = "第1批") {
+//   return Data.batch_info[batchNumber];
+// }
 
-export function get_batch_dynasty_num(batchTitle, dynasty) {
-  return Data.batch_info[batchTitle][dynasty].length;
-}
+// export function get_batch_dynasty_num(batchTitle, dynasty) {
+//   return Data.batch_info[batchTitle][dynasty].length;
+// }
 
-export function get_batchTitle_info() {
-  let batch = Object.keys(Data.batch_info);
-  return batch.sort();
-}
+// export function get_batchTitle_info() {
+//   let batch = Object.keys(Data.batch_info);
+//   return batch.sort();
+// }
 
 export function get_institution_info(institution_id) {
   return Data.institution_info[institution_id];
@@ -76,54 +76,51 @@ export function get_institution_list() {
   return Object.keys(Data.institution_info);
 }
 
-export function get_statics(displayOrder) {
-  let data = [];
-  let bacthTitle = get_batchTitle_info();
-  let dispLength = Object.keys(displayOrder).length;
-  for (let i = 0; i < dispLength; i++) {
-    let dispTitle = displayOrder[i];
-    // console.log(i, dispTitle)
-    let dict = {};
-    for (let j in bacthTitle) {
-      let title = bacthTitle[j];
-      let len = 0;
-      if (Data.batch_info[title][dispTitle] != undefined)
-        len = Object.keys(Data.batch_info[title][dispTitle]).length;
-      // console.log(title, Data.batch_info[title], len)
-      dict[title] = len;
-    }
-    data.push(dict);
-  }
-  // console.log(data)
-  return data;
-}
+// export function get_statics(displayOrder) {
+//   let data = [];
+//   let bacthTitle = get_batchTitle_info();
+//   let dispLength = Object.keys(displayOrder).length;
+//   for (let i = 0; i < dispLength; i++) {
+//     let dispTitle = displayOrder[i];
+//     // console.log(i, dispTitle)
+//     let dict = {};
+//     for (let j in bacthTitle) {
+//       let title = bacthTitle[j];
+//       let len = 0;
+//       if (Data.batch_info[title][dispTitle] != undefined)
+//         len = Object.keys(Data.batch_info[title][dispTitle]).length;
+//       dict[title] = len;
+//     }
+//     data.push(dict);
+//   }
+//   return data;
+// }
 
-export function get_stack_data(xOrder, yOrder, batchSel) {
-  let data = [];
-  for (let i in xOrder) {
-    let dispTitle = xOrder[i]; // dynasty
-    let dict = { name: dispTitle };
-    for (let j in yOrder) {
-      let title = yOrder[j]; // category
-      let len = 0;
-      for (let k in batchSel) {
-        if (batchSel[k] > 0) {
-          if (Data.stack_info[Number(k) + 1][dispTitle] != undefined)
-            len += Data.stack_info[Number(k) + 1][dispTitle][title];
-        }
-      }
-      dict[title] = len;
-    }
-    data.push(dict);
-  }
-  // console.log(data)
-  return data;
-}
+// export function get_stack_data(xOrder, yOrder, batchSel) {
+//   let data = [];
+//   for (let i in xOrder) {
+//     let dispTitle = xOrder[i]; // dynasty
+//     let dict = { name: dispTitle };
+//     for (let j in yOrder) {
+//       let title = yOrder[j]; // category
+//       let len = 0;
+//       for (let k in batchSel) {
+//         if (batchSel[k] > 0) {
+//           if (Data.stack_info[Number(k) + 1][dispTitle] != undefined)
+//             len += Data.stack_info[Number(k) + 1][dispTitle][title];
+//         }
+//       }
+//       dict[title] = len;
+//     }
+//     data.push(dict);
+//   }
+//   return data;
+// }
 
 export function get_province_list() {
   return Data.province_info;
 }
 
-export function get_relationship_list() {
-  return Data.relationship_info;
-}
+// export function get_relationship_list() {
+//   return Data.relationship_info;
+// }

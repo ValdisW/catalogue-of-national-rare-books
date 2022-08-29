@@ -25,6 +25,7 @@ export default {
 .book-item {
   flex: 5rem 1 1;
   margin: 0.2rem;
+  cursor: pointer;
   div {
     background: #6666;
     height: 5rem;

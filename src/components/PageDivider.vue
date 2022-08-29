@@ -111,6 +111,7 @@ export default {
   display: inline-block;
 }
 .page-divider {
+  user-select: none;
   li {
     list-style-type: none;
     text-decoration: none;

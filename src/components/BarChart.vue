@@ -22,8 +22,8 @@ export default {
     return {
       bar_color: "#604a2f",
       margin: {
-        left: 0.2,
-        right: 0.2,
+        left: 0.25,
+        right: 0.08,
         top: 0.1,
         bottom: 0.1,
       },

@@ -31,11 +31,7 @@
           <table class="results-list">
             <thead>
               <tr>
-                <th
-                  v-for="e in display_attrs"
-                  :key="e.name"
-                  @click="toggleRank(e.value, e.order)"
-                >
+                <th v-for="e in display_attrs" :key="e.name" @click="toggleRank(e.value, e.order)">
                   <span class="attr-title" v-text="e.name"></span>
                   <span class="rank">
                     <span></span>
@@ -45,56 +41,35 @@
               </tr>
             </thead>
             <tbody>
-              <tr
-                v-for="item in curr_d"
-                :key="item.id"
-                class="item-block"
-                @click="$emit('openBookDetail', item.id)"
-              >
+              <tr v-for="item in curr_d" :key="item.id" class="item-block" @click="$emit('openBookDetail', item.id)">
                 <td v-text="item.id"></td>
                 <td v-text="item.batch"></td>
                 <td v-text="item.name"></td>
                 <td
                   v-text="
-                    $store.state.all_edition_dynasty.find(
-                      (ele) => ele.id == item.edition_dynasty_id
-                    )
-                      ? $store.state.all_edition_dynasty.find(
-                          (ele) => ele.id == item.edition_dynasty_id
-                        ).name
+                    $store.state.all_edition_dynasty.find((ele) => ele.id == item.edition_dynasty_id)
+                      ? $store.state.all_edition_dynasty.find((ele) => ele.id == item.edition_dynasty_id).name
                       : '-'
                   "
                 ></td>
                 <td
                   v-text="
-                    $store.state.all_document_type.find(
-                      (ele) => ele.id == item.document_type_id
-                    )
-                      ? $store.state.all_document_type.find(
-                          (ele) => ele.id == item.document_type_id
-                        ).name
+                    $store.state.all_document_type.find((ele) => ele.id == item.document_type_id)
+                      ? $store.state.all_document_type.find((ele) => ele.id == item.document_type_id).name
                       : '-'
                   "
                 ></td>
                 <td
                   v-text="
-                    $store.state.all_language.find(
-                      (ele) => ele.id == item.language_id
-                    )
-                      ? $store.state.all_language.find(
-                          (ele) => ele.id == item.language_id
-                        ).name
+                    $store.state.all_language.find((ele) => ele.id == item.language_id)
+                      ? $store.state.all_language.find((ele) => ele.id == item.language_id).name
                       : '-'
                   "
                 ></td>
                 <td
                   v-text="
-                    $store.state.all_institution.find(
-                      (ele) => ele.id == item.institution_id
-                    )
-                      ? $store.state.all_institution.find(
-                          (ele) => ele.id == item.institution_id
-                        ).name
+                    $store.state.all_institution.find((ele) => ele.id == item.institution_id)
+                      ? $store.state.all_institution.find((ele) => ele.id == item.institution_id).name
                       : '-'
                   "
                 ></td>
@@ -102,12 +77,7 @@
             </tbody>
           </table>
         </div>
-        <PageDivider
-          @turnTo="alterPage"
-          :items_sum="items_sum"
-          :each_page_items="each_page_items"
-          ref="page-divider"
-        />
+        <PageDivider @turnTo="alterPage" :items_sum="items_sum" :each_page_items="each_page_items" ref="page-divider" />
       </div>
     </div>
   </div>
@@ -155,30 +125,20 @@ export default {
   methods: {
     // 开始搜索。根据检索词及筛选条件
     search() {
-      axios
-        .get(
-          `/data/text?query=${this.$refs.text.value}&attr=${this.$refs["drop-list"].curr_value}`
-        )
-        .then((d) => {
-          this.search_result = d.data;
-          this.items_sum = d.data.length;
-          this.curr_d = this.search_result.slice(0, this.each_page_items); // 当前页数据
-          this.updateFilter();
-        });
+      axios.get(`/data/text?query=${this.$refs.text.value}&attr=${this.$refs["drop-list"].curr_value}`).then((d) => {
+        this.search_result = d.data;
+        this.items_sum = d.data.length;
+        this.curr_d = this.search_result.slice(0, this.each_page_items); // 当前页数据
+        this.updateFilter();
+      });
     },
     updateFilter() {
       for (let i in this.filter_data)
-        this.filter_data[i].value = this.getSum(
-          this.search_result,
-          this.filter_data[i].id + "_id"
-        );
+        this.filter_data[i].value = this.getSum(this.search_result, this.filter_data[i].id + "_id");
     },
     filterResult(e) {
-      this.filtered_result = this.search_result.filter(
-        (ele) => ele[e.attr + "_id"] == e.value
-      );
+      this.filtered_result = this.search_result.filter((ele) => ele[e.attr + "_id"] == e.value);
       this.curr_d = this.filtered_result.slice(0, this.each_page_items); // 当前页数据
-      console.log(e, this.filtered_result);
     },
     getSum(r, attr) {
       let a = {};
@@ -213,8 +173,7 @@ export default {
           return flag;
         });
       }
-      this.display_attrs.find((e) => e.value == attr).order =
-        !this.display_attrs.find((e) => e.value == attr).order;
+      this.display_attrs.find((e) => e.value == attr).order = !this.display_attrs.find((e) => e.value == attr).order;
       this.$refs["page-divider"].turnTo(1);
     },
     alterPage(page_index) {
@@ -224,24 +183,14 @@ export default {
       );
     },
     showFilterOptions(e) {
-      let b =
-        e.currentTarget.querySelector(".options").style.display == "block";
-      document
-        .querySelectorAll(".options")
-        .forEach((e) => (e.style.display = "none"));
-      e.currentTarget.querySelector(".options").style.display = b
-        ? "none"
-        : "block";
+      let b = e.currentTarget.querySelector(".options").style.display == "block";
+      document.querySelectorAll(".options").forEach((e) => (e.style.display = "none"));
+      e.currentTarget.querySelector(".options").style.display = b ? "none" : "block";
     },
     choose(e) {
-      document
-        .querySelectorAll(".options")
-        .forEach((e) => (e.style.display = "none"));
+      document.querySelectorAll(".options").forEach((e) => (e.style.display = "none"));
       let parent_filter_value = e.path[3].querySelector(".value");
-      parent_filter_value.setAttribute(
-        "val",
-        e.currentTarget.getAttribute("val")
-      );
+      parent_filter_value.setAttribute("val", e.currentTarget.getAttribute("val"));
       parent_filter_value.innerText = e.currentTarget.innerText;
     },
   },
