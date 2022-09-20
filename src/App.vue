@@ -27,7 +27,10 @@
     </router-view>
 
     <BookDetail ref="book-detail" />
-    <InstitutionDetail ref="institution-detail" institutionID="201"></InstitutionDetail>
+    <InstitutionDetail
+      ref="institution-detail"
+      institutionID="201"
+    ></InstitutionDetail>
   </div>
 </template>
 
@@ -157,6 +160,7 @@ nav {
   }
 }
 #main-container {
-  background-color: #f2e0c4;
+  // background-color: #f2e0c4;
+  background-color: #f0e9dd;
 }
 </style>

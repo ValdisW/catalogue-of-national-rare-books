@@ -12,7 +12,11 @@
               <div class="person-birth">
                 <p>
                   生卒：
-                  <span v-text="`${person_info.year_of_birth} - ${person_info.year_of_death}`"></span>
+                  <span
+                    v-text="
+                      `${person_info.year_of_birth} - ${person_info.year_of_death}`
+                    "
+                  ></span>
                 </p>
               </div>
               <div class="person-title">
@@ -29,7 +33,10 @@
               <span></span>
             </div>
           </div>
-          <div class="person-intro" v-text="person_info.introduction || '暫無數據'"></div>
+          <div
+            class="person-intro"
+            v-text="person_info.introduction || '暫無數據'"
+          ></div>
         </div>
 
         <div class="related-person">
@@ -38,7 +45,12 @@
             <p v-for="b in this.related_person" :key="b">
               <router-link
                 :to="/person-detail/ + b.person_id"
-                v-text="$store.state.persons.find((ele) => ele.id == b.person_id).name + ' ' + b.count"
+                v-text="
+                  $store.state.persons.find((ele) => ele.id == b.person_id)
+                    .name +
+                  ' ' +
+                  b.count
+                "
               ></router-link>
             </p>
           </div>
@@ -57,13 +69,21 @@
           <ul>
             <li v-for="e in relatedBooks" :key="e">
               <span v-text="e.book_id + ' '"></span>
-              <span v-text="e.title + ' '" @click="$emit('openBookDetail', e.book_id)"></span>
+              <span
+                v-text="e.title + ' '"
+                @click="$emit('openBookDetail', e.book_id)"
+              ></span>
             </li>
           </ul>
         </div>
       </div>
     </div>
-    <BookInfoDialog ref="book-info-dialog" :id="hover_data.id" :title="hover_data.title" :detail="hover_data.detail" />
+    <BookInfoDialog
+      ref="book-info-dialog"
+      :id="hover_data.id"
+      :title="hover_data.title"
+      :detail="hover_data.detail"
+    />
   </div>
 </template>
 
@@ -93,69 +113,73 @@ export default {
     //     (ele) => ele.id == this.$route.params.personID
     //   ).name,
     // };
-    this.person_info = this.$store.state.persons.find((ele) => ele.id == this.$route.params.personID);
+    this.person_info = this.$store.state.persons.find(
+      (ele) => ele.id == this.$route.params.personID
+    );
 
-    axios.get(`/data/person-detail/${this.$route.params.personID}`).then((d) => {
-      this.relatedBooks = d.data[0];
-      console.log(this.relatedBooks, this.$store.state.all_action);
-      this.related_person = d.data[1];
-      this.related_person.sort((a, b) => b.count - a.count);
-      let max = 0,
-        min = Number.POSITIVE_INFINITY;
-      for (let p of this.related_person) {
-        if (max > p.count) max = p.count;
-        if (min < p.count) min = p.count;
-      }
-      // let rp = d3.select(".related-person");
-      // rp.selectAll("div")
-      //   .data(this.related_person)
-      //   .enter()
-      //   .append("div")
-      //   .style("width", "16px")
-      //   .style("height", "16px")
-      //   .style("border-radius", "50%")
-      //   .style("background", "#4a330066")
-      //   .style("display", "inline-block")
-      //   .style("cursor", "pointer")
-      //   .style("margin", "2px")
-      //   .style("position", "absolute")
-      //   .style(
-      //     "left",
-      //     (e, i, a) =>
-      //       `${
-      //         250 +
-      //         (200 - e.count * 10) * Math.cos(((Math.PI * 2) / a.length) * i)
-      //       }px`
-      //   )
-      //   .style(
-      //     "top",
-      //     (e, i, a) =>
-      //       `${
-      //         250 +
-      //         (200 - e.count * 10) * Math.sin(((Math.PI * 2) / a.length) * i)
-      //       }px`
-      //   )
-      //   .on("click", (e, d) => {
-      //     this.$router.push(`/person-detail/${d.责任人姓名}`);
-      //   })
-      //   .on("mousemove", (ev) => {
-      //     this.$refs["book-info-dialog"].$el.style.left =
-      //       ev.clientX + 10 + "px";
-      //     this.$refs["book-info-dialog"].$el.style.top =
-      //       ev.clientY + 30 + "px";
-      //   })
-      //   .on("mouseenter", (ev, data) => {
-      //     ev.target.style.background = "#da9f21";
-      //     this.$refs["book-info-dialog"].$el.style.display = "block";
-      //     this.hover_data = {
-      //       title: data.责任人姓名,
-      //     };
-      //   })
-      //   .on("mouseleave", (ev) => {
-      //     ev.target.style.background = "#4a330066";
-      //     this.$refs["book-info-dialog"].$el.style.display = "none";
-      //   });
-    });
+    axios
+      .get(`/data/person-detail/${this.$route.params.personID}`)
+      .then((d) => {
+        this.relatedBooks = d.data[0];
+        console.log(this.relatedBooks, this.$store.state.all_action);
+        this.related_person = d.data[1];
+        this.related_person.sort((a, b) => b.count - a.count);
+        let max = 0,
+          min = Number.POSITIVE_INFINITY;
+        for (let p of this.related_person) {
+          if (max > p.count) max = p.count;
+          if (min < p.count) min = p.count;
+        }
+        // let rp = d3.select(".related-person");
+        // rp.selectAll("div")
+        //   .data(this.related_person)
+        //   .enter()
+        //   .append("div")
+        //   .style("width", "16px")
+        //   .style("height", "16px")
+        //   .style("border-radius", "50%")
+        //   .style("background", "#4a330066")
+        //   .style("display", "inline-block")
+        //   .style("cursor", "pointer")
+        //   .style("margin", "2px")
+        //   .style("position", "absolute")
+        //   .style(
+        //     "left",
+        //     (e, i, a) =>
+        //       `${
+        //         250 +
+        //         (200 - e.count * 10) * Math.cos(((Math.PI * 2) / a.length) * i)
+        //       }px`
+        //   )
+        //   .style(
+        //     "top",
+        //     (e, i, a) =>
+        //       `${
+        //         250 +
+        //         (200 - e.count * 10) * Math.sin(((Math.PI * 2) / a.length) * i)
+        //       }px`
+        //   )
+        //   .on("click", (e, d) => {
+        //     this.$router.push(`/person-detail/${d.责任人姓名}`);
+        //   })
+        //   .on("mousemove", (ev) => {
+        //     this.$refs["book-info-dialog"].$el.style.left =
+        //       ev.clientX + 10 + "px";
+        //     this.$refs["book-info-dialog"].$el.style.top =
+        //       ev.clientY + 30 + "px";
+        //   })
+        //   .on("mouseenter", (ev, data) => {
+        //     ev.target.style.background = "#da9f21";
+        //     this.$refs["book-info-dialog"].$el.style.display = "block";
+        //     this.hover_data = {
+        //       title: data.责任人姓名,
+        //     };
+        //   })
+        //   .on("mouseleave", (ev) => {
+        //     ev.target.style.background = "#4a330066";
+        //     this.$refs["book-info-dialog"].$el.style.display = "none";
+        //   });
+      });
   },
 };
 </script>

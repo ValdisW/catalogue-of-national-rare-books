@@ -9,7 +9,11 @@
       <p>*金、遼、蒙古入宋</p>
     </div>
 
-    <BookDetailTooltip @openBookDetail="$emit('openBookDetail', hover_id)" ref="book-detail-tooltip" :id="hover_id" />
+    <BookDetailTooltip
+      @openBookDetail="$emit('openBookDetail', hover_id)"
+      ref="book-detail-tooltip"
+      :id="hover_id"
+    />
   </div>
 </template>
 
@@ -66,19 +70,27 @@ export default {
       if (this.particles_original_data.length > this.max_particles) {
         let temp_arr = JSON.parse(JSON.stringify(this.particles_original_data));
         this.particles_original_data = [];
-        for (let i = 0; i < this.max_particles; i++) this.particles_original_data.push(temp_arr.pop());
+        for (let i = 0; i < this.max_particles; i++)
+          this.particles_original_data.push(temp_arr.pop());
       }
 
       // 生成某数量的粒子
-      for (let e of this.particles_original_data) this.particles.push(this.generateParticleData(e));
+      for (let e of this.particles_original_data)
+        this.particles.push(this.generateParticleData(e));
 
       // 绘制
-      this.svg.selectAll("circle").data(this.particles).enter().append("circle");
+      this.svg
+        .selectAll("circle")
+        .data(this.particles)
+        .enter()
+        .append("circle");
 
       this.svg.selectAll("circle").on("click", (e, d) => {
         event.stopPropagation();
-        this.$refs["book-detail-tooltip"].$el.style.left = e.clientX + 30 + "px";
-        this.$refs["book-detail-tooltip"].$el.style.top = e.clientY - 140 + "px";
+        this.$refs["book-detail-tooltip"].$el.style.left =
+          e.clientX + 30 + "px";
+        this.$refs["book-detail-tooltip"].$el.style.top =
+          e.clientY - 140 + "px";
         this.$refs["book-detail-tooltip"].$el.style.display = "block";
         this.$refs["book-detail-tooltip"].open();
         this.hover_id = d.info.id;
@@ -99,7 +111,10 @@ export default {
       } while (r < 100);
     },
     randomNormal(o) {
-      if (((o = Object.assign({ mean: 0, dev: 1, pool: [] }, o)), Array.isArray(o.pool) && o.pool.length > 0))
+      if (
+        ((o = Object.assign({ mean: 0, dev: 1, pool: [] }, o)),
+        Array.isArray(o.pool) && o.pool.length > 0)
+      )
         return this.normalPool(o);
       let r,
         a,
@@ -151,11 +166,15 @@ export default {
 
     // 计算粒子的新位置
     moveParticle(particle) {
-      const progress = ((this.curr_time - particle.startTime) % particle.duration) / particle.duration;
+      const progress =
+        ((this.curr_time - particle.startTime) % particle.duration) /
+        particle.duration;
       return {
         ...particle,
         x: progress,
-        y: Math.sin(progress * particle.arc) * particle.amplitude + particle.offsetY,
+        y:
+          Math.sin(progress * particle.arc) * particle.amplitude +
+          particle.offsetY,
       };
     },
 
@@ -185,13 +204,21 @@ export default {
     init() {},
     start() {
       // 配置画布
-      this.svg = d3.select("#particles-svg").attr("width", window.innerWidth).attr("height", window.innerHeight);
+      this.svg = d3
+        .select("#particles-svg")
+        .attr("width", window.innerWidth)
+        .attr("height", window.innerHeight);
 
       // 生成某数量的粒子
-      for (let i = 0; i < this.NUM_PARTICLES; i++) this.particles.push(this.generateParticleData());
+      for (let i = 0; i < this.NUM_PARTICLES; i++)
+        this.particles.push(this.generateParticleData());
 
       // 绘制
-      this.svg.selectAll("circle").data(this.particles).enter().append("circle");
+      this.svg
+        .selectAll("circle")
+        .data(this.particles)
+        .enter()
+        .append("circle");
 
       // 动画
       this.draw();

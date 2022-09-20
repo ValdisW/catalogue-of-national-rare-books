@@ -1,5 +1,10 @@
 <template>
-  <div class="introduction" @wheel.prevent="rowScroll" ref="introduction" v-if="complete">
+  <div
+    class="introduction"
+    @wheel.prevent="rowScroll"
+    ref="introduction"
+    v-if="complete"
+  >
     <section class="section-1">
       <!-- <FlowingParticles_new /> -->
       <div class="everyday-book">
@@ -12,7 +17,11 @@
           <p>01523</p>
           <p>鲍氏国策十卷</p>
         </div>
-        <img @click="$emit('openBookDetail', '01523')" src="/images/placeholder.jpg" alt="今日古籍-书影" />
+        <img
+          @click="$emit('openBookDetail', '01523')"
+          src="/images/placeholder.jpg"
+          alt="今日古籍-书影"
+        />
       </div>
       <div class="cover">
         <div>
@@ -114,7 +123,9 @@ export default {
       this.current_page = id;
       this.scrolling = true;
 
-      document.getElementsByTagName("section")[id].scrollIntoView({ behavior: "smooth", inline: "nearest" });
+      document
+        .getElementsByTagName("section")
+        [id].scrollIntoView({ behavior: "smooth", inline: "nearest" });
 
       clearTimeout(timeout);
       timeout = setTimeout(() => {
@@ -128,7 +139,9 @@ export default {
       this.$store.commit("loadIntroductionData", res.data);
 
       for (let e of this.$store.state.all_institution) {
-        let r = this.$store.state.all_province.find((el) => el.id == e.province_id);
+        let r = this.$store.state.all_province.find(
+          (el) => el.id == e.province_id
+        );
         if (!r.child) r.child = [];
         r.child.push(e.id);
       }
@@ -143,7 +156,9 @@ export default {
         passive: false,
       }); // Other browsers
 
-      window.addEventListener("touchstart", this.touchStart, { passive: false }); // mobile devices
+      window.addEventListener("touchstart", this.touchStart, {
+        passive: false,
+      }); // mobile devices
       window.addEventListener("touchmove", this.touchMove, { passive: false }); // mobile devices
     });
   },

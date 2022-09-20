@@ -12,21 +12,39 @@
             <td class="detail-title">文種：</td>
             <td
               class="detail-content language"
-              v-text="id2name(this.$store.state.all_language, book_data.language_id, '-')"
+              v-text="
+                id2name(
+                  this.$store.state.all_language,
+                  book_data.language_id,
+                  '-'
+                )
+              "
             ></td>
           </tr>
           <tr>
             <td class="detail-title">文獻類型：</td>
             <td
               class="detail-content document-type"
-              v-text="id2name(this.$store.state.all_document_type, book_data.document_type_id, '-')"
+              v-text="
+                id2name(
+                  this.$store.state.all_document_type,
+                  book_data.document_type_id,
+                  '-'
+                )
+              "
             ></td>
           </tr>
           <tr>
             <td class="detail-title">分類：</td>
             <td
               class="detail-content name"
-              v-text="id2name(this.$store.state.all_catalogue, book_data.catalogue_id, '-')"
+              v-text="
+                id2name(
+                  this.$store.state.all_catalogue,
+                  book_data.catalogue_id,
+                  '-'
+                )
+              "
             ></td>
           </tr>
           <tr>
@@ -42,11 +60,17 @@
           </tr> -->
           <tr>
             <td class="detail-title">版本：</td>
-            <td class="detail-content edition" v-text="book_data.edition || '-'"></td>
+            <td
+              class="detail-content edition"
+              v-text="book_data.edition || '-'"
+            ></td>
           </tr>
           <tr>
             <td class="detail-title">數量：</td>
-            <td class="detail-content quantity" v-text="book_data.quantity + book_data.measurement || '-'"></td>
+            <td
+              class="detail-content quantity"
+              v-text="book_data.quantity + book_data.measurement || '-'"
+            ></td>
           </tr>
           <tr>
             <td class="detail-title">裝幀形式：</td>
@@ -54,15 +78,24 @@
           </tr>
           <tr>
             <td class="detail-title">開本尺寸：</td>
-            <td class="detail-content book-size" v-text="book_data.book_size || '-'"></td>
+            <td
+              class="detail-content book-size"
+              v-text="book_data.book_size || '-'"
+            ></td>
           </tr>
           <tr>
             <td class="detail-title">板框尺寸：</td>
-            <td class="detail-content frame-size" v-text="book_data.frame_size || '-'"></td>
+            <td
+              class="detail-content frame-size"
+              v-text="book_data.frame_size || '-'"
+            ></td>
           </tr>
           <tr>
             <td class="detail-title">版式：</td>
-            <td class="detail-content typeset" v-text="book_data.typeset || '-'"></td>
+            <td
+              class="detail-content typeset"
+              v-text="book_data.typeset || '-'"
+            ></td>
           </tr>
           <tr>
             <td class="detail-title">牌記：</td>
@@ -72,19 +105,34 @@
             <td class="detail-title">收藏省份：</td>
             <td
               class="detail-content institute"
-              v-text="id2name(this.$store.state.all_province, book_data.province_id, '-')"
+              v-text="
+                id2name(
+                  this.$store.state.all_province,
+                  book_data.province_id,
+                  '-'
+                )
+              "
             ></td>
           </tr>
           <tr>
             <td class="detail-title">收藏單位：</td>
             <td
               class="detail-content institute"
-              v-text="id2name(this.$store.state.all_institution, book_data.institution_id, '-')"
+              v-text="
+                id2name(
+                  this.$store.state.all_institution,
+                  book_data.institution_id,
+                  '-'
+                )
+              "
             ></td>
           </tr>
           <tr>
             <td class="detail-title">索書號：</td>
-            <td class="detail-content" v-text="book_data.call_number || '-'"></td>
+            <td
+              class="detail-content"
+              v-text="book_data.call_number || '-'"
+            ></td>
           </tr>
         </table>
 
@@ -94,15 +142,15 @@
             <div
               class="actions"
               v-text="
-                $store.state.all_action.find((el) => el.id == person.action_id)
-                  ? $store.state.all_action.find((el) => el.id == person.action_id).name
-                  : '未知行为'
+                id2name($store.state.all_action, person.action_id, '未知行爲')
               "
             ></div>
             <b></b>
             <span
               class="person"
-              v-if="$store.state.persons.find((el) => el.id == person.person_id).name == '□□'"
+              v-if="
+                id2name($store.state.persons, person.person_id, '□□') == '□□'
+              "
               v-text="`[${person.dynasty_or_nation}]佚名`"
             ></span>
             <router-link
@@ -111,7 +159,11 @@
               :to="'/person-detail/' + person.person_id"
               class="person"
               v-text="
-                `[${person.dynasty_or_nation}]${$store.state.persons.find((el) => el.id == person.person_id).name}`
+                `[${person.dynasty_or_nation}]${id2name(
+                  $store.state.persons,
+                  person.person_id,
+                  '佚名'
+                )}`
               "
               :title="JSON.stringify(person)"
             ></router-link>
@@ -142,7 +194,10 @@
         </div>
       </div>
     </div>
-    <ImageViewer ref="image-viewer" :imageUrl="image_filenames[image_showed_index]" />
+    <ImageViewer
+      ref="image-viewer"
+      :imageUrl="image_filenames[image_showed_index]"
+    />
   </div>
 </template>
 
@@ -201,10 +256,12 @@ export default {
 .fade-leave-active {
   transition: opacity 0.5s;
 }
+
 .fade-enter,
 .fade-leave-to {
   opacity: 0;
 }
+
 .book-detail {
   width: 100vw;
   height: 100vh;
@@ -222,6 +279,7 @@ export default {
     display: flex;
     // align-items: center;
     justify-content: center;
+
     .close-button {
       position: absolute;
       left: 0;
@@ -232,10 +290,12 @@ export default {
       background-size: 100%;
       cursor: pointer;
     }
+
     .display {
       // height: 80vh;
       font-size: 0.7rem;
       margin-top: 5vh;
+
       div {
         // p:first-child {
         //   font-weight: bold;
@@ -244,14 +304,17 @@ export default {
         // }
       }
     }
+
     .book-image {
       width: 45%;
       height: 75vh;
       align-items: center;
       justify-content: center;
+
       .switch_pic {
         display: block;
         margin: 0 auto;
+
         button {
           margin: 8px;
           width: 15px;
@@ -261,6 +324,7 @@ export default {
           background: transparent;
           cursor: pointer;
         }
+
         button.active {
           background: #42230f;
         }
@@ -273,6 +337,7 @@ export default {
         display: flex;
         justify-content: center;
         align-items: center;
+
         img {
           // margin: 0 auto;
           // display: block;
@@ -289,6 +354,7 @@ export default {
       margin-right: 5vh;
       width: 40%;
       height: 80vh;
+
       .title {
         text-overflow: ellipsis;
         width: 20rem;
@@ -297,21 +363,26 @@ export default {
         font-weight: bold;
         font-size: 2rem;
         margin: 0 0 1rem 0;
+
         span:first-child {
           color: #8f644d;
           margin: 0 1rem 0 0;
         }
+
         span:last-child {
           color: #4a3300;
           white-space: nowrap;
         }
       }
+
       .detail {
         // display: flex;
         font-size: 0.7rem;
+
         tr {
           line-height: 1.3rem;
         }
+
         .detail-title {
           width: 3.5rem;
           text-align: right;
@@ -319,6 +390,7 @@ export default {
           margin: 0 0.5rem 0 0;
           flex: auto 0 0;
         }
+
         .detail-content {
           line-height: 1rem;
         }
@@ -330,6 +402,7 @@ export default {
         max-width: 70%;
         align-items: center;
         justify-content: center;
+
         li {
           float: left;
           min-width: 25%;
@@ -338,6 +411,7 @@ export default {
           text-align: center;
           padding-top: 10px;
         }
+
         .actions {
           text-align: center;
           font-weight: bold;
@@ -346,6 +420,7 @@ export default {
           margin-bottom: 0.7rem;
           border-bottom: 3px solid #4f4545;
         }
+
         .person {
           text-align: center;
           margin-top: 0.7rem;
@@ -353,6 +428,7 @@ export default {
           color: #333;
         }
       }
+
       .timeline li b:before {
         content: "";
         position: absolute;
@@ -366,6 +442,7 @@ export default {
         margin-left: 40%;
       }
     }
+
     z-index: 1;
     position: absolute;
   }

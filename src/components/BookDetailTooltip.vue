@@ -18,11 +18,15 @@
           </p>
           <p>
             <span>版本年代/國別：</span>
-            <span v-text="getEditionDynastyNameById(detail_data.edition_dynasty_id)"></span>
+            <span
+              v-text="getEditionDynastyNameById(detail_data.edition_dynasty_id)"
+            ></span>
           </p>
           <p>
             <span>文獻類型：</span>
-            <span v-text="getDocumentTypeNameById(detail_data.document_type_id)"></span>
+            <span
+              v-text="getDocumentTypeNameById(detail_data.document_type_id)"
+            ></span>
           </p>
           <p>
             <span>批次：</span>
@@ -30,7 +34,9 @@
           </p>
           <p>
             <span>收藏單位：</span>
-            <span v-text="getInstitutionNameById(detail_data.institution_id)"></span>
+            <span
+              v-text="getInstitutionNameById(detail_data.institution_id)"
+            ></span>
           </p>
         </div>
       </div>

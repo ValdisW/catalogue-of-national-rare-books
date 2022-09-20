@@ -6,7 +6,7 @@ const mysql = require("mysql");
 const connection_config = {
   host: "127.0.0.1",
   user: "root",
-  password: "78632",
+  password: "pkudh",
   database: "rare",
   multipleStatements: true,
 };
@@ -23,7 +23,7 @@ function query(q) {
   });
 }
 
-// const connection_config = "root:78632@127.0.0.1";
+// const connection_config = "root:pkudh@127.0.0.1";
 
 // function query(q) {
 //   return new Promise((resolve, reject) => {
@@ -31,7 +31,7 @@ function query(q) {
 //       s
 //         .sql(q)
 //         .execute((result) => resolve(result))
-//         .then(() => session.close())
+//         .then(() => s.close())
 //     );
 //   });
 // }
