@@ -6,63 +6,87 @@
         <div class="title">
           <span v-text="this.book_data.name"></span>
         </div>
-        <div class="switch">
-          <button class="book-content" ref="switch-detail" @click="this.show_attrs = false">字段顯示</button>
-          <div>│</div>
-          <button class="book-display" ref="switch-content" @click="this.show_attrs = true">名錄内容</button>
-        </div>
 
-        <transition name="fade">
-          <div class="detail" v-show="show_attrs">
-            <div class="detail-title">
-              <p>题名：</p>
-              <p>文種：</p>
-              <p>文獻類型：</p>
-              <p>版本類型：</p>
-              <p>版本：</p>
-              <p>數量：</p>
-              <p>板框尺寸：</p>
-              <p>版式：</p>
-              <p>裝幀形式：</p>
-              <p>開本尺寸：</p>
-              <p>牌記：</p>
-              <p>館藏：</p>
-              <p>索書號：</p>
-            </div>
-            <div class="detail-content">
-              <p class="name" v-text="book_data.name || '-'"></p>
-              <p class="language" v-text="id2name(this.$store.state.all_language, book_data.language_id, '-')"></p>
-              <p
-                class="document-type"
-                v-text="id2name(this.$store.state.all_document_type, book_data.document_type_id, '-')"
-              ></p>
-              <p
-                class="edition-type"
-                v-text="id2name(this.$store.state.all_document_type, book_data.edition_type_id, '-')"
-              ></p>
-              <p class="edition" v-text="book_data.edition || '-'"></p>
-              <p class="quantity" v-text="book_data.quantity + book_data.measurement || '-'"></p>
-              <p class="frame-size" v-text="book_data.frame_size || '-'"></p>
-              <p class="typeset" v-text="book_data.typeset || '-'"></p>
-              <p class="binding-form">-</p>
-              <p class="book-size" v-text="book_data.book_size || '-'"></p>
-              <p class="note">-</p>
-              <p
-                class="institute"
-                v-text="id2name(this.$store.state.all_institution, book_data.institution_id, '-')"
-              ></p>
-              <p v-text="book_data.call_number || '-'"></p>
-            </div>
-          </div>
-        </transition>
-
-        <transition name="fade">
-          <div class="display" v-show="!show_attrs">
-            <p v-text="book_data.content_sc"></p>
-            <p v-text="book_data.content_tc"></p>
-            <p v-text="book_data.content_full"></p>
-          </div>
-        </transition>
+        <table class="detail">
+          <tr>
+            <td class="detail-title">文種：</td>
+            <td
+              class="detail-content language"
+              v-text="id2name(this.$store.state.all_language, book_data.language_id, '-')"
+            ></td>
+          </tr>
+          <tr>
+            <td class="detail-title">文獻類型：</td>
+            <td
+              class="detail-content document-type"
+              v-text="id2name(this.$store.state.all_document_type, book_data.document_type_id, '-')"
+            ></td>
+          </tr>
+          <tr>
+            <td class="detail-title">分類：</td>
+            <td
+              class="detail-content name"
+              v-text="id2name(this.$store.state.all_catalogue, book_data.catalogue_id, '-')"
+            ></td>
+          </tr>
+          <tr>
+            <td class="detail-title">题名：</td>
+            <td class="detail-content name" v-text="book_data.name || '-'"></td>
+          </tr>
+          <!-- <tr>
+            <td class="detail-title">版本類型：</td>
+            <td
+              class="detail-content edition-type"
+              v-text="id2name(this.$store.state.all_document_type, book_data.edition_type_id, '-')"
+            ></td>
+          </tr> -->
+          <tr>
+            <td class="detail-title">版本：</td>
+            <td class="detail-content edition" v-text="book_data.edition || '-'"></td>
+          </tr>
+          <tr>
+            <td class="detail-title">數量：</td>
+            <td class="detail-content quantity" v-text="book_data.quantity + book_data.measurement || '-'"></td>
+          </tr>
+          <tr>
+            <td class="detail-title">裝幀形式：</td>
+            <td class="detail-content binding-form">-</td>
+          </tr>
+          <tr>
+            <td class="detail-title">開本尺寸：</td>
+            <td class="detail-content book-size" v-text="book_data.book_size || '-'"></td>
+          </tr>
+          <tr>
+            <td class="detail-title">板框尺寸：</td>
+            <td class="detail-content frame-size" v-text="book_data.frame_size || '-'"></td>
+          </tr>
+          <tr>
+            <td class="detail-title">版式：</td>
+            <td class="detail-content typeset" v-text="book_data.typeset || '-'"></td>
+          </tr>
+          <tr>
+            <td class="detail-title">牌記：</td>
+            <td class="detail-content note">-</td>
+          </tr>
+          <tr>
+            <td class="detail-title">收藏省份：</td>
+            <td
+              class="detail-content institute"
+              v-text="id2name(this.$store.state.all_province, book_data.province_id, '-')"
+            ></td>
+          </tr>
+          <tr>
+            <td class="detail-title">收藏單位：</td>
+            <td
+              class="detail-content institute"
+              v-text="id2name(this.$store.state.all_institution, book_data.institution_id, '-')"
+            ></td>
+          </tr>
+          <tr>
+            <td class="detail-title">索書號：</td>
+            <td class="detail-content" v-text="book_data.call_number || '-'"></td>
+          </tr>
+        </table>
 
         <!-- 责任者 -->
         <ul class="timeline">
@@ -76,17 +100,21 @@
               "
             ></div>
             <b></b>
-            <div
+            <span
+              class="person"
+              v-if="$store.state.persons.find((el) => el.id == person.person_id).name == '□□'"
+              v-text="`[${person.dynasty_or_nation}]佚名`"
+            ></span>
+            <router-link
+              v-else
+              @click="close"
+              :to="'/person-detail/' + person.person_id"
               class="person"
               v-text="
-                `[${person.dynasty_or_nation}]${
-                  $store.state.persons.find((el) => el.id == person.person_id)
-                    ? $store.state.persons.find((el) => el.id == person.person_id).name
-                    : '佚名'
-                }`
+                `[${person.dynasty_or_nation}]${$store.state.persons.find((el) => el.id == person.person_id).name}`
               "
               :title="JSON.stringify(person)"
-            ></div>
+            ></router-link>
           </li>
         </ul>
       </div>
@@ -96,6 +124,7 @@
         <div class="img-wrapper" @click="openImageViewer">
           <img :src="image_filenames[image_showed_index]" />
         </div>
+
         <div class="switch_pic" style="text-align: center">
           <button
             v-for="(u, i) in image_filenames"
@@ -103,6 +132,13 @@
             :key="u"
             @click="switchImage(i)"
           ></button>
+        </div>
+
+        <div class="display">
+          <div>
+            <!-- <p>名录内容</p> -->
+            <p v-text="book_data.content_sc"></p>
+          </div>
         </div>
       </div>
     </div>
@@ -124,7 +160,6 @@ export default {
       bookID: "",
       image_filenames: ["/images/placeholder.jpg", "/images/placeholder2.jpg"],
       image_showed_index: 0,
-      show_attrs: false,
       book_data: { content: "" },
       related_person: [],
       seals: [],
@@ -135,13 +170,12 @@ export default {
     close() {
       this.show = false;
     },
-    open(book_id) {
-      this.bookID = book_id;
+    open(book_data) {
       this.show = true;
 
-      this.book_data = this.$store.state.books.find((ele) => ele.id == book_id);
+      this.book_data = book_data;
 
-      axios.get(`/data/book-detail/${book_id}`).then((d) => {
+      axios.get(`/data/book-detail/${book_data.id}`).then((d) => {
         this.related_person = d.data[0];
         this.seals = d.data[1];
       });
@@ -149,9 +183,6 @@ export default {
     openImageViewer() {
       this.$refs["image-viewer"].open();
     },
-    // closeImageViewer() {
-    //   this.$refs["image-viewer"].close();
-    // },
     switchImage(index) {
       this.image_showed_index = index;
     },
@@ -189,12 +220,12 @@ export default {
   .content {
     width: 80%;
     display: flex;
-    align-items: center;
+    // align-items: center;
     justify-content: center;
     .close-button {
       position: absolute;
       left: 0;
-      top: 0;
+      top: 0.5rem;
       width: 2rem;
       height: 2rem;
       background: url(../assets/icons/back.svg) center no-repeat;
@@ -205,8 +236,12 @@ export default {
       // height: 80vh;
       font-size: 0.7rem;
       margin-top: 5vh;
-      p {
-        margin: 0.7rem 0;
+      div {
+        // p:first-child {
+        //   font-weight: bold;
+        //   margin: 0.7rem 0 0;
+        //   font-size: 0.8rem;
+        // }
       }
     }
     .book-image {
@@ -239,11 +274,13 @@ export default {
         justify-content: center;
         align-items: center;
         img {
-          margin: 0 auto;
-          display: block;
+          // margin: 0 auto;
+          // display: block;
           height: 60vh;
+          width: 60vh;
+          object-fit: contain;
           transition: all 1s ease-in-out;
-          max-width: 100%;
+          // max-width: 100%;
         }
       }
     }
@@ -252,25 +289,10 @@ export default {
       margin-right: 5vh;
       width: 40%;
       height: 80vh;
-      .switch {
-        display: flex;
-
-        margin-bottom: 10px;
-
-        .book-content {
-          color: #8f644d;
-          background-color: transparent;
-          border-style: none;
-          font-size: 2.3vh;
-        }
-        .book-display {
-          color: #4a3300;
-          background-color: transparent;
-          border-style: none;
-          font-size: 2.3vh;
-        }
-      }
       .title {
+        text-overflow: ellipsis;
+        width: 20rem;
+        overflow: hidden;
         font-family: "SourceHanSerif";
         font-weight: bold;
         font-size: 2rem;
@@ -285,44 +307,27 @@ export default {
         }
       }
       .detail {
-        display: flex;
-        font-size: 0.8rem;
-        div {
-          line-height: 1.6rem;
+        // display: flex;
+        font-size: 0.7rem;
+        tr {
+          line-height: 1.3rem;
         }
         .detail-title {
+          width: 3.5rem;
           text-align: right;
           font-weight: bold;
           margin: 0 0.5rem 0 0;
           flex: auto 0 0;
         }
+        .detail-content {
+          line-height: 1rem;
+        }
       }
-      // .related-books {
-      //   font-size: 0.8rem;
-      //   position: relative;
-      //   width: 500px;
-      //   height: 300px;
-      //   overflow-y: scroll;
-      // }
-      // .person {
-      //   position: absolute;
-      //   right: 100px;
-      //   bottom: 100px;
-      //   table {
-      //     font-size: 0.8rem;
-      //     tr {
-      //       td {
-      //         a {
-      //           color: #000;
-      //         }
-      //       }
-      //     }
-      //   }
-      // }
 
       .timeline {
         list-style-type: none;
         display: flex;
+        max-width: 70%;
         align-items: center;
         justify-content: center;
         li {
@@ -345,6 +350,7 @@ export default {
           text-align: center;
           margin-top: 0.7rem;
           font-size: 0.6rem;
+          color: #333;
         }
       }
       .timeline li b:before {

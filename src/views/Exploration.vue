@@ -1,17 +1,10 @@
 <template>
-  <div class="exploration">
-    <div class="search">
-      <!-- 檢索框 -->
-      <input placeholder="請輸入關鍵詞" type="text" ref="text" />
-
-      <!-- 檢索字段 -->
-      <Droplist ref="drop-list" :attr_list="display_attrs" />
-
-      <!-- 檢索按鈕 -->
-      <button id="search-button" @click="search"></button>
+  <div class="exploration" :class="{ new: !show_results }" v-if="complete">
+    <div class="search" :class="{ new: !show_results }">
+      <SearchBar :attr_list="display_attrs" @search="search" />
     </div>
 
-    <div class="main-content">
+    <div class="main-content" v-show="show_results">
       <!-- 左側篩選欄 -->
       <div class="filters">
         <Filter
@@ -26,7 +19,7 @@
 
       <!-- 右側檢索結果 -->
       <div class="search-result">
-        <p class="total">共{{ search_result.length }}條結果</p>
+        <p class="total">共{{ has_filtered ? filtered_result.length : search_result.length }}條結果</p>
         <div class="results results-plain">
           <table class="results-list">
             <thead>
@@ -41,10 +34,11 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="item in curr_d" :key="item.id" class="item-block" @click="$emit('openBookDetail', item.id)">
-                <td v-text="item.id"></td>
-                <td v-text="item.batch"></td>
-                <td v-text="item.name"></td>
+              <tr v-for="item in curr_d" :key="item.id" class="item-block" @click="$emit('openBookDetail', item)">
+                <td v-text="'第' + item.batch + '批'"></td>
+                <td v-text="item.id || '-'"></td>
+                <td v-text="item.name || '-'"></td>
+                <td v-text="item.edition || '-'"></td>
                 <td
                   v-text="
                     $store.state.all_edition_dynasty.find((ele) => ele.id == item.edition_dynasty_id)
@@ -77,7 +71,12 @@
             </tbody>
           </table>
         </div>
-        <PageDivider @turnTo="alterPage" :items_sum="items_sum" :each_page_items="each_page_items" ref="page-divider" />
+        <PageDivider
+          @turnTo="alterPage"
+          :items_sum="has_filtered ? filtered_result.length : search_result.length"
+          :each_page_items="each_page_items"
+          ref="page-divider"
+        />
       </div>
     </div>
   </div>
@@ -85,26 +84,30 @@
 
 <script>
 import axios from "axios";
-import PageDivider from "@/components/PageDivider.vue";
+import SearchBar from "@/components/SearchBar";
+import PageDivider from "@/components/PageDivider";
 import Filter from "@/components/Filter";
-import Droplist from "@/components/Droplist";
 
 export default {
   name: "Exploration",
-  components: { PageDivider, Filter, Droplist },
+  components: { SearchBar, PageDivider, Filter },
   data() {
     return {
-      curr_attr: "id", // 當前檢索字段
+      complete: false,
+      show_results: false,
       search_result: [], // 所有检索结果
       curr_d: [], // 当前页的检索结果
-      items_sum: 1,
-      each_page_items: 50, // 每頁的檢索結果數量
+      each_page_items: 50, // 每页的检索结果数量
+
+      curr_filter: {}, // 当前的筛选条件
+
+      has_filtered: false, // 标记是否已经进行过筛选（用于正确显示检索结果数量以及页码数）
 
       // 筛选器数据
       filter_data: [
         { id: "language", name: "文種", value: [] },
-        { id: "edition_dynasty", name: "版本年代", value: [] },
         { id: "document_type", name: "文獻類型", value: [] },
+        { id: "edition_dynasty", name: "版本年代", value: [] },
         { id: "edition_type", name: "版本類型", value: [] },
       ],
 
@@ -112,9 +115,10 @@ export default {
 
       // 展示字段与检索字段
       display_attrs: [
-        { name: "ID", value: "id", order: true, byID: false },
-        { name: "批次", value: "batch", order: true, byID: false },
+        { name: "名錄批次", value: "batch", order: true, byID: false },
+        { name: "名錄號", value: "id", order: true, byID: false },
         { name: "題名", value: "name", order: true, byID: false },
+        { name: "版本", value: "edition", order: true, byID: true },
         { name: "版本年代", value: "edition_dynasty", order: true, byID: true },
         { name: "文獻類型", value: "document_type", order: true, byID: true },
         { name: "文種", value: "language", order: true, byID: true },
@@ -123,22 +127,41 @@ export default {
     };
   },
   methods: {
-    // 开始搜索。根据检索词及筛选条件
-    search() {
-      axios.get(`/data/text?query=${this.$refs.text.value}&attr=${this.$refs["drop-list"].curr_value}`).then((d) => {
-        this.search_result = d.data;
-        this.items_sum = d.data.length;
-        this.curr_d = this.search_result.slice(0, this.each_page_items); // 当前页数据
-        this.updateFilter();
-      });
+    // 开始检索。根据检索词及筛选条件
+    search(values) {
+      axios
+        .post("/data/search-for-books", { values })
+        .then((res) => {
+          this.search_result = res.data;
+          this.curr_d = this.search_result.slice(0, this.each_page_items); // 当前页数据
+          this.updateFilter();
+          this.show_results = true;
+        })
+        .then((err) => {
+          if (err) console.error(err);
+        });
     },
+    // 更新统计数据
     updateFilter() {
       for (let i in this.filter_data)
         this.filter_data[i].value = this.getSum(this.search_result, this.filter_data[i].id + "_id");
     },
+    // Filter发生变化
     filterResult(e) {
-      this.filtered_result = this.search_result.filter((ele) => ele[e.attr + "_id"] == e.value);
+      this.curr_filter[e.attr] = e.value;
+      console.log(this.curr_filter);
+      this.filtered_result = this.search_result.filter((el) => {
+        let flag = true;
+        for (let i in this.curr_filter) {
+          if (!this.curr_filter[i].length) continue;
+          let _flag = false;
+          for (let v of this.curr_filter[i]) _flag = _flag || "" + el[i + "_id"] == v;
+          flag = flag && _flag;
+        }
+        return flag;
+      });
       this.curr_d = this.filtered_result.slice(0, this.each_page_items); // 当前页数据
+      this.has_filtered = true;
     },
     getSum(r, attr) {
       let a = {};
@@ -151,8 +174,10 @@ export default {
         arr.push({
           name: i,
           value: a[i],
+          selected: false,
         });
       }
+      console.log(arr);
       return arr;
     },
     toggleRank(attr, order) {
@@ -195,11 +220,20 @@ export default {
     },
   },
   mounted() {
-    this.search_result = this.$store.state.books;
-    this.items_sum = this.$store.state.books.length;
-    this.curr_d = this.search_result.slice(0, this.each_page_items); // 当前页数据
+    axios.get("/data/exploration-load").then((res) => {
+      this.$store.commit("loadExplorationData", res.data);
 
-    this.updateFilter();
+      this.complete = true;
+      this.$emit("endLoading");
+
+      this.filtered_result = this.search_result = this.$store.state.books;
+      this.curr_d = this.search_result.slice(0, this.each_page_items); // 当前页数据
+
+      this.updateFilter();
+    });
+  },
+  unmounted() {
+    this.$emit("startLoading");
   },
 };
 </script>
@@ -212,28 +246,11 @@ export default {
   padding: 3rem 5rem;
   box-sizing: border-box;
   // background: linear-gradient(#b8a885, #fff2d9, #fff2d9, #fff2d9, #fff2d9, #fff2d9, #fff2d9, #fff2d9, #fff2d9, #fff2d9, #b8a885);
-  .search {
-    input[type="text"] {
-      height: 2rem;
-      width: 15rem;
-      border-radius: 0.5rem;
-      font-size: 0.9rem;
-      outline: none;
-      vertical-align: top; // 防错位
-    }
-    #search-button {
-      background: #fbb03b url(../assets/icons/search.svg) center no-repeat;
-      background-size: 66%;
-      width: 2rem;
-      height: 2rem;
-      border-radius: 0.5rem;
-      border: none;
-      cursor: pointer;
-      margin: 0 0 0 0.7rem;
-    }
-    #search-button:hover {
-      filter: brightness(80%);
-    }
+  .search.new {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
   }
   .main-content {
     display: flex;
@@ -265,8 +282,9 @@ export default {
                 height: 0.6rem;
                 margin: 0 0 0 0.2rem;
                 span {
+                  width: 0;
                   display: block;
-                  border: 0.3rem solid #3333;
+                  border: 0.23rem solid #3333;
                   border-left-color: transparent;
                   border-right-color: transparent;
                 }
@@ -282,6 +300,8 @@ export default {
           }
 
           tr.item-block {
+            user-select: none;
+            cursor: pointer;
             td {
               text-align: center;
               padding: 4px 8px;
@@ -307,5 +327,9 @@ export default {
       }
     }
   }
+}
+.exploration.new {
+  background: url(../assets/bookshelf_texture.png) no-repeat center;
+  background-size: auto 80%;
 }
 </style>

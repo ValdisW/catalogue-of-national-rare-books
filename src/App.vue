@@ -1,24 +1,14 @@
 <template>
   <Loading :complete="complete" />
-  <div id="main-container" v-if="complete">
+  <div id="main-container">
     <nav>
       <ul>
-        <li @mouseenter="showSub = true" @mouseleave="showSub = false">
-          <router-link to="/">名錄介紹</router-link>
-          <ul v-show="showSub">
-            <li><router-link to="/">粒子</router-link></li>
-            <li><router-link to="/">統計</router-link></li>
-            <li><router-link to="/">地點</router-link></li>
-          </ul>
-        </li>
-        <li>
-          <router-link to="/exploration">古籍瀏覽</router-link>
-        </li>
-        <li>
-          <router-link to="/relationship">流傳分析</router-link>
-        </li>
-        <li>
-          <router-link to="/about">關於我們</router-link>
+        <li v-for="page in nav_pages" :key="page.name">
+          <router-link
+            :class="{ active: $router.currentRoute.value.path == page.router }"
+            :to="page.router"
+            v-text="page.name"
+          ></router-link>
         </li>
       </ul>
     </nav>
@@ -26,7 +16,10 @@
     <router-view
       v-slot="{ Component }"
       :key="$route.fullPath"
+      @startLoading="complete = false"
+      @endLoading="complete = true"
       @openBookDetail="openBookDetail"
+      @openInstitutionDetail="openInstitutionDetail"
     >
       <keep-alive>
         <component :is="Component" />
@@ -34,28 +27,38 @@
     </router-view>
 
     <BookDetail ref="book-detail" />
+    <InstitutionDetail ref="institution-detail" institutionID="201"></InstitutionDetail>
   </div>
 </template>
 
 <script>
-import axios from "axios";
 import Loading from "@/components/Loading";
 import BookDetail from "@/views/BookDetail";
+import InstitutionDetail from "@/views/InstitutionDetail";
 
 const baseSize = 20;
 
 export default {
   name: "App",
-  components: { Loading, BookDetail },
+  components: { Loading, BookDetail, InstitutionDetail },
   data() {
     return {
       complete: false,
-      showSub: false,
+
+      nav_pages: [
+        { name: "名錄介紹", router: "/" },
+        { name: "古籍瀏覽", router: "/exploration" },
+        { name: "書目分析", router: "/relationship" },
+        { name: "關於我們", router: "/about" },
+      ],
     };
   },
   methods: {
-    openBookDetail(book_id) {
-      this.$refs["book-detail"].open(book_id);
+    openBookDetail(book_data) {
+      this.$refs["book-detail"].open(book_data);
+    },
+    openInstitutionDetail(institution_id) {
+      this.$refs["institution-detail"].open(institution_id);
     },
     PageSize() {
       let width = window.innerWidth;
@@ -71,18 +74,12 @@ export default {
       this.$store.commit("changeRem", rem);
       document.documentElement.style.fontSize = rem + "px";
     },
-    loadData() {
-      axios.get("/data/").then((res) => {
-        this.$store.commit("loadData", res.data);
-        this.complete = true;
-      });
-    },
+
     init() {
       this.setRem();
       window.onresize = () => {
         this.init();
       };
-      this.loadData();
     },
   },
   mounted() {
@@ -96,6 +93,10 @@ export default {
   margin: 0;
   padding: 0;
   font-family: "SourceHanSerif";
+}
+::selection {
+  background: #77664b;
+  color: #fff;
 }
 ::-webkit-scrollbar {
   width: 12px;
@@ -130,10 +131,14 @@ nav {
       margin: 1rem;
       position: relative;
       a {
-        color: #77664b;
+        color: #77664b66;
+        // color: #77664b;
         text-decoration: none;
         font-family: "SourceHanSerif";
         font-weight: normal;
+      }
+      a.active {
+        color: #77664b;
       }
       ul {
         display: block;

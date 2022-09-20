@@ -1,17 +1,15 @@
 <template>
-  <div class="book-detail-tooltip">
+  <div class="book-detail-tooltip" v-show="show">
     <div class="container">
-      <div class="img-wrapper">
+      <!-- <div class="img-wrapper">
         <img src="/images/placeholder.jpg" alt="書影" />
-      </div>
+      </div> -->
       <div class="content">
         <h4>
           <span v-text="id"></span>
           <span v-text="detail_data.name"></span>
         </h4>
-        <span class="to-detail" @click="$emit('openBookDetail', id)"
-          >查看詳情</span
-        >
+        <span class="to-detail" @click="openBookDetail">查看詳情</span>
         <div class="detail">
           <!-- <button id="test" @click="test">临时按钮</button> -->
           <p>
@@ -20,15 +18,11 @@
           </p>
           <p>
             <span>版本年代/國別：</span>
-            <span
-              v-text="getEditionDynastyNameById(detail_data.edition_dynasty_id)"
-            ></span>
+            <span v-text="getEditionDynastyNameById(detail_data.edition_dynasty_id)"></span>
           </p>
           <p>
             <span>文獻類型：</span>
-            <span
-              v-text="getDocumentTypeNameById(detail_data.document_type_id)"
-            ></span>
+            <span v-text="getDocumentTypeNameById(detail_data.document_type_id)"></span>
           </p>
           <p>
             <span>批次：</span>
@@ -36,9 +30,7 @@
           </p>
           <p>
             <span>收藏單位：</span>
-            <span
-              v-text="getInstitutionNameById(detail_data.institution_id)"
-            ></span>
+            <span v-text="getInstitutionNameById(detail_data.institution_id)"></span>
           </p>
         </div>
       </div>
@@ -54,8 +46,23 @@ export default {
   props: {
     id: String,
   },
+  data() {
+    return {
+      show: true,
+    };
+  },
   methods: {
     ...Utils.methods,
+    open() {
+      this.show = true;
+    },
+    close() {
+      this.show = false;
+    },
+    openBookDetail() {
+      this.close();
+      this.$emit("openBookDetail", this.id);
+    },
   },
   computed: {
     detail_data() {
@@ -63,14 +70,6 @@ export default {
       else return this.$store.state.books.find((el) => el.id == this.id);
     },
   },
-  created() {
-    console.log(this);
-  },
-  // methods: {
-  //   test() {
-  //     console.log("2333");
-  //   },
-  // },
 };
 </script>
 
@@ -82,12 +81,12 @@ export default {
 
   .container {
     display: flex;
-    .img-wrapper {
-      height: 100px;
-      img {
-        height: 100%;
-      }
-    }
+    // .img-wrapper {
+    //   height: 100px;
+    //   img {
+    //     height: 100%;
+    //   }
+    // }
     .content {
       width: 13rem;
       background-color: #333;

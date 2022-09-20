@@ -1,32 +1,28 @@
 import { createRouter, createWebHistory } from "vue-router";
-import Introduction from "../views/Introduction.vue";
 
 const routes = [
   {
     path: "/",
     name: "Introduction",
-    meta: { title: "古籍介绍" },
-    component: Introduction,
+    meta: { title: "名錄介紹" },
+    component: () => import("../views/Introduction.vue"),
   },
   {
     path: "/exploration",
     name: "Exploration",
-    meta: { title: "古籍浏览" },
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
+    meta: { title: "古籍瀏覽" },
     component: () => import("../views/Exploration.vue"),
   },
   {
     path: "/relationship",
     name: "Relationship",
-    meta: { title: "古籍流传" },
+    meta: { title: "書目分析" },
     component: () => import("../views/Relationship.vue"),
   },
   {
     path: "/about",
     name: "About",
-    meta: { title: "关于我们" },
+    meta: { title: "關於我們" },
     component: () => import("../views/About.vue"),
   },
   // {

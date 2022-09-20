@@ -1,5 +1,6 @@
 <template>
   <div class="page-divider">
+    <!-- 总页码数超过12时 -->
     <div class="all-pages" v-if="pages_sum > 12">
       <li class="prev-page" @click="toPrevPage">上一頁</li>
       <li
@@ -52,7 +53,7 @@
       <li class="next-page" @click="toNextPage">下一頁</li>
     </div>
 
-    <!-- 縂頁碼數不超过12页时，顯示所有頁面按鈕 -->
+    <!-- 总页码数不超过12时，显示所有页面按钮 -->
     <div class="all-pages" v-else>
       <li
         class="page-index"
@@ -62,6 +63,13 @@
         @click="turnTo(e)"
         :class="{ is_current_page: e == current_page }"
       ></li>
+    </div>
+
+    <!-- 跳转 -->
+    <div class="jumper">
+      <span>跳轉至第</span>
+      <input type="text" name="" id="" v-model.number="current_page" />
+      <span>頁</span>
     </div>
   </div>
 </template>
@@ -79,39 +87,47 @@ export default {
       current_page: 1,
     };
   },
+  watch: {
+    current_page(n) {
+      this.$emit("turnTo", n);
+    },
+  },
   props: {
     items_sum: Number,
     each_page_items: Number,
   },
   methods: {
     toPrevPage() {
-      this.current_page--;
-      this.$emit("turnTo", this.current_page);
+      if (this.current_page > 1) this.current_page--;
     },
     toNextPage() {
-      this.current_page++;
-      this.$emit("turnTo", this.current_page);
+      if (this.current_page < this.pages_sum) this.current_page++;
     },
     turnTo(page_index) {
-      // this.current_page = parseInt(e.target.innerText);
-      this.current_page = page_index;
-      this.$emit("turnTo", this.current_page);
+      if (page_index >= 1 && page_index <= this.pages_sum)
+        this.current_page = page_index;
     },
   },
 };
 </script>
 
 <style lang="less" scoped>
-.page-divider {
-  display: flex;
-  justify-content: center;
-}
 .prev-page,
 .next-page {
   display: inline-block;
 }
 .page-divider {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   user-select: none;
+  .jumper {
+    margin: 0 0 0 1rem;
+    input {
+      width: 1.2rem;
+    }
+  }
+
   li {
     list-style-type: none;
     text-decoration: none;

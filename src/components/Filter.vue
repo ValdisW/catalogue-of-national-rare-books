@@ -3,12 +3,19 @@
     <p class="title" v-text="attr_name"></p>
     <div class="content">
       <ul>
-        <li v-for="e in attrs" :key="e" :val="e.value" @click="toggleSelect(e)">
+        <li
+          v-for="e in attrs"
+          :class="{ selected: e.selected }"
+          :key="e"
+          :val="e.value"
+          @click="toggleSelect(e)"
+        >
           <!-- 条形-->
           <div
             class="bar"
             :style="{
-              width: (Math.log(e.value) / Math.log(max_value)) * 100 + '%',
+              width:
+                (Math.log(e.value + 1) / Math.log(max_value + 1)) * 100 + '%',
             }"
           ></div>
 
@@ -16,10 +23,9 @@
           <div class="info">
             <span
               v-text="
-                $store.state['all_' + attr_id].find((ele) => ele.id == e.name)
-                  ? $store.state['all_' + attr_id].find(
-                      (ele) => ele.id == e.name
-                    ).name
+                $store.state['all_' + attr_id].find((el) => el.id == e.name)
+                  ? $store.state['all_' + attr_id].find((el) => el.id == e.name)
+                      .name
                   : '未知'
               "
             ></span>
@@ -37,7 +43,7 @@ export default {
   props: {
     attr_id: String,
     attr_name: String, // 筛选器的标题
-    attrs: Array, // 筛选器展示的内容。键值对，各个属性id及其值 e.g. {name: 12, value: 345}
+    attrs: Array, // 筛选器展示的内容。键值对，各个属性id及其值 e.g. {name: 12, value: 345，selected: false}
   },
   computed: {
     max_value() {
@@ -49,8 +55,15 @@ export default {
     },
   },
   methods: {
+    // 点击某个筛选项
     toggleSelect(e) {
-      this.$emit("filter", { attr: this.attr_id, value: e.name });
+      e.selected = !e.selected;
+      this.$emit("filter", {
+        attr: this.attr_id,
+        value: this.attrs
+          .filter((el) => el.selected)
+          .map((el) => (el = el.name)),
+      });
     },
   },
 };
@@ -95,6 +108,13 @@ export default {
           position: absolute;
           top: 0;
         }
+      }
+      li.selected {
+        background: rgb(70, 83, 85);
+      }
+      li:hover {
+        filter: brightness(80%);
+        background: rgb(153, 135, 105);
       }
     }
   }

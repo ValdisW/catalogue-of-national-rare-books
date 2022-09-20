@@ -1,5 +1,5 @@
 <template>
-  <div class="institution-detail">
+  <div class="institution-detail" v-show="show">
     <!-- <BackButton /> -->
     <div class="content">
       <div class="intro">
@@ -33,9 +33,26 @@ export default {
   },
   data() {
     return {
+      show: false,
       books: [],
       batches: [[], [], [], [], [], []],
     };
+  },
+  methods: {
+    close() {
+      this.show = false;
+    },
+    open(book_id) {
+      this.bookID = book_id;
+      this.show = true;
+
+      this.book_data = this.$store.state.books.find((ele) => ele.id == book_id);
+
+      axios.get(`/data/book-detail/${book_id}`).then((d) => {
+        this.related_person = d.data[0];
+        this.seals = d.data[1];
+      });
+    },
   },
   mounted() {
     axios.get(`/data/institution-detail/${this.institutionID}`).then((d) => {

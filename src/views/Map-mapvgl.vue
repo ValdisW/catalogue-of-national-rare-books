@@ -6,35 +6,36 @@
         <li
           v-for="(city, index) in province_info"
           :key="index"
+          @click="clickProvince(city, index)"
           :id="`list-${index}`"
           :show="false"
         >
-          <p @click="clickProvince(city, index)">
-            {{ city.name }} - {{ city.count }}
-          </p>
+          <span v-text="`${city.name} - ${city.count}`"></span>
+          <ul class="sublist" v-show="false">
+            <li></li>
+          </ul>
         </li>
       </ul>
     </div>
 
     <!-- 悬浮框 -->
     <div id="tooltip">
-      <div id="tooltip-box"></div>
+      <div id="tooltip-box">
+        <h2 v-text="current_institution_name"></h2>
+        <div class="intro" v-text="current_institution_intro"></div>
+        <div class="books" v-text="current_institution_books"></div>
+      </div>
     </div>
   </div>
-
-  <InstitutionDetail institutionID="201"></InstitutionDetail>
 </template>
 
 <script>
-import * as Data from "@/data/dataLoader";
-import InstitutionDetail from "@/views/InstitutionDetail";
-
 export default {
-  components: {
-    InstitutionDetail,
-  },
   data() {
     return {
+      current_institution_name: "",
+      current_institution_intro: "",
+      current_institution_books: "",
       zoom: null,
       pointLayer: null,
       province_info: [
@@ -72,29 +73,27 @@ export default {
       this.view.addLayer(this.institutionLayer);
     },
     initProvinceLayer() {
-      var data = [];
-      var province_info = Data.get_province_list();
-
+      let data = [];
       this.province_info = [];
 
-      for (let i in province_info) {
-        let city = province_info[i];
+      for (let city of this.$store.state.all_province) {
         data.push({
           geometry: {
             type: "Point",
-            coordinates: [city["经度"], city["纬度"]],
+            coordinates: [city["lng"], city["lat"]],
           },
           properties: {
-            count: city["藏书总数"],
-            name: city["省份"],
+            id: city["id"],
+            count: city["books"],
+            name: city["name"],
           },
         });
 
         this.province_info.push({
-          name: city["省份"],
-          count: city["藏书总数"],
-          child: city["馆藏ID"],
-          pos: { lng: city["经度"], lat: city["纬度"] },
+          name: city["name"],
+          count: city["books"],
+          child: city["child"],
+          pos: { lng: city["lng"], lat: city["lat"] },
         });
       }
 
@@ -138,33 +137,25 @@ export default {
       this.provinceLayer.setData(data);
     },
     initInstitutionLayer() {
-      var data = [];
-      var institution_list = Data.get_institution_list();
+      let data = [];
+      let institution_list = this.$store.state.all_institution; // 机构id数组
 
-      this.insititution_info = [];
-
-      for (let i in institution_list) {
-        let inst = Data.get_institution_info(institution_list[i]);
+      for (let inst of institution_list) {
+        // let inst = Data.get_institution_info(institution_list[i]);
         data.push({
           geometry: {
             type: "Point",
-            coordinates: [inst["经度"], inst["纬度"]],
+            coordinates: [inst["lng"], inst["lat"]],
           },
           properties: {
-            count: inst.cnt,
-            name: inst["馆名"],
+            count: inst.books,
+            name: inst["name"],
           },
         });
-
-        this.insititution_info[institution_list[i]] = {
-          count: inst.cnt,
-          name: inst["馆名"],
-          pos: { lng: inst["经度"], lat: inst["纬度"] },
-        };
       }
 
       /* eslint-disable */
-      var intensity = new mapvgl.Intensity({
+      let intensity = new mapvgl.Intensity({
         max: 3081,
         min: 0,
         gradient: {
@@ -186,19 +177,17 @@ export default {
         selectedColor: "#ff0000",
         autoSelect: true,
         onClick: (e) => {
-          // 点击事件
-          this.$router.push(`/institution-detail/${e.dataItem.properties.name}`);
+          // 点击机构点
+          // this.$router.push(`/institution-detail/${e.dataItem.properties.name}`); // 跳转至机构详情页
+          // this.$emit("openInstituionDetail", );
+          console.log(e.dataItem.properties);
+
           let id = e.dataIndex;
           if (id == -1) {
             this.map.reset();
             this.removeAllSublist();
-          } else {
-            // this.clickProvince(this.province_info[id], id)
           }
         },
-        // onMousemove: (e) => {
-        //   console.log(e);
-        // },
       });
 
       this.institutionLayer.setData(data);
@@ -221,7 +210,6 @@ export default {
       map.enableScrollWheelZoom();
       map.enableInertialDragging();
       map.enableContinuousZoom();
-
       map.setDefaultCursor("default");
 
       // map.setDisplayOptions(options.displayOptions || {
@@ -254,20 +242,12 @@ export default {
         if (self.pointLayer == null) return;
         let index = self.pointLayer.pick(e.x, e.y);
         if (index.dataIndex == -1) {
-          // move tooltip
           self.removeTooltip();
           return;
         }
         self.showTooltip(e, index.dataItem.properties);
       });
       return map;
-    },
-    initTooltip() {
-      this.tooltipBox = document.getElementById("tooltip-box");
-      // let tooltip = document.getElementById("tooltip")
-      // let toolTipBox = document.createElement("div")
-      // toolTipBox.className = "tooltip-box"
-      // tooltip.appendChild(toolTipBox)
     },
     showTooltip(e, d) {
       // position
@@ -278,21 +258,25 @@ export default {
       if (left + this.tooltipBox.offsetWidth > document.body.clientWidth) {
         let demoLeft = document.getElementById("map_container").offsetLeft;
         left = document.body.clientWidth - toolTipBox.offsetWidth - demoLeft;
-        if (left < 0) {
-          left = 0;
-        }
+        if (left < 0) left = 0;
       }
       this.tooltipBox.style.left = left + "px";
       this.tooltipBox.style.top = top + 20 + "px";
-
       // text
-      let html = `<p>${d.name}<br/>藏书数: ${d.count}</p>`;
-      this.tooltipBox.innerHTML = html;
+      this.current_institution_name = d.name;
+      this.current_institution_intro =
+        d.name.length > 3
+          ? "国家图书馆前身是筹建于1909年9月9日的京师图书馆，1998年更名为国家图书馆。该馆收藏古籍200万册件，其中善本古籍27万册件。宋元善本、敦煌遗书、赵城金藏、永乐大典、四库全书、方志家谱等是其特色藏品，另有金石拓片、舆图、少数民族语文等特藏古籍。专用古籍书库5个，总面积8493平方米。由古籍馆全面管理，工作人员130余人，专设典藏阅览、文献保护、古籍特藏修复等机构管理、保护、修复古籍。"
+          : "";
+      this.current_institution_books = `藏书数: ${d.count}`;
 
       this.tooltipBox.style.visibility = "visible";
     },
     removeTooltip() {
       this.tooltipBox.style.visibility = "hidden";
+    },
+    expandProvince(e) {
+      console.log(e);
     },
     clickProvince(d, i) {
       let list = document.getElementById("list-" + i);
@@ -307,24 +291,23 @@ export default {
         this.map.reset();
       }
     },
-
     // 二级菜单
     showSublist(d, list) {
       let sublist = document.createElement("ul");
       let self = this;
-      sublist.setAttribute("id", "sublist");
+      // sublist.setAttribute("id", "sublist");
       for (let i in d.child) {
         let child_id = d.child[i];
-        let child = this.insititution_info[child_id];
-        if (child == undefined) {
+        let child = this.$store.state.all_institution.find((el) => el.id == child_id);
+        if (!child) {
           console.log(child_id);
           continue;
         }
         let li = document.createElement("li");
-        li.innerHTML = `${child.name} - ${child.count}`;
+        li.innerHTML = `${child.name} - ${child.books}`;
         li.onclick = function () {
           self.zoom = 10;
-          self.map.flyTo(child.pos, 10);
+          self.map.flyTo({ lng: child["lng"], lat: child["lat"] }, 10);
         };
         sublist.appendChild(li);
       }
@@ -346,6 +329,7 @@ export default {
     },
   },
   mounted() {
+    // 初始化地图参数
     this.zoom = 5;
     this.map = this.initMap({
       tilt: 49.6,
@@ -358,11 +342,10 @@ export default {
       map: this.map,
     });
 
-    this.initTooltip();
+    this.tooltipBox = document.getElementById("tooltip-box");
     this.initProvinceLayer();
     this.initInstitutionLayer();
   },
-  computed: {},
 };
 </script>
 
@@ -392,6 +375,13 @@ export default {
       position: absolute;
       display: block;
       visibility: hidden;
+      max-width: 33%;
+      h2 {
+        font-size: 1rem;
+      }
+      .intro {
+        font-size: 0.7rem;
+      }
     }
   }
   #map-list {
@@ -409,7 +399,7 @@ export default {
         padding: 0.3rem 0;
       }
     }
-    #sublist {
+    .sublist {
       background-color: antiquewhite;
       // overflow: scroll;
     }

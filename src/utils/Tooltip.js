@@ -1,5 +1,4 @@
 import * as d3 from "d3";
-// import * as Data from "@/data/dataLoader"
 
 export function Tooltip() {
   let frameOfReference,

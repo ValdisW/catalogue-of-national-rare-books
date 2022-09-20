@@ -72,7 +72,9 @@ export default {
   .list {
     position: absolute;
     list-style: none;
-    background-color: rgba(184, 164, 119, 0.87);
+    background-color: #333;
+    color: #fff;
+    border-radius: 0.3rem;
     text-align: center;
     z-index: 10;
     width: 4rem;

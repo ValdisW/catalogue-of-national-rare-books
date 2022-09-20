@@ -1,8 +1,6 @@
 <template>
   <div class="bar-chart">
-    <div class="title">
-      {{ title }}
-    </div>
+    <div class="title" v-text="title"></div>
     <div class="chart" ref="chart"></div>
   </div>
 </template>
@@ -22,7 +20,7 @@ export default {
     return {
       bar_color: "#604a2f",
       margin: {
-        left: 0.25,
+        left: 0.3,
         right: 0.08,
         top: 0.1,
         bottom: 0.1,
@@ -53,27 +51,17 @@ export default {
     },
     initializeBarchart() {
       if (this.info) {
-        let svgHeight =
-            this.canvasHeight * (1 - this.margin.top - this.margin.bottom),
-          svgWidth =
-            this.canvasWidth * (1 - this.margin.left - this.margin.right);
+        let svgHeight = this.canvasHeight * (1 - this.margin.top - this.margin.bottom),
+          svgWidth = this.canvasWidth * (1 - this.margin.left - this.margin.right);
 
         d3.select(this.$refs.chart).selectAll("svg").remove();
-        this.svg = d3
-          .select(this.$refs.chart)
-          .append("svg")
-          .attr("width", this.canvasWidth)
-          .attr("height", svgHeight);
+        this.svg = d3.select(this.$refs.chart).append("svg").attr("width", this.canvasWidth).attr("height", svgHeight);
 
         let x = d3
           .scaleLinear()
           .domain([0, Math.log(d3.max(this.info, (l) => l.value))])
           .range([0, svgWidth]);
-        let y = d3
-          .scaleBand()
-          .domain(this.get_name())
-          .range([0, svgHeight])
-          .padding(0.5);
+        let y = d3.scaleBand().domain(this.get_name()).range([0, svgHeight]).padding(0.5);
 
         this.chart = this.svg
           .selectAll("g")
@@ -82,11 +70,7 @@ export default {
           .attr("class", (d) => {
             "bar " + d.name;
           })
-          .attr(
-            "transform",
-            (d) =>
-              `translate(${this.canvasWidth * this.margin.left},${y(d.name)})`
-          );
+          .attr("transform", (d) => `translate(${this.canvasWidth * this.margin.left},${y(d.name)})`);
 
         // add bar
         this.chart
@@ -94,17 +78,14 @@ export default {
           .append("rect")
           .attr("x", 0)
           .attr("y", 0)
-          .attr("width", (d) => x(Math.log(d.value)))
+          .attr("width", (d) => x(Math.log(d.value + 1)))
           .attr("height", y.bandwidth())
           .attr("fill", this.bar_color)
           .attr("fill-opacity", 0.8);
 
         this.chart
           .append("g")
-          .attr(
-            "transform",
-            (d) => `translate(${x(Math.log(d.value)) + 3},${y.bandwidth()})`
-          )
+          .attr("transform", (d) => `translate(${x(Math.log(d.value + 1)) + 3},${y.bandwidth()})`)
           .append("text")
           .attr("font-size", "0.6rem")
           .text((d) => d.value);
@@ -119,12 +100,7 @@ export default {
         this.svg
           .append("g")
           .attr("id", "axis")
-          .attr(
-            "transform",
-            `translate(${this.canvasWidth * this.margin.left}, ${
-              svgHeight * 0
-            })`
-          )
+          .attr("transform", `translate(${this.canvasWidth * this.margin.left}, ${svgHeight * 0})`)
           .call(axis_y) // 将g作为函数参数调用函数
           .attr("font-size", "0.6rem")
           .selectAll("text")

@@ -1,5 +1,5 @@
 <template>
-  <div class="introduction" @wheel.prevent="rowScroll" ref="introduction">
+  <div class="introduction" @wheel.prevent="rowScroll" ref="introduction" v-if="complete">
     <section class="section-1">
       <!-- <FlowingParticles_new /> -->
       <div class="everyday-book">
@@ -8,16 +8,16 @@
           <p v-text="now.getDate()"></p>
           <p v-text="now.getFullYear() + '.' + (now.getMonth() + 1)"></p>
         </div>
-        <div>
+        <div @click="$emit('openBookDetail', '01523')">
           <p>01523</p>
           <p>鲍氏国策十卷</p>
         </div>
-        <img src="/images/placeholder.jpg" alt="今日古籍-书影" />
+        <img @click="$emit('openBookDetail', '01523')" src="/images/placeholder.jpg" alt="今日古籍-书影" />
       </div>
       <div class="cover">
         <div>
           <div>
-            <h1>国<br />家<br />珍<br />贵<br />古<br />籍<br />名<br />录</h1>
+            <h1>國<br />家<br />珍<br />貴<br />古<br />籍<br />名<br />錄</h1>
           </div>
         </div>
       </div>
@@ -33,6 +33,15 @@
     <section class="section-4">
       <FlowingParticles @openBookDetail="openBookDetail" />
     </section>
+
+    <div class="badges">
+      <span
+        v-for="e in 4"
+        :key="e"
+        :class="{ active: e - 1 == current_page }"
+        @click="scrollToSection(e - 1, true)"
+      ></span>
+    </div>
   </div>
 </template>
 
@@ -40,6 +49,7 @@
 import FlowingParticles from "@/components/FlowingParticles.vue";
 import BaiduMap from "@/views/Exploration-BaiduMap.vue";
 import Stack from "@/views/Exploration-Stack.vue";
+import axios from "axios";
 
 export default {
   name: "Introduction",
@@ -56,6 +66,7 @@ export default {
       current_page: 0,
       page_width: Number,
       offsets: [],
+      complete: false,
     };
   },
   methods: {
@@ -63,9 +74,9 @@ export default {
       this.$emit("openBookDetail", id);
     },
     calculateSectionOffsets() {
-      let sections = document.getElementsByTagName("section");
+      let sections = document.querySelectorAll("section");
       let length = sections.length;
-
+      console.log(sections);
       for (let i = 0; i < length; i++) {
         let sectionOffset = sections[i].offsetRight;
         this.offsets.push(sectionOffset);
@@ -79,28 +90,19 @@ export default {
     },
 
     toNextPage() {
-      // if (this.current_page < 4) {
-      //   this.current_page++;
-      //   this.scrollToSection(this.current_page,true);
-      //   console.log(this.current_page);
-      //
-      // }
       this.scrolling = true;
       this.current_page++;
 
-      if (this.current_page > this.offsets.length - 1) this.current_page = 3;
+      // if (this.current_page > this.offsets.length - 1) this.current_page = 3;
+      if (this.current_page > 3) this.current_page = 3;
 
       this.scrollToSection(this.current_page, true);
     },
     toPrevPage() {
-      // this.current_page--;
-      // if (this.current_page > 0) {
-      //   this.scrollToSection(this.current_page,true);
-
       this.scrolling = true;
       this.current_page--;
 
-      if (this.current_page < 0) this.current_page = 1;
+      if (this.current_page < 0) this.current_page = 0;
 
       this.scrollToSection(this.current_page, true);
     },
@@ -112,64 +114,41 @@ export default {
       this.current_page = id;
       this.scrolling = true;
 
-      document
-        .getElementsByTagName("section")
-        [id].scrollIntoView({ behavior: "smooth", inline: "nearest" });
+      document.getElementsByTagName("section")[id].scrollIntoView({ behavior: "smooth", inline: "nearest" });
 
       clearTimeout(timeout);
       timeout = setTimeout(() => {
         this.scrolling = false;
       }, 400);
     },
-
-    // moveToPage(target_page) {
-    //   if (target_page > this.current_page) {
-    //     let t = setInterval(() => {
-    //       this.scrolling = true;
-    //       this.$refs.introduction.scrollLeft +=
-    //         (this.page_width / 200) * (target_page - this.current_page);
-    //       if (
-    //         this.$refs.introduction.scrollLeft >=
-    //         (target_page - 1) * this.page_width
-    //       ) {
-    //         this.scrolling = false;
-    //         this.current_page = target_page;
-    //         clearInterval(t);
-    //       }
-    //     }, 1);
-    //   } else {
-    //     let t = setInterval(() => {
-    //       this.scrolling = true;
-    //       this.$refs.introduction.scrollLeft +=
-    //         (this.page_width / 200) * (target_page - this.current_page);
-    //       if (
-    //         this.$refs.introduction.scrollLeft <=
-    //         (target_page - 1) * this.page_width
-    //       ) {
-    //         this.scrolling = false;
-    //         this.current_page = target_page;
-    //         clearInterval(t);
-    //       }
-    //     }, 1);
-    //   }
-    // },
   },
-  // mounted() {
-  //   this.page_width = this.$refs.introduction.clientWidth;
-  // },
 
   mounted() {
-    this.calculateSectionOffsets();
+    axios.get("/data/introduction-load").then((res) => {
+      this.$store.commit("loadIntroductionData", res.data);
 
-    window.addEventListener("DOMMouseScroll", this.handleMouseWheelDOM); // Mozilla Firefox
-    window.addEventListener("mousewheel", this.handleMouseWheel, {
-      passive: false,
-    }); // Other browsers
+      for (let e of this.$store.state.all_institution) {
+        let r = this.$store.state.all_province.find((el) => el.id == e.province_id);
+        if (!r.child) r.child = [];
+        r.child.push(e.id);
+      }
 
-    window.addEventListener("touchstart", this.touchStart, { passive: false }); // mobile devices
-    window.addEventListener("touchmove", this.touchMove, { passive: false }); // mobile devices
+      this.complete = true;
+      this.$emit("endLoading");
+
+      this.calculateSectionOffsets();
+
+      window.addEventListener("DOMMouseScroll", this.handleMouseWheelDOM); // Mozilla Firefox
+      window.addEventListener("mousewheel", this.handleMouseWheel, {
+        passive: false,
+      }); // Other browsers
+
+      window.addEventListener("touchstart", this.touchStart, { passive: false }); // mobile devices
+      window.addEventListener("touchmove", this.touchMove, { passive: false }); // mobile devices
+    });
   },
   unmounted() {
+    this.$emit("startLoading");
     window.removeEventListener("mousewheel", this.handleMouseWheel, {
       passive: false,
     }); // Other browsers
@@ -193,6 +172,26 @@ export default {
     flex: 0 0 100vw;
     position: relative;
   }
+  .badges {
+    position: fixed;
+    display: flex;
+    left: 50%;
+    bottom: 0.8rem;
+    transform: translatex(-50%);
+    span {
+      display: block;
+      width: 0.5rem;
+      height: 0.5rem;
+      border-radius: 50%;
+      border: 0.08rem solid #666;
+      margin: 0 0.5rem;
+      cursor: pointer;
+      user-select: none;
+    }
+    span.active {
+      background: #666;
+    }
+  }
 }
 .section-1 {
   display: flex;
@@ -200,12 +199,14 @@ export default {
   align-items: center;
   // padding: 5rem 0 0;
   box-sizing: border-box;
-  background: url(../assets/book-bg.png);
+  // object-fit: cover;
+  background: url(../assets/book-bg.png) center no-repeat;
+  background-size: cover;
   .cover {
     background-color: #111;
     width: 20rem;
-    height: 87vh;
-    margin: 3vh 0 0;
+    height: 86vh;
+    margin: 2vh 0 0;
     box-shadow: 5px 5px 10px 0 #666;
     display: flex;
     justify-content: center;

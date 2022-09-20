@@ -5,7 +5,11 @@
 
     <svg id="particles-svg" ref="particles-svg" @click="pause"></svg>
 
-    <BookDetailTooltip ref="book-detail-tooltip" :id="hover_data.id" />
+    <div class="comment">
+      <p>*金、遼、蒙古入宋</p>
+    </div>
+
+    <BookDetailTooltip @openBookDetail="$emit('openBookDetail', hover_id)" ref="book-detail-tooltip" :id="hover_id" />
   </div>
 </template>
 
@@ -20,8 +24,14 @@ export default {
     DynastySelector,
     BookDetailTooltip,
   },
+  watch: {
+    playing(n) {
+      if (n) this.$refs["book-detail-tooltip"].close();
+    },
+  },
   data() {
     return {
+      max_particles: 300,
       NUM_PARTICLES: 100,
       PARTICLE_SIZE: 0.5, // View heights
       SPEED: 20000, // 毫秒数
@@ -35,9 +45,7 @@ export default {
 
       particles_original_data: [],
 
-      hover_data: {
-        id: "",
-      },
+      hover_id: "",
     };
   },
   methods: {
@@ -53,36 +61,27 @@ export default {
       // 清零
       this.svg.html("");
       this.particles = [];
-      // this.curr_time = 0;
+      this.curr_time = 0;
 
-      if (this.particles_original_data.length > 400) {
+      if (this.particles_original_data.length > this.max_particles) {
         let temp_arr = JSON.parse(JSON.stringify(this.particles_original_data));
         this.particles_original_data = [];
-        for (let i = 0; i < 400; i++)
-          this.particles_original_data.push(temp_arr.pop());
+        for (let i = 0; i < this.max_particles; i++) this.particles_original_data.push(temp_arr.pop());
       }
 
       // 生成某数量的粒子
-      for (let e of this.particles_original_data)
-        this.particles.push(this.generateParticleData(e));
+      for (let e of this.particles_original_data) this.particles.push(this.generateParticleData(e));
 
       // 绘制
-      this.svg
-        .selectAll("circle")
-        .data(this.particles)
-        .enter()
-        .append("circle");
+      this.svg.selectAll("circle").data(this.particles).enter().append("circle");
 
       this.svg.selectAll("circle").on("click", (e, d) => {
         event.stopPropagation();
-        this.$refs["book-detail-tooltip"].$el.style.left =
-          e.clientX + 30 + "px";
-        this.$refs["book-detail-tooltip"].$el.style.top =
-          e.clientY - 140 + "px";
+        this.$refs["book-detail-tooltip"].$el.style.left = e.clientX + 30 + "px";
+        this.$refs["book-detail-tooltip"].$el.style.top = e.clientY - 140 + "px";
         this.$refs["book-detail-tooltip"].$el.style.display = "block";
-        this.hover_data = {
-          id: d.info.id,
-        };
+        this.$refs["book-detail-tooltip"].open();
+        this.hover_id = d.info.id;
       });
     },
     pause() {
@@ -100,10 +99,7 @@ export default {
       } while (r < 100);
     },
     randomNormal(o) {
-      if (
-        ((o = Object.assign({ mean: 0, dev: 1, pool: [] }, o)),
-        Array.isArray(o.pool) && o.pool.length > 0)
-      )
+      if (((o = Object.assign({ mean: 0, dev: 1, pool: [] }, o)), Array.isArray(o.pool) && o.pool.length > 0))
         return this.normalPool(o);
       let r,
         a,
@@ -148,23 +144,18 @@ export default {
         amplitude: this.randomNormal({ mean: 16, dev: 2 }),
         offsetY: this.randomNormal({ mean: 0, dev: 10 }),
         arc: Math.PI * 2,
-        startTime: performance.now() - this.rand(0, this.SPEED),
+        startTime: this.curr_time - this.rand(0, this.SPEED),
         colour: `rgba(${colour.r}, ${colour.g}, ${colour.b}, ${colour.a})`,
       };
     },
 
     // 计算粒子的新位置
     moveParticle(particle) {
-      const progress =
-        ((this.curr_time - particle.startTime) % particle.duration) /
-        particle.duration;
-
+      const progress = ((this.curr_time - particle.startTime) % particle.duration) / particle.duration;
       return {
         ...particle,
         x: progress,
-        y:
-          Math.sin(progress * particle.arc) * particle.amplitude +
-          particle.offsetY,
+        y: Math.sin(progress * particle.arc) * particle.amplitude + particle.offsetY,
       };
     },
 
@@ -194,21 +185,13 @@ export default {
     init() {},
     start() {
       // 配置画布
-      this.svg = d3
-        .select("#particles-svg")
-        .attr("width", window.innerWidth)
-        .attr("height", window.innerHeight);
+      this.svg = d3.select("#particles-svg").attr("width", window.innerWidth).attr("height", window.innerHeight);
 
       // 生成某数量的粒子
-      for (let i = 0; i < this.NUM_PARTICLES; i++)
-        this.particles.push(this.generateParticleData());
+      for (let i = 0; i < this.NUM_PARTICLES; i++) this.particles.push(this.generateParticleData());
 
       // 绘制
-      this.svg
-        .selectAll("circle")
-        .data(this.particles)
-        .enter()
-        .append("circle");
+      this.svg.selectAll("circle").data(this.particles).enter().append("circle");
 
       // 动画
       this.draw();
@@ -233,6 +216,14 @@ export default {
   width: 100vw;
   height: 100vh;
   position: relative;
+  .comment {
+    position: absolute;
+    bottom: 2rem;
+    left: 1rem;
+    p {
+      font-size: 0.7rem;
+    }
+  }
   .pause {
     user-select: none;
     background: rgb(108, 108, 108);
