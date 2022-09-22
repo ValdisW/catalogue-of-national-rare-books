@@ -3,16 +3,13 @@
     <div id="map_container" @wheel.stop=""></div>
     <div id="map-list">
       <ul>
-        <li
-          v-for="(city, index) in province_info"
-          :key="index"
-          @click="clickProvince(city, index)"
-          :id="`list-${index}`"
-          :show="false"
-        >
+        <li v-for="(city, index) in province_info" :key="index" @click.stop="clickProvince($event, city, index)"
+          :id="`list-${index}`" :show="false">
           <span v-text="`${city.name} - ${city.count}`"></span>
           <ul class="sublist" v-show="false">
-            <li></li>
+            <li v-for="e in city.child" :key="e"
+              v-text="this.$store.state.all_institution.find(el=>el.id==e).name + ' - '+this.$store.state.all_institution.find(el=>el.id==e).books">
+            </li>
           </ul>
         </li>
       </ul>
@@ -114,12 +111,8 @@ export default {
       /* eslint-disable */
       this.provinceLayer = new mapvgl.PointLayer({
         // blend: 'lighter',
-        size: function (data) {
-          return intensity.getSize(data.properties.count);
-        },
-        color: function (data) {
-          return intensity.getColor(data.properties.count);
-        },
+        size: (data) => intensity.getSize(data.properties.count),
+        color: (data) => intensity.getColor(data.properties.count),
         enablePicked: true,
         selectedColor: "#ff0000",
         autoSelect: true,
@@ -275,23 +268,20 @@ export default {
     removeTooltip() {
       this.tooltipBox.style.visibility = "hidden";
     },
-    expandProvince(e) {
-      console.log(e);
-    },
-    clickProvince(d, i) {
-      let list = document.getElementById("list-" + i);
-      if (list.getAttribute("show") == "false") {
+    // 点击省份列表的省份项
+    clickProvince(e, d, i) {
+      if (e.target.getAttribute("show") == "false") {
         // draw
         this.removeAllSublist();
-        this.showSublist(d, list);
+        this.showSublist(d, e.target);
       } else {
         // remove
-        list.removeChild(list.children[1]);
-        list.setAttribute("show", false);
+        e.target.removeChild(e.target.children[1]);
+        e.target.setAttribute("show", false);
         this.map.reset();
       }
     },
-    // 二级菜单
+    // 显示机构菜单
     showSublist(d, list) {
       let sublist = document.createElement("ul");
       let self = this;
@@ -332,9 +322,9 @@ export default {
     // 初始化地图参数
     this.zoom = 5;
     this.map = this.initMap({
-      tilt: 49.6,
+      tilt: 0,
       heading: 0,
-      center: [103.438656, 25.753594],
+      center: [104.438656, 37.753594],
       zoom: this.zoom,
     });
     /* eslint-disable */
@@ -357,12 +347,14 @@ export default {
   left: 5vw;
   width: 90vw;
   height: 80vh;
+
   #map_container {
     // position: fixed;
     width: 80%;
     height: 100%;
     border: 2px solid rgb(177, 117, 68);
   }
+
   #tooltip {
     #tooltip-box {
       background-color: #333;
@@ -376,14 +368,17 @@ export default {
       display: block;
       visibility: hidden;
       max-width: 33%;
+
       h2 {
         font-size: 1rem;
       }
+
       .intro {
         font-size: 0.7rem;
       }
     }
   }
+
   #map-list {
     // position: absolute;
     width: 20%;
@@ -394,11 +389,13 @@ export default {
     overflow-y: scroll;
     font-size: 0.7rem;
     text-align: center;
+
     ul {
       li {
         padding: 0.3rem 0;
       }
     }
+
     .sublist {
       background-color: antiquewhite;
       // overflow: scroll;

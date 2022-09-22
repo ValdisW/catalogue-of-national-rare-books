@@ -272,7 +272,7 @@ export default {
   position: fixed;
   top: 0;
   left: 0;
-  background: #f2e0c4;
+  background: #f1e8db;
 
   .content {
     width: 80%;

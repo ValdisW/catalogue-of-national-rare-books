@@ -160,7 +160,7 @@ nav {
   }
 }
 #main-container {
-  // background-color: #f2e0c4;
-  background-color: #f0e9dd;
+  // background: #f2e0c4;
+  background: #f1e8db;
 }
 </style>
