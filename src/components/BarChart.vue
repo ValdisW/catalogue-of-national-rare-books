@@ -15,10 +15,11 @@ export default {
     canvasHeight: Number,
     title: String,
     info: Array,
+    bar_color: String,
   },
   data() {
     return {
-      bar_color: "#604a2f",
+      // bar_color: "#604a2f",
       margin: {
         left: 0.3,
         right: 0.08,
@@ -135,11 +136,22 @@ export default {
 
 <style scoped lang="less">
 .bar-chart {
+  position: relative;
+
   .title {
+    position: absolute;
+    left: 0;
+    top: 0;
     font-weight: bold;
+    border: 0.05rem solid #000;
+    font-size: 0.8rem;
+    width: 0.8rem;
+    line-height: 0.9rem;
+    padding: 0.1rem;
   }
+
   .chart {
-    left: 10vw;
+    margin: 0 0 0 1rem;
   }
 }
 </style>

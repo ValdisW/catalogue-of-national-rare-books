@@ -23,23 +23,31 @@ export default {
 
 <style lang="less" scoped>
 .book-item {
-  flex: 5rem 1 1;
+  flex: 6rem 1 1;
   margin: 0.2rem;
   cursor: pointer;
+
   div {
     background: #6666;
     height: 5rem;
     width: 100%;
     display: flex;
     justify-content: center;
+
     img {
-      height: 100%;
+      object-fit: contain;
     }
   }
+
   p {
     font-size: 0.6rem;
     text-align: center;
     margin: 0.1rem 0 0;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+
     a {
       color: rgb(75, 28, 28);
       text-decoration: none;

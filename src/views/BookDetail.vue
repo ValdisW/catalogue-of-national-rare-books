@@ -10,42 +10,29 @@
         <table class="detail">
           <tr>
             <td class="detail-title">文種：</td>
-            <td
-              class="detail-content language"
-              v-text="
-                id2name(
-                  this.$store.state.all_language,
-                  book_data.language_id,
-                  '-'
-                )
-              "
-            ></td>
+            <td class="detail-content language" v-text="
+              id2name(
+                this.$store.state.all_language,
+                book_data.language_id,
+                '-'
+              )
+            "></td>
           </tr>
           <tr>
             <td class="detail-title">文獻類型：</td>
-            <td
-              class="detail-content document-type"
-              v-text="
-                id2name(
-                  this.$store.state.all_document_type,
-                  book_data.document_type_id,
-                  '-'
-                )
-              "
-            ></td>
+            <td class="detail-content document-type" v-text="
+              id2name(
+                this.$store.state.all_document_type,
+                book_data.document_type_id,
+                '-'
+              )
+            "></td>
           </tr>
           <tr>
             <td class="detail-title">分類：</td>
-            <td
-              class="detail-content name"
-              v-text="
-                id2name(
-                  this.$store.state.all_catalogue,
-                  book_data.catalogue_id,
-                  '-'
-                )
-              "
-            ></td>
+            <td class="detail-content name" v-text="
+                book_data
+            "></td>
           </tr>
           <tr>
             <td class="detail-title">题名：</td>
@@ -60,17 +47,11 @@
           </tr> -->
           <tr>
             <td class="detail-title">版本：</td>
-            <td
-              class="detail-content edition"
-              v-text="book_data.edition || '-'"
-            ></td>
+            <td class="detail-content edition" v-text="book_data.edition || '-'"></td>
           </tr>
           <tr>
             <td class="detail-title">數量：</td>
-            <td
-              class="detail-content quantity"
-              v-text="book_data.quantity + book_data.measurement || '-'"
-            ></td>
+            <td class="detail-content quantity" v-text="book_data.quantity + book_data.measurement || '-'"></td>
           </tr>
           <tr>
             <td class="detail-title">裝幀形式：</td>
@@ -78,24 +59,15 @@
           </tr>
           <tr>
             <td class="detail-title">開本尺寸：</td>
-            <td
-              class="detail-content book-size"
-              v-text="book_data.book_size || '-'"
-            ></td>
+            <td class="detail-content book-size" v-text="book_data.book_size || '-'"></td>
           </tr>
           <tr>
             <td class="detail-title">板框尺寸：</td>
-            <td
-              class="detail-content frame-size"
-              v-text="book_data.frame_size || '-'"
-            ></td>
+            <td class="detail-content frame-size" v-text="book_data.frame_size || '-'"></td>
           </tr>
           <tr>
             <td class="detail-title">版式：</td>
-            <td
-              class="detail-content typeset"
-              v-text="book_data.typeset || '-'"
-            ></td>
+            <td class="detail-content typeset" v-text="book_data.typeset || '-'"></td>
           </tr>
           <tr>
             <td class="detail-title">牌記：</td>
@@ -103,70 +75,47 @@
           </tr>
           <tr>
             <td class="detail-title">收藏省份：</td>
-            <td
-              class="detail-content institute"
-              v-text="
-                id2name(
-                  this.$store.state.all_province,
-                  book_data.province_id,
-                  '-'
-                )
-              "
-            ></td>
+            <td class="detail-content institute" v-text="
+              id2name(
+                this.$store.state.all_province,
+                book_data.province_id,
+                '-'
+              )
+            "></td>
           </tr>
           <tr>
             <td class="detail-title">收藏單位：</td>
-            <td
-              class="detail-content institute"
-              v-text="
-                id2name(
-                  this.$store.state.all_institution,
-                  book_data.institution_id,
-                  '-'
-                )
-              "
-            ></td>
+            <td class="detail-content institute" v-text="
+              id2name(
+                this.$store.state.all_institution,
+                book_data.institution_id,
+                '-'
+              )
+            "></td>
           </tr>
           <tr>
             <td class="detail-title">索書號：</td>
-            <td
-              class="detail-content"
-              v-text="book_data.call_number || '-'"
-            ></td>
+            <td class="detail-content" v-text="book_data.call_number || '-'"></td>
           </tr>
         </table>
 
         <!-- 责任者 -->
         <ul class="timeline">
           <li v-for="person in related_person" :key="person">
-            <div
-              class="actions"
-              v-text="
-                id2name($store.state.all_action, person.action_id, '未知行爲')
-              "
-            ></div>
+            <div class="actions" v-text="
+              id2name($store.state.all_action, person.action_id, '未知行爲')
+            "></div>
             <b></b>
-            <span
-              class="person"
-              v-if="
-                id2name($store.state.persons, person.person_id, '□□') == '□□'
-              "
-              v-text="`[${person.dynasty_or_nation}]佚名`"
-            ></span>
-            <router-link
-              v-else
-              @click="close"
-              :to="'/person-detail/' + person.person_id"
-              class="person"
-              v-text="
-                `[${person.dynasty_or_nation}]${id2name(
-                  $store.state.persons,
-                  person.person_id,
-                  '佚名'
-                )}`
-              "
-              :title="JSON.stringify(person)"
-            ></router-link>
+            <span class="person" v-if="
+              id2name($store.state.persons, person.person_id, '□□') == '□□'
+            " v-text="`[${person.dynasty_or_nation}]佚名`"></span>
+            <router-link v-else @click="close" :to="'/person-detail/' + person.person_id" class="person" v-text="
+              `[${person.dynasty_or_nation}]${id2name(
+                $store.state.persons,
+                person.person_id,
+                '佚名'
+              )}`
+            " :title="JSON.stringify(person)"></router-link>
           </li>
         </ul>
       </div>
@@ -178,12 +127,8 @@
         </div>
 
         <div class="switch_pic" style="text-align: center">
-          <button
-            v-for="(u, i) in image_filenames"
-            :class="{ active: i == image_showed_index }"
-            :key="u"
-            @click="switchImage(i)"
-          ></button>
+          <button v-for="(u, i) in image_filenames" :class="{ active: i == image_showed_index }" :key="u"
+            @click="switchImage(i)"></button>
         </div>
 
         <div class="display">
@@ -194,10 +139,7 @@
         </div>
       </div>
     </div>
-    <ImageViewer
-      ref="image-viewer"
-      :imageUrl="image_filenames[image_showed_index]"
-    />
+    <ImageViewer ref="image-viewer" :imageUrl="image_filenames[image_showed_index]" />
   </div>
 </template>
 

@@ -1,87 +1,99 @@
 <template>
   <div class="exploration-stack">
-    <div class="col-1">
+    <div class="container">
       <div class="batch-buttons">
         <button
           v-for="(batch, index) in batchInfo"
           :key="index"
           v-text="batch.name"
+          :class="{ selected: current_batch == index }"
           @click="updateBatch(index)"
-          :class="{ all_batches: index == 0 }"
         ></button>
       </div>
-    </div>
 
-    <div class="col-2">
-      <h1 v-if="current_batch == 0" v-animate="'tempStyle'">
-        國家珍貴古籍名錄
-      </h1>
-      <h1
-        v-else
-        v-text="`國家珍貴古籍名錄 第${batchInfo[current_batch].name}批`"
-      ></h1>
+      <div class="content">
+        <div class="info">
+          <div class="col-1">
+            <h3 v-if="current_batch == 0" v-animate="'tempStyle'">
+              國家珍貴古籍名錄
+            </h3>
+            <h3
+              v-else
+              v-text="`國家珍貴古籍名錄 第${batchInfo[current_batch].name}批`"
+            ></h3>
 
-      <!-- 批次描述 -->
-      <p
-        class="batch-description"
-        v-text="batchInfo[current_batch].description"
-      ></p>
-
-      <!-- 特色古籍 -->
-      <div class="featured-books">
-        <div class="show-more">
-          <span class="icon"></span>
-          <span @click="showMore">換一組</span>
-        </div>
-        <transition name="fade">
-          <div class="content">
-            <BookItem
-              @openBookDetail="openBookDetail"
-              v-for="b in showing_books"
-              :key="b"
-              :id="b"
-            />
+            <!-- 批次描述 -->
+            <p
+              class="batch-description"
+              v-text="batchInfo[current_batch].description"
+            ></p>
           </div>
-        </transition>
-      </div>
-    </div>
 
-    <div class="col-3">
-      <div class="chart-wrapper edition-dynasties">
-        <BarChart
-          title="版本朝代"
-          ref="edition_dynasty"
-          :canvasWidth="400"
-          :canvasHeight="120"
-          :info="statistics.edition_dynasty"
-        />
-      </div>
-      <div class="chart-wrapper document-types">
-        <BarChart
-          title="文獻類型"
-          ref="document_type"
-          :canvasWidth="400"
-          :canvasHeight="150"
-          :info="statistics.document_type"
-        />
-      </div>
-      <div class="chart-wrapper edition-types">
-        <BarChart
-          title="版本類型"
-          ref="edition_type"
-          :canvasWidth="400"
-          :canvasHeight="200"
-          :info="statistics.edition_type"
-        />
-      </div>
-      <div class="chart-wrapper languagess">
-        <BarChart
-          title="文種"
-          ref="language"
-          :canvasWidth="400"
-          :canvasHeight="400"
-          :info="statistics.language"
-        />
+          <div class="col-2">
+            <div class="left">
+              <div class="chart-wrapper edition-dynasties">
+                <BarChart
+                  title="版本朝代"
+                  ref="edition_dynasty"
+                  bar_color="#76978F"
+                  :canvasWidth="400"
+                  :canvasHeight="120"
+                  :info="statistics.edition_dynasty"
+                />
+              </div>
+              <div class="chart-wrapper document-types">
+                <BarChart
+                  title="文獻類型"
+                  ref="document_type"
+                  bar_color="#C4A1A1"
+                  :canvasWidth="400"
+                  :canvasHeight="150"
+                  :info="statistics.document_type"
+                />
+              </div>
+              <div class="chart-wrapper edition-types">
+                <BarChart
+                  title="版本類型"
+                  ref="edition_type"
+                  bar_color="#B1B098"
+                  :canvasWidth="400"
+                  :canvasHeight="200"
+                  :info="statistics.edition_type"
+                />
+              </div>
+            </div>
+            <div class="right">
+              <div class="chart-wrapper languagess">
+                <BarChart
+                  title="文種"
+                  ref="language"
+                  bar_color="#B0A1B8"
+                  :canvasWidth="400"
+                  :canvasHeight="500"
+                  :info="statistics.language"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 特色古籍 -->
+        <div class="featured-books">
+          <div class="show-more">
+            <span class="icon"></span>
+            <span @click="showMore">換一組</span>
+          </div>
+          <transition name="fade">
+            <div class="books">
+              <BookItem
+                @openBookDetail="openBookDetail"
+                v-for="b in showing_books"
+                :key="b"
+                :id="b"
+              />
+            </div>
+          </transition>
+        </div>
       </div>
     </div>
   </div>
@@ -105,7 +117,7 @@ export default {
     return {
       batchInfo: [
         {
-          name: "總覽",
+          name: "總",
           description:
             "《國家珍貴古籍名録》是由中華人民共和國國務院批准公布的我國現存珍貴古籍目録。建立《國家珍貴古籍名録》是確保珍貴古籍安全、推動古籍保護工作、促進優秀傳統文化傳承和弘揚的重要舉措。目前，國務院已批准公布六批《國家珍貴古籍名録》，全國485家機構/個人收藏的13026部古籍入選，囊括先秦兩漢至明清時期的漢文古籍、少數民族文字古籍和其他文字古籍，其中漢文文獻11855部（含甲骨4種，簡帛187種，敦煌遺書405件，碑帖拓本219件，古地圖149件，漢文古籍10891部），少數民族文字古籍1133部，其他文字古籍38部。",
         },
@@ -209,6 +221,7 @@ export default {
 .fade-leave-active {
   transition: opacity 1s;
 }
+
 .fade-enter {
   opacity: 0;
 }
@@ -217,15 +230,18 @@ export default {
   from {
     background: red;
   }
+
   from {
     background: yellow;
   }
 }
+
 .tempStyle {
   // transform: scale(1.5);
   // transition: 0.5s;
   animation-name: test;
 }
+
 .exploration-stack {
   width: 100vw;
   height: 100vh;
@@ -233,81 +249,122 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  .col-1 {
-    flex: 5rem 0 0;
+
+  .container {
+    width: 90%;
+    height: 80%;
+    border: 0.1rem solid #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
     .batch-buttons {
-      // position: absolute;
-      // top: 50%;
-      // left: 5rem;
-      // transform: translateY(-50%);
+      flex: 5% 0 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border-right: 0.05rem solid #000;
+
       button {
         cursor: pointer;
+        outline: none;
         display: block;
         background: none;
         width: 1.8rem;
         height: 1.8rem;
-        line-height: 1.8rem;
         border-radius: 50%;
-        border: 1px solid #000;
+        border: none;
         text-align: center;
-        margin: 0.5rem;
+        margin: 1rem 0;
         font-size: 0.8rem;
       }
-      button.all_batches {
-        border: 1px solid #000;
-        width: auto;
-        padding: 0 0.5rem;
-        border-radius: 0.3rem;
-        margin-left: 0rem;
-      }
-      button:hover {
-        background: #000;
-        color: #fff;
-      }
-    }
-  }
-  .col-2 {
-    flex: 20rem 0 0;
-    margin: 0 1.2rem 0 0;
-    .featured-books {
-      .show-more {
-        user-select: none;
-        font-size: 0.7rem;
-        text-align: right;
-        .icon {
-          display: inline-block;
-          width: 0.7rem;
-          height: 0.7rem;
-          background: url(../assets/icons/show-more.svg) center no-repeat;
-          background-size: 100%;
-        }
-        span {
-          cursor: pointer;
-        }
-      }
-      .content {
-        display: flex;
-        flex-wrap: wrap;
-      }
-    }
-    .batch-description {
-      font-size: 0.7rem;
-      margin: 1rem 0 0;
-    }
-  }
-  .col-3 {
-    flex: auto 0 0;
-    height: 70%;
-    overflow-y: scroll;
-    .chart-wrapper {
-      position: relative;
-    }
-  }
 
-  .stack {
-    position: absolute;
-    left: 20vw;
-    top: 10vh;
+      button:hover {
+        border: 0.15rem solid #c94324;
+      }
+
+      button.selected {
+        border: 0.15rem solid #c94324;
+      }
+    }
+
+    .content {
+      height: 100%;
+      flex: 95% 1 1;
+      padding: 0 3% 0 3%;
+      display: flex;
+      flex-direction: column;
+
+      .info {
+        display: flex;
+        height: 70%;
+        padding: 3% 0 0;
+
+        .col-1 {
+          flex: 40% 0 0;
+
+          h3 {
+            letter-spacing: 0.05rem;
+            background: #e2d7cc;
+            padding: 0.3rem 0.6rem;
+            width: fit-content;
+          }
+
+          .batch-description {
+            font-size: 0.7rem;
+            padding: 1.1rem 3rem 0 0;
+            line-height: 1.3rem;
+          }
+        }
+
+        .col-2 {
+          flex: 60% 0 0;
+          display: flex;
+          height: 100%;
+          .chart-wrapper {
+            position: relative;
+          }
+
+          .left {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+          }
+
+          .right {
+          }
+        }
+      }
+
+      .featured-books {
+        flex: 30% 1 1;
+
+        .show-more {
+          user-select: none;
+          font-size: 0.7rem;
+          text-align: right;
+
+          .icon {
+            display: inline-block;
+            width: 0.7rem;
+            height: 0.7rem;
+            background: url(../assets/icons/show-more.svg) center no-repeat;
+            background-size: 100%;
+          }
+
+          span {
+            cursor: pointer;
+          }
+        }
+
+        .books {
+          display: flex;
+          flex-wrap: wrap;
+        }
+      }
+    }
   }
 }
 </style>

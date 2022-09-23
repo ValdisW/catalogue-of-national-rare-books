@@ -1,7 +1,7 @@
 <template>
   <div id="flow">
     <DynastySelector @changeDynastyIDs="test" />
-    <div class="pause" @click="pause">暫停/播放</div>
+    <div class="pause" @click="pause"></div>
 
     <svg id="particles-svg" ref="particles-svg" @click="pause"></svg>
 
@@ -243,21 +243,27 @@ export default {
   width: 100vw;
   height: 100vh;
   position: relative;
+
   .comment {
     position: absolute;
     bottom: 2rem;
     left: 1rem;
+
     p {
       font-size: 0.7rem;
     }
   }
+
   .pause {
     user-select: none;
     background: rgb(108, 108, 108);
     cursor: pointer;
     position: absolute;
-    right: 0;
-    top: 5rem;
+    right: 3rem;
+    bottom: 5rem;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
   }
 }
 </style>

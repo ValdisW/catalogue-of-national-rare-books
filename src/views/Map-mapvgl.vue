@@ -3,13 +3,25 @@
     <div id="map_container" @wheel.stop=""></div>
     <div id="map-list">
       <ul>
-        <li v-for="(city, index) in province_info" :key="index" @click.stop="clickProvince($event, city, index)"
-          :id="`list-${index}`" :show="false">
+        <li
+          v-for="(city, index) in province_info"
+          :key="index"
+          @click.stop="clickProvince($event, city, index)"
+          :id="`list-${index}`"
+          :show="false"
+        >
           <span v-text="`${city.name} - ${city.count}`"></span>
           <ul class="sublist" v-show="false">
-            <li v-for="e in city.child" :key="e"
-              v-text="this.$store.state.all_institution.find(el=>el.id==e).name + ' - '+this.$store.state.all_institution.find(el=>el.id==e).books">
-            </li>
+            <li
+              v-for="e in city.child"
+              :key="e"
+              v-text="
+                this.$store.state.all_institution.find((el) => el.id == e)
+                  .name +
+                ' - ' +
+                this.$store.state.all_institution.find((el) => el.id == e).books
+              "
+            ></li>
           </ul>
         </li>
       </ul>
