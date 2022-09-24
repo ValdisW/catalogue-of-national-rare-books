@@ -31,7 +31,11 @@
           <tr>
             <td class="detail-title">分類：</td>
             <td class="detail-content name" v-text="
-                book_data
+              id2name(
+                this.$store.state.all_catalogue,
+                book_data.catalogue_id,
+                '-'
+              )
             "></td>
           </tr>
           <tr>

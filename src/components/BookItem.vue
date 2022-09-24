@@ -1,5 +1,5 @@
 <template>
-  <div class="book-item" @click="$emit('openBookDetail', id)">
+  <div class="book-item" @click="$emit('openBookDetail', this.$store.state.books.find((e) => e.id == id))">
     <div>
       <img src="/images/placeholder.jpg" alt="書影" />
     </div>
