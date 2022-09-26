@@ -14,9 +14,15 @@ const routes = [
     component: () => import("../views/Exploration.vue"),
   },
   {
+    path: "/relationship-old",
+    name: "Relationship_old",
+    meta: { title: "書目分析" },
+    component: () => import("../views/Relationship_old.vue"),
+  },
+  {
     path: "/relationship",
     name: "Relationship",
-    meta: { title: "書目分析" },
+    meta: { title: "流传分析" },
     component: () => import("../views/Relationship.vue"),
   },
   {

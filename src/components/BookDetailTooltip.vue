@@ -1,9 +1,7 @@
+<!-- 粒子的悬浮框 -->
 <template>
   <div class="book-detail-tooltip" v-show="show">
     <div class="container">
-      <!-- <div class="img-wrapper">
-        <img src="/images/placeholder.jpg" alt="書影" />
-      </div> -->
       <div class="content">
         <h4>
           <span v-text="id"></span>
@@ -11,22 +9,17 @@
         </h4>
         <span class="to-detail" @click="openBookDetail">查看詳情</span>
         <div class="detail">
-          <!-- <button id="test" @click="test">临时按钮</button> -->
           <p>
-            <span>語種：</span>
+            <span>文種：</span>
             <span v-text="getLanguageNameById(detail_data.language_id)"></span>
           </p>
           <p>
-            <span>版本年代/國別：</span>
-            <span
-              v-text="getEditionDynastyNameById(detail_data.edition_dynasty_id)"
-            ></span>
+            <span>版本年代：</span>
+            <span v-text="getEditionDynastyNameById(detail_data.edition_dynasty_id)"></span>
           </p>
           <p>
             <span>文獻類型：</span>
-            <span
-              v-text="getDocumentTypeNameById(detail_data.document_type_id)"
-            ></span>
+            <span v-text="getDocumentTypeNameById(detail_data.document_type_id)"></span>
           </p>
           <p>
             <span>批次：</span>
@@ -34,9 +27,7 @@
           </p>
           <p>
             <span>收藏單位：</span>
-            <span
-              v-text="getInstitutionNameById(detail_data.institution_id)"
-            ></span>
+            <span v-text="getInstitutionNameById(detail_data.institution_id)"></span>
           </p>
         </div>
       </div>
@@ -87,30 +78,29 @@ export default {
 
   .container {
     display: flex;
-    // .img-wrapper {
-    //   height: 100px;
-    //   img {
-    //     height: 100%;
-    //   }
-    // }
+
     .content {
       width: 13rem;
       background-color: #333;
       padding: 1.5rem;
       color: #fff;
+
       h4 {
         font-size: 0.9rem;
+
         span {
           display: block;
           color: #fff;
         }
       }
+
       span.to-detail {
         color: #ccc;
         font-size: 0.7rem;
         text-decoration: underline;
         cursor: pointer;
       }
+
       .detail {
         font-size: 0.7rem;
         color: #ccc;

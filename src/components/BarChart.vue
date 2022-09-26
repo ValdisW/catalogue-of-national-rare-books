@@ -16,13 +16,13 @@ export default {
     title: String,
     info: Array,
     bar_color: String,
+    margin_left: Number
   },
   data() {
     return {
-      // bar_color: "#604a2f",
-      margin: {
-        left: 0.3,
-        right: 0.08,
+        margin: {
+        left: this.margin_left,
+        right: 0.15,
         top: 0.1,
         bottom: 0.1,
       },

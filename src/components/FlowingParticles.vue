@@ -1,6 +1,6 @@
 <template>
   <div id="flow">
-    <DynastySelector @changeDynastyIDs="test" />
+    <DynastySelector @changeDynastyIDs="changeDynasty" />
     <div class="pause" @click="pause"></div>
 
     <svg id="particles-svg" ref="particles-svg" @click="pause"></svg>
@@ -9,11 +9,7 @@
       <p>*金、遼、蒙古入宋</p>
     </div>
 
-    <BookDetailTooltip
-      @openBookDetail="$emit('openBookDetail', hover_id)"
-      ref="book-detail-tooltip"
-      :id="hover_id"
-    />
+    <BookDetailTooltip @openBookDetail="$emit('openBookDetail', tooltip_id)" ref="book-detail-tooltip" :id="tooltip_id" />
   </div>
 </template>
 
@@ -49,11 +45,11 @@ export default {
 
       particles_original_data: [],
 
-      hover_id: "",
+      tooltip_id: "",
     };
   },
   methods: {
-    test(ids) {
+    changeDynasty(ids) {
       // 更新粒子数据
       this.particles_original_data = [];
       ids.forEach((id) => {
@@ -67,6 +63,7 @@ export default {
       this.particles = [];
       this.curr_time = 0;
 
+      // 如果粒子数量太多，只显示其中一部分
       if (this.particles_original_data.length > this.max_particles) {
         let temp_arr = JSON.parse(JSON.stringify(this.particles_original_data));
         this.particles_original_data = [];
@@ -93,7 +90,7 @@ export default {
           e.clientY - 140 + "px";
         this.$refs["book-detail-tooltip"].$el.style.display = "block";
         this.$refs["book-detail-tooltip"].open();
-        this.hover_id = d.info.id;
+        this.tooltip_id = d.info.id;
       });
     },
     pause() {
@@ -113,7 +110,7 @@ export default {
     randomNormal(o) {
       if (
         ((o = Object.assign({ mean: 0, dev: 1, pool: [] }, o)),
-        Array.isArray(o.pool) && o.pool.length > 0)
+          Array.isArray(o.pool) && o.pool.length > 0)
       )
         return this.normalPool(o);
       let r,
@@ -178,7 +175,9 @@ export default {
       };
     },
 
+    // 每帧绘制的内容
     draw() {
+      // 动画句柄，用来控制播放
       this.animation_handler = requestAnimationFrame(this.draw);
 
       // 更新粒子位置数据
@@ -197,11 +196,23 @@ export default {
         .attr("r", (e) => e.diameter * vh)
         .attr("cursor", "pointer");
 
+      // 交互
+      this.svg.selectAll("circle").on("click", (e, d) => {
+        event.stopPropagation();
+        this.$refs["book-detail-tooltip"].$el.style.left =
+          e.clientX + 30 + "px";
+        this.$refs["book-detail-tooltip"].$el.style.top =
+          e.clientY - 140 + "px";
+        this.$refs["book-detail-tooltip"].$el.style.display = "block";
+        this.$refs["book-detail-tooltip"].open();
+        this.tooltip_id = d.info.id;
+      });
+
       // 计时器
       this.curr_time += 17;
     },
-    reset() {},
-    init() {},
+    reset() { },
+    init() { },
     start() {
       // 配置画布
       this.svg = d3

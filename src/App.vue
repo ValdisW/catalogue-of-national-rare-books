@@ -51,7 +51,8 @@ export default {
       nav_pages: [
         { name: "名錄介紹", router: "/" },
         { name: "古籍瀏覽", router: "/exploration" },
-        { name: "書目分析", router: "/relationship" },
+        { name: "書目分析", router: "/relationship-old" },
+        { name: "流传分析", router: "/relationship" },
         { name: "關於我們", router: "/about" },
       ],
     };

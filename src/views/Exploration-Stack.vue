@@ -36,8 +36,9 @@
                   title="版本朝代"
                   ref="edition_dynasty"
                   bar_color="#76978F"
-                  :canvasWidth="400"
-                  :canvasHeight="120"
+                  :canvasWidth="17 * $store.state.rem"
+                  :canvasHeight="6 * $store.state.rem"
+                  :margin_left="0.35"
                   :info="statistics.edition_dynasty"
                 />
               </div>
@@ -46,8 +47,9 @@
                   title="文獻類型"
                   ref="document_type"
                   bar_color="#C4A1A1"
-                  :canvasWidth="400"
-                  :canvasHeight="150"
+                  :canvasWidth="17 * $store.state.rem"
+                  :canvasHeight="7.5 * $store.state.rem"
+                  :margin_left="0.35"
                   :info="statistics.document_type"
                 />
               </div>
@@ -56,8 +58,9 @@
                   title="版本類型"
                   ref="edition_type"
                   bar_color="#B1B098"
-                  :canvasWidth="400"
-                  :canvasHeight="200"
+                  :canvasWidth="17 * $store.state.rem"
+                  :canvasHeight="10 * $store.state.rem"
+                  :margin_left="0.35"
                   :info="statistics.edition_type"
                 />
               </div>
@@ -68,8 +71,9 @@
                   title="文種"
                   ref="language"
                   bar_color="#B0A1B8"
-                  :canvasWidth="400"
-                  :canvasHeight="500"
+                  :canvasWidth="12 * $store.state.rem"
+                  :canvasHeight="25 * $store.state.rem"
+                  :margin_left="0.35"
                   :info="statistics.language"
                 />
               </div>
@@ -323,6 +327,7 @@ export default {
           flex: 60% 0 0;
           display: flex;
           height: 100%;
+
           .chart-wrapper {
             position: relative;
           }

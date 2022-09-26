@@ -1,5 +1,5 @@
 <template>
-  <div class="book-item" @click="$emit('openBookDetail', this.$store.state.books.find((e) => e.id == id))">
+  <div class="book-item" @click="openBookDetail">
     <div>
       <img src="/images/placeholder.jpg" alt="書影" />
     </div>
@@ -8,10 +8,20 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
   name: "BookItem",
   props: {
     id: String,
+  },
+  methods: {
+    openBookDetail() {
+      axios.get(`/data/get-book-data/${this.id}`).then((d) => {
+        this.$emit("openBookDetail", d.data[0]);
+        console.log(d.data);
+      });
+    },
   },
   data() {
     return {

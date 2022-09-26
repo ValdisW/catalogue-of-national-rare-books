@@ -1,5 +1,5 @@
 <template>
-  <div class="relationship" v-if="complete">
+  <div class="relationship">
     <div class="left">
       <!-- 檢索工具 -->
       <div class="search">
@@ -82,7 +82,6 @@ export default {
   components: { Droplist },
   data() {
     return {
-      complete: false,
       graph_data: { nodes: [], links: [] },
       curr_nodes: [],
       curr_links: [],
@@ -434,17 +433,7 @@ export default {
     },
   },
   mounted() {
-    axios.get("/data/relationship-load").then((res) => {
-      this.$store.commit("loadRelationshipData", res.data);
-
-      this.complete = true;
-      this.$emit("endLoading");
-
-      this.search();
-    });
-  },
-  unmounted() {
-    this.$emit("startLoading");
+    this.search();
   },
 };
 </script>
