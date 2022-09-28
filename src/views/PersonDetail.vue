@@ -59,7 +59,7 @@
 
       <div class="related-books">
         <div class="responsibility-select">
-          <h4>責任目錄</h4>
+          <h4>責任目録</h4>
           <button class="responsibility-type">創作</button>
           <button class="responsibility-type">出版</button>
           <button class="responsibility-type">批校題跋</button>

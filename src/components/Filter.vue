@@ -110,7 +110,7 @@ export default {
         }
       }
       li.selected {
-        background: rgb(70, 83, 85);
+        background: #c1ae78;
       }
       li:hover {
         filter: brightness(80%);

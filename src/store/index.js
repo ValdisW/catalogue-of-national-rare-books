@@ -1,4 +1,6 @@
 import { createStore } from "vuex";
+import Vue from "vue";
+console.log(Vue);
 
 export default createStore({
   state: {
@@ -36,7 +38,6 @@ export default createStore({
       ] = _data;
     },
     loadIntroductionData(state, _data) {
-      console.log("加载名录介绍数据");
       [
         state.books,
         state.all_edition_dynasty,
@@ -48,7 +49,6 @@ export default createStore({
       ] = _data;
     },
     loadExplorationData(state, _data) {
-      console.log("加载古籍浏览数据");
       [
         state.all_document_type,
         state.all_edition_type,
@@ -59,9 +59,9 @@ export default createStore({
       ] = _data;
     },
     loadRelationshipData(state, _data) {
-      console.log("加载书目分析数据");
       [
         state.books,
+        state.persons,
         state.all_document_type,
         state.all_language,
         state.all_edition_dynasty,

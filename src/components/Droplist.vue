@@ -76,7 +76,7 @@ export default {
     color: #fff;
     border-radius: 0.3rem;
     text-align: center;
-    z-index: 10;
+    z-index: 200;
     width: 4rem;
     li {
       height: 1.5rem;

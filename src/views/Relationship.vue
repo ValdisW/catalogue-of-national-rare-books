@@ -1,439 +1,77 @@
 <template>
   <div class="relationship">
-    <div class="left">
-      <!-- 檢索工具 -->
-      <div class="search">
-        <input type="text" value="史記" ref="text" />
-        <Droplist ref="drop-list" :attr_list="display_attrs" />
-        <button id="search-button" @click="search"></button>
-        <button id="tip-button"></button>
+    <div class="search">
+      <div>
+        <label for="person-name">人物名稱：</label>
+        <input id="person-name" type="text" v-model="person_name" ref="text" />
       </div>
-
-      <!-- 關係圖 -->
-      <div class="results results-relation">
-        <div class="graph" ref="svg-wrapper"></div>
+      <div>
+        <label for="min-books">最少相關數：</label>
+        <input id="min-books" type="text" v-model="min_books" ref="text" />
       </div>
+      <button id="search-button" @click="search"></button>
     </div>
-
-    <div class="right">
-      <div class="list nodes-list">
-        <h4>相關人物</h4>
-        <ul ref="nodes-list">
-          <li
-            v-for="n in node_list"
-            :name="n.id"
-            :key="n.id"
-            v-text="n.name"
-            :class="[`n${n.id}`, { active: n.active }]"
-            @mouseover="nodeHighlight(n.id, false)"
-          ></li>
-        </ul>
+    <div class="result">
+      <div>
+        <span
+          class="person-name"
+          v-for="e in result_persons"
+          :key="e"
+          v-text="$store.state.persons.find((el) => el.id == e.id).name + ' '"
+          @click="test(e.id)"
+        ></span>
       </div>
-      <div class="list relationship-detail">
-        <h4>相關古籍</h4>
-        <ul>
-          <!-- <li v-for="r in relation_list" :key="r">
-            <router-link :to="'/book-detail/' + convertBookId(r.book_id)" v-text="r"></router-link>
-          </li> -->
-          <li
-            v-for="r in relation_list"
-            :key="r"
-            @click="$emit('openBookDetail', convertBookId(r.book_id))"
-          >
-            <!-- 古籍信息 -->
-            <div class="book">
-              <span v-text="convertBookId(r.book_id)"></span>
-              <span v-text="getBookNameById(convertBookId(r.book_id))"></span>
-            </div>
 
-            <!-- 人物信息 -->
-            <div class="person">
-              <span class="name" v-text="getPersonNameById(r.person1_id)"></span
-              ><span
-                class="action"
-                v-text="getActionNameById(r.action1_id)"
-              ></span
-              >&nbsp;&nbsp;&nbsp;&nbsp;
-              <span class="name" v-text="getPersonNameById(r.person2_id)"></span
-              ><span
-                class="action"
-                v-text="getActionNameById(r.action2_id)"
-              ></span>
-            </div>
-          </li>
-        </ul>
+      <div>
+        <span
+          class="book-name"
+          v-for="e in result_books"
+          :key="e"
+          v-text="$store.state.persons.find((el) => el.id == e.person_id).name + '(' + e.count + ')' + ' '"
+        ></span>
       </div>
-    </div>
-
-    <div ref="tooltip" class="tooltip" v-show="show_tooltip">
-      <h5 v-text="selected_info.name"></h5>
-      <router-link :to="/person-detail/ + selected_info.id">詳情</router-link>
     </div>
   </div>
 </template>
 
 <script>
-import * as d3 from "d3";
 import axios from "axios";
-import Droplist from "@/components/Droplist";
 
 export default {
-  name: "Relationship",
-  components: { Droplist },
+  name: "2333",
   data() {
     return {
-      graph_data: { nodes: [], links: [] },
-      curr_nodes: [],
-      curr_links: [],
-      curr_relation: null,
-      display_attrs: [
-        { name: "題名", value: "book_name" },
-        { name: "人名", value: "person_name" },
-      ],
-      show_tooltip: false,
-      selected_id: 0,
-      selected_info: {},
+      person_name: "黄",
+      min_books: 2,
+
+      result_persons: [],
+      result_books: [],
     };
   },
-  computed: {
-    node_list: function () {
-      let arr = [];
-      this.curr_nodes.forEach((e) => {
-        let item = this.$store.state.persons.find((ele) => ele.id == e.id);
-        item.active = false;
-        arr.push(item);
-      });
-      return arr;
-    },
-    relation_list: function () {
-      let arr = [];
-      if (this.curr_relation) {
-        arr = `${this.getPersonNameById(
-          this.curr_relation.source.id
-        )} -- ${this.getPersonNameById(this.curr_relation.target.id)}`;
-
-        let r = this.$store.state.person_ralations.filter(
-          (e) =>
-            (e.person1_id == this.curr_relation.source.id &&
-              e.person2_id == this.curr_relation.target.id) ||
-            (e.person2_id == this.curr_relation.source.id &&
-              e.person1_id == this.curr_relation.target.id)
-        );
-        arr = r;
-      }
-      return arr;
-    },
-  },
-  watch: {
-    selected_id(value) {
-      this.selected_info = this.$store.state.persons.find(
-        (ele) => ele.id == value
-      );
-    },
-  },
   methods: {
-    convertBookId(id) {
-      let t = "00000".split("");
-      let id_str = "" + id;
-      for (let i = 0; i < id_str.length; i++) {
-        t[t.length - id_str.length + i] = id_str[i];
-      }
-      return t.join("");
-    },
-    getPersonNameById(id) {
-      let r = this.$store.state.persons.find((e) => e.id == id);
-      if (r) return r.name;
-      else return "未知人名";
-    },
-    getBookNameById(id) {
-      let r = this.$store.state.books.find(
-        (e) => e.id == this.convertBookId(id)
-      );
-      if (r) return r.name;
-      else return "未知书名";
-    },
-    getActionNameById(id) {
-      let r = this.$store.state.all_action.find((e) => e.id == id);
-      if (r) return r.name;
-      else return "未知行为";
-    },
     search() {
-      // 按书名检索
-      if (this.$refs["drop-list"].curr_value == "book_name")
-        axios
-          .get(`/data/person?text=${this.$refs.text.value}`)
-          .then((d) => {
-            d.data[0].forEach((ele) => {
-              ele.value = 1.5 + Math.sqrt(ele.books); // 点的大小
-            });
-            this.curr_nodes = d.data[0];
-            this.curr_links = d.data[1];
-          })
-          .then(() => {
-            this.renderGraphChart({
-              nodes: this.curr_nodes,
-              links: this.curr_links,
-            });
-          });
-      // 按人名检索
-      else if (this.$refs["drop-list"].curr_value == "person_name")
-        axios
-          .get(`/data/person-relationship?text=${this.$refs.text.value}`)
-          .then((d) => {
-            d.data[0].forEach((el) => {
-              el.related = 0;
-              el.value = 1.5 + Math.sqrt(el.books); // 点的大小
-            });
-            d.data[1].forEach((el) => {
-              el.related = 1;
-              el.value = 1.5 + Math.sqrt(el.books); // 点的大小
-            });
-
-            this.curr_nodes = d.data[0].concat(d.data[1]);
-            this.curr_links = d.data[2];
-          })
-          .then(() => {
-            this.renderGraphChart({
-              nodes: this.curr_nodes,
-              links: [],
-            });
-          });
-    },
-
-    intern(value) {
-      return value !== null && typeof value === "object"
-        ? value.valueOf()
-        : value;
-    },
-    forceGraph(
-      {
-        nodes, // 節點列表 (typically [{id}, …])
-        links, // 邊表 (typically [{source, target}, …])
-      },
-      {
-        nodeGroup, // given d in nodes, returns an (ordinal) value for color
-        nodeGroups, // an array of ordinal values representing the node groups
-        nodeTitle, // given d in nodes, a title string
-        nodeFill = "currentColor", // node stroke fill (if not using a group color encoding)
-        nodeStroke = "#000", // 點的描邊顔色
-        nodeStrokeWidth = 1.2, // 點的描邊寬度
-        nodeStrokeOpacity = 1, // 點的描邊的不透明度
-        nodeRadius = 10, // 點的直徑
-        linkSource = ({ source }) => source, // given d in links, returns a node identifier string
-        linkTarget = ({ target }) => target, // given d in links, returns a node identifier string
-        linkStroke = "#B8A4A483", // 邊的顔色
-        linkStrokeOpacity = 1.0, // 邊的不透明度
-        linkStrokeWidth = 1.5, // given d in links, returns a stroke width in pixels
-        linkStrokeLinecap = "round", // link stroke linecap
-        nodeStrength = -2, // 斥力
-        linkStrength = 0.02, // 連綫的引力
-        colors = ["#93A7A7"], // an array of color strings, for the node groups
-        width = 640, // outer width, in pixels
-        height = 640, // outer height, in pixels
-        invalidation, // when this promise resolves, stop the simulation
-      } = {}
-    ) {
-      // let self = this;
-      // Compute values.
-      const N = d3.map(nodes, (d) => d.id).map(this.intern);
-      const LS = d3.map(links, linkSource).map(this.intern);
-      const LT = d3.map(links, linkTarget).map(this.intern);
-      if (nodeTitle === undefined) nodeTitle = (_, i) => N[i];
-      // const T = nodeTitle == null ? null : d3.map(nodes, nodeTitle);
-      const G =
-        nodeGroup == null ? null : d3.map(nodes, nodeGroup).map(this.intern);
-      const W =
-        typeof linkStrokeWidth !== "function"
-          ? null
-          : d3.map(links, linkStrokeWidth);
-      const L =
-        typeof linkStroke !== "function" ? null : d3.map(links, linkStroke);
-      const R =
-        typeof nodeRadius != "function" ? null : d3.map(nodes, nodeRadius);
-
-      // Replace the input nodes and links with mutable objects for the simulation.
-      nodes = d3.map(nodes, (_, i) => ({ id: N[i] }));
-      links = d3.map(links, (_, i) => ({ source: LS[i], target: LT[i] }));
-
-      // Compute default domains.
-      if (G && nodeGroups === undefined) nodeGroups = d3.sort(G);
-
-      // Construct the scales.
-      const color =
-        nodeGroup == null ? null : d3.scaleOrdinal(nodeGroups, colors);
-
-      // Construct the forces.
-      const forceNode = d3.forceManyBody();
-      const forceLink = d3.forceLink(links).id(({ index: i }) => N[i]);
-      if (nodeStrength !== undefined) forceNode.strength(nodeStrength);
-      if (linkStrength !== undefined) forceLink.strength(linkStrength);
-
-      const simulation = d3
-        .forceSimulation(nodes)
-        .force("link", forceLink)
-        .force("charge", forceNode)
-        .force(
-          "collide",
-          d3.forceCollide().radius(() => (2 * height) / nodes.length)
-        )
-        .force("center", d3.forceCenter())
-        .on("tick", ticked);
-
-      // 创建画布
-      const svg = d3
-        .create("svg")
-        .attr("width", width)
-        .attr("height", height)
-        .attr("viewBox", [-width / 2, -height / 2, width, height]);
-      // .attr("style", "max-width: 100%; height: auto; height: intrinsic;");
-
-      // 添加连线
-      const link = svg
-        .append("g")
-        .attr("stroke", typeof linkStroke !== "function" ? linkStroke : null)
-        .attr("stroke-opacity", linkStrokeOpacity)
-        .attr(
-          "stroke-width",
-          typeof linkStrokeWidth !== "function" ? linkStrokeWidth : null
-        )
-        .attr("stroke-linecap", linkStrokeLinecap)
-        .selectAll("line")
-        .data(links)
-        .join("line")
-        .attr("cursor", "pointer")
-        .on("click", (_, d) => {
-          this.curr_relation = d;
-        });
-
-      // 添加结点
-      const node = svg
-        .append("g")
-        .attr("fill", nodeFill)
-        .attr("stroke", nodeStroke)
-        .attr("stroke-opacity", nodeStrokeOpacity)
-        .attr("stroke-width", nodeStrokeWidth)
-        .selectAll("circle")
-        .data(nodes)
-        .join("circle")
-        .attr("r", typeof nodeRadius != "function" ? nodeRadius : null)
-        .attr("cursor", "pointer")
-        .attr("class", (d) => `n${d.id}`)
-        .on("click", (e, d) => {
-          this.nodeHighlight(d.id, true);
-        })
-        // .on("mousemove", (e) => {
-        //   self.$refs["book-info-dialog"].$el.style.left = e.clientX + 10 + "px";
-        //   self.$refs["book-info-dialog"].$el.style.top = e.clientY + 30 + "px";
-        // })
-        // .on("mouseleave", () => {
-        //   self.$refs["book-info-dialog"].$el.style.display = "none";
-        // })
-        .call(drag(simulation));
-
-      if (W) link.attr("stroke-width", ({ index: i }) => W[i]);
-      if (L) link.attr("stroke", ({ index: i }) => L[i]);
-      if (G) node.attr("fill", ({ index: i }) => color(G[i]));
-      if (R) node.attr("r", ({ index: i }) => R[i]);
-      // if (T) node.append("title").text(({ index: i }) => T[i]);
-      if (invalidation != null) invalidation.then(() => simulation.stop());
-
-      function ticked() {
-        link
-          .attr("x1", (d) => d.source.x)
-          .attr("y1", (d) => d.source.y)
-          .attr("x2", (d) => d.target.x)
-          .attr("y2", (d) => d.target.y);
-
-        node.attr("cx", (d) => d.x).attr("cy", (d) => d.y);
-      }
-
-      // 滚轮缩放
-      svg.on("wheel", (e) => {
-        this.show_tooltip = false;
-
-        let scale = e.deltaY / 2e3;
-
-        let [x, y, w, h] = svg.attr("viewBox").split(",");
-
-        let nw = Number(w) * scale;
-        let nh = Number(h) * scale;
-
-        x = Number(x) - (e.offsetX / svg.attr("width")) * nw;
-        y = Number(y) - (e.offsetY / svg.attr("height")) * nh;
-        w = Number(w) + nw;
-        h = Number(h) + nh;
-
-        svg.attr("viewBox", [x, y, w, h].toString());
+      axios.get(`/data/get-person-by-keyword?kwd=${this.person_name}`).then((res) => {
+        this.result_persons = res.data;
       });
-
-      // 拖拽交互
-      function drag(simulation) {
-        function dragstarted(event) {
-          if (!event.active) simulation.alphaTarget(0.3).restart();
-          event.subject.fx = event.subject.x;
-          event.subject.fy = event.subject.y;
-        }
-
-        function dragged(event) {
-          event.subject.fx = event.x;
-          event.subject.fy = event.y;
-        }
-
-        function dragended(event) {
-          if (!event.active) simulation.alphaTarget(0);
-          event.subject.fx = null;
-          event.subject.fy = null;
-        }
-
-        return d3
-          .drag()
-          .on("start", dragstarted)
-          .on("drag", dragged)
-          .on("end", dragended);
-      }
-
-      return Object.assign(svg.node(), { scales: { color } });
     },
-
-    // 绘制关系
-    renderGraphChart(graph_data) {
-      this.$refs["svg-wrapper"].innerHTML = "";
-      this.$refs["svg-wrapper"].append(
-        this.forceGraph(graph_data, {
-          nodeId: (d) => d.id,
-          nodeGroup: (d) => d.group,
-          nodeTitle: (d) => `${d.id}\n${d.group}`,
-          nodeRadius: (d) => d.value,
-          linkStrokeWidth: (l) => Math.sqrt(l.value) + 1,
-          width: this.$refs["svg-wrapper"].parentNode.parentNode.offsetWidth,
-          height: this.$refs["svg-wrapper"].parentNode.parentNode.offsetHight,
-          // invalidation, // a promise to stop the simulation when the cell is re-run
-        })
-      );
-    },
-
-    nodeHighlight(node_id, scroll) {
-      this.selected_id = node_id;
-      this.show_tooltip = true;
-      this.node_list.forEach((e) => (e.active = false));
-      this.node_list.find((e) => e.id == node_id).active = true;
-      d3.selectAll(`circle`).attr("fill", "#93A7A7");
-      d3.select(`circle.n${node_id}`).attr("fill", "#fc1");
-      let box = document
-        .querySelector(`circle.n${node_id}`)
-        .getBoundingClientRect();
-
-      this.$refs.tooltip.style.left = `${box.x + 40}px`;
-      this.$refs.tooltip.style.top = `${box.y - 40}px`;
-
-      if (scroll)
-        document
-          .querySelector(`li.n${node_id}`)
-          .scrollIntoView({ behavior: "smooth" });
+    test(id) {
+      axios.get(`/data/related-persons?personID=${id}&minRelations=${this.min_books}`).then((res) => {
+        this.result_books = res.data;
+      });
     },
   },
   mounted() {
-    this.search();
+    axios.get("/data/relationship-load").then((res) => {
+      this.$store.commit("loadRelationshipData", res.data);
+
+      this.complete = true;
+      this.$emit("endLoading");
+
+      this.search();
+    });
+  },
+  unmounted() {
+    this.$emit("startLoading");
   },
 };
 </script>
@@ -445,140 +83,24 @@ export default {
   padding: 3rem 5rem;
   box-sizing: border-box;
   display: flex;
-  .left {
-    flex: 70% 1 1;
-    .search {
-      input[type="text"] {
-        height: 2rem;
-        width: 15rem;
-        border-radius: 0.5rem;
-        font-size: 0.9rem;
-        outline: none;
-        vertical-align: top; // 防错位
-      }
-      #search-button {
-        background: #fbb03b url(../assets/icons/search.svg) center no-repeat;
-        background-size: 66%;
-        width: 2rem;
-        height: 2rem;
-        border-radius: 0.5rem;
-        border: none;
-        cursor: pointer;
-        margin: 0 0 0 0.7rem;
-      }
-      #tip-button {
-        background: #45a1bb url(../assets/icons/tip.svg) center no-repeat;
-        background-size: 80%;
-        width: 2rem;
-        height: 2rem;
-        border-radius: 0.5rem;
-        border: none;
-        cursor: pointer;
-        margin: 0 0 0 0.7rem;
-      }
-      #search-button:hover {
-        filter: brightness(80%);
-      }
-    }
-    .results-relation {
-      margin: 0.8rem 1.2rem 0 0;
-      .graph {
-        height: 31rem;
-        width: 37rem;
-        overflow: hidden;
-        background: #3331;
-        border-radius: 0.5rem;
-      }
-    }
-  }
-
-  .right {
-    flex: 30% 1 1;
-    .list {
-      box-sizing: border-box;
-      padding: 0.5rem;
-      background: #3331;
+  div.search {
+    input[type="text"] {
+      height: 2rem;
+      width: 15rem;
       border-radius: 0.5rem;
-      h4 {
-        margin: 0 0 0.3rem;
-      }
+      font-size: 0.9rem;
+      outline: none;
+      vertical-align: top; // 防错位
     }
-    .nodes-list {
-      ul {
-        font-size: 0.7rem;
-        list-style: none;
-        overflow-y: scroll;
-        height: 18rem;
-        li {
-          cursor: pointer;
-          padding: 0.1rem 0;
-        }
-        li:hover {
-          background: #3333;
-        }
-        li.active {
-          background: #3333;
-        }
-      }
-    }
-    .relationship-detail {
-      margin: 1.2rem 0 0;
-      ul {
-        font-size: 0.7rem;
-        list-style: none;
-        overflow-y: scroll;
-        height: 9.3rem;
-        li {
-          padding: 0.3rem 0;
-          cursor: pointer;
-          .book {
-            font-size: 0.9rem;
-            span:nth-child(1) {
-              color: rgb(168, 124, 79);
-              margin: 0 0.2rem 0 0;
-            }
-            margin: 0 0 0.1rem;
-          }
-          .person {
-            .name {
-              margin: 0 0.1rem 0 0;
-            }
-            .action {
-              background: rgba(63, 40, 82, 0.413);
-              color: #eee;
-              padding: 0 0.1rem;
-              border-radius: 0.1rem;
-            }
-          }
-        }
-        li:hover {
-          background: #3333;
-        }
-        li:nth-child(2n + 1) {
-          background: #42210b0a;
-        }
-        li:nth-child(2n) {
-          background: #42210b14;
-        }
-      }
-    }
-  }
-
-  .tooltip {
-    position: absolute;
-    background: #333;
-    color: #fff;
-    width: 8rem;
-    height: 5rem;
-    top: 0;
-    left: 0;
-    z-index: 10;
-    box-sizing: border-box;
-    padding: 1rem;
-    border-radius: 0.3rem;
-    a {
-      color: #fff;
-      font-size: 0.7rem;
+    #search-button {
+      background: #fbb03b url(../assets/icons/search.svg) center no-repeat;
+      background-size: 66%;
+      width: 2rem;
+      height: 2rem;
+      border-radius: 0.5rem;
+      border: none;
+      cursor: pointer;
+      margin: 0 0 0 0.7rem;
     }
   }
 }

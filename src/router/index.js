@@ -4,7 +4,7 @@ const routes = [
   {
     path: "/",
     name: "Introduction",
-    meta: { title: "名錄介紹" },
+    meta: { title: "名録介紹" },
     component: () => import("../views/Introduction.vue"),
   },
   {

@@ -273,7 +273,7 @@ export default {
         d.name.length > 3
           ? "国家图书馆前身是筹建于1909年9月9日的京师图书馆，1998年更名为国家图书馆。该馆收藏古籍200万册件，其中善本古籍27万册件。宋元善本、敦煌遗书、赵城金藏、永乐大典、四库全书、方志家谱等是其特色藏品，另有金石拓片、舆图、少数民族语文等特藏古籍。专用古籍书库5个，总面积8493平方米。由古籍馆全面管理，工作人员130余人，专设典藏阅览、文献保护、古籍特藏修复等机构管理、保护、修复古籍。"
           : "";
-      this.current_institution_books = `藏书数: ${d.count}`;
+      this.current_institution_books = `入选古籍数: ${d.count}`;
 
       this.tooltipBox.style.visibility = "visible";
     },
@@ -409,7 +409,7 @@ export default {
     }
 
     .sublist {
-      background-color: antiquewhite;
+      background-color: rgb(102, 80, 52);
       // overflow: scroll;
     }
   }

@@ -19,20 +19,12 @@
 
       <!-- 右側檢索結果 -->
       <div class="search-result">
-        <p class="total">
-          共{{
-            has_filtered ? filtered_result.length : search_result.length
-          }}條結果
-        </p>
+        <p class="total">共{{ has_filtered ? filtered_result.length : search_result.length }}條結果</p>
         <div class="results results-plain">
           <table class="results-list">
             <thead>
               <tr>
-                <th
-                  v-for="e in display_attrs"
-                  :key="e.name"
-                  @click="toggleRank(e.value, e.order)"
-                >
+                <th v-for="e in display_attrs" :key="e.name" @click="toggleRank(e.value, e.order)">
                   <span class="attr-title" v-text="e.name"></span>
                   <span class="rank">
                     <span></span>
@@ -42,57 +34,36 @@
               </tr>
             </thead>
             <tbody>
-              <tr
-                v-for="item in curr_d"
-                :key="item.id"
-                class="item-block"
-                @click="$emit('openBookDetail', item)"
-              >
+              <tr v-for="item in curr_d" :key="item.id" class="item-block" @click="$emit('openBookDetail', item)">
                 <td v-text="'第' + item.batch + '批'"></td>
                 <td v-text="item.id || '-'"></td>
                 <td v-text="item.name || '-'"></td>
                 <td v-text="item.edition || '-'"></td>
                 <td
                   v-text="
-                    $store.state.all_edition_dynasty.find(
-                      (ele) => ele.id == item.edition_dynasty_id
-                    )
-                      ? $store.state.all_edition_dynasty.find(
-                          (ele) => ele.id == item.edition_dynasty_id
-                        ).name
+                    $store.state.all_edition_dynasty.find((ele) => ele.id == item.edition_dynasty_id)
+                      ? $store.state.all_edition_dynasty.find((ele) => ele.id == item.edition_dynasty_id).name
                       : '-'
                   "
                 ></td>
                 <td
                   v-text="
-                    $store.state.all_document_type.find(
-                      (ele) => ele.id == item.document_type_id
-                    )
-                      ? $store.state.all_document_type.find(
-                          (ele) => ele.id == item.document_type_id
-                        ).name
+                    $store.state.all_document_type.find((ele) => ele.id == item.document_type_id)
+                      ? $store.state.all_document_type.find((ele) => ele.id == item.document_type_id).name
                       : '-'
                   "
                 ></td>
                 <td
                   v-text="
-                    $store.state.all_language.find(
-                      (ele) => ele.id == item.language_id
-                    )
-                      ? $store.state.all_language.find(
-                          (ele) => ele.id == item.language_id
-                        ).name
+                    $store.state.all_language.find((ele) => ele.id == item.language_id)
+                      ? $store.state.all_language.find((ele) => ele.id == item.language_id).name
                       : '-'
                   "
                 ></td>
                 <td
                   v-text="
-                    $store.state.all_institution.find(
-                      (ele) => ele.id == item.institution_id
-                    )
-                      ? $store.state.all_institution.find(
-                          (ele) => ele.id == item.institution_id
-                        ).name
+                    $store.state.all_institution.find((ele) => ele.id == item.institution_id)
+                      ? $store.state.all_institution.find((ele) => ele.id == item.institution_id).name
                       : '-'
                   "
                 ></td>
@@ -102,9 +73,7 @@
         </div>
         <PageDivider
           @turnTo="alterPage"
-          :items_sum="
-            has_filtered ? filtered_result.length : search_result.length
-          "
+          :items_sum="has_filtered ? filtered_result.length : search_result.length"
           :each_page_items="each_page_items"
           ref="page-divider"
         />
@@ -146,8 +115,8 @@ export default {
 
       // 展示字段与检索字段
       display_attrs: [
-        { name: "名錄批次", value: "batch", order: true, byID: false },
-        { name: "名錄號", value: "id", order: true, byID: false },
+        { name: "名録批次", value: "batch", order: true, byID: false },
+        { name: "名録號", value: "id", order: true, byID: false },
         { name: "題名", value: "name", order: true, byID: false },
         { name: "版本", value: "edition", order: true, byID: true },
         { name: "版本年代", value: "edition_dynasty", order: true, byID: true },
@@ -160,6 +129,7 @@ export default {
   methods: {
     // 开始检索。根据检索词及筛选条件
     search(values) {
+      console.log(values);
       axios
         .post("/data/search-for-books", { values })
         .then((res) => {
@@ -175,10 +145,7 @@ export default {
     // 更新统计数据
     updateFilter() {
       for (let i in this.filter_data)
-        this.filter_data[i].value = this.getSum(
-          this.search_result,
-          this.filter_data[i].id + "_id"
-        );
+        this.filter_data[i].value = this.getSum(this.search_result, this.filter_data[i].id + "_id");
     },
     // Filter发生变化
     filterResult(e) {
@@ -189,8 +156,7 @@ export default {
         for (let i in this.curr_filter) {
           if (!this.curr_filter[i].length) continue;
           let _flag = false;
-          for (let v of this.curr_filter[i])
-            _flag = _flag || "" + el[i + "_id"] == v;
+          for (let v of this.curr_filter[i]) _flag = _flag || "" + el[i + "_id"] == v;
           flag = flag && _flag;
         }
         return flag;
@@ -232,8 +198,7 @@ export default {
           return flag;
         });
       }
-      this.display_attrs.find((e) => e.value == attr).order =
-        !this.display_attrs.find((e) => e.value == attr).order;
+      this.display_attrs.find((e) => e.value == attr).order = !this.display_attrs.find((e) => e.value == attr).order;
       this.$refs["page-divider"].turnTo(1);
     },
     alterPage(page_index) {
@@ -243,24 +208,14 @@ export default {
       );
     },
     showFilterOptions(e) {
-      let b =
-        e.currentTarget.querySelector(".options").style.display == "block";
-      document
-        .querySelectorAll(".options")
-        .forEach((e) => (e.style.display = "none"));
-      e.currentTarget.querySelector(".options").style.display = b
-        ? "none"
-        : "block";
+      let b = e.currentTarget.querySelector(".options").style.display == "block";
+      document.querySelectorAll(".options").forEach((e) => (e.style.display = "none"));
+      e.currentTarget.querySelector(".options").style.display = b ? "none" : "block";
     },
     choose(e) {
-      document
-        .querySelectorAll(".options")
-        .forEach((e) => (e.style.display = "none"));
+      document.querySelectorAll(".options").forEach((e) => (e.style.display = "none"));
       let parent_filter_value = e.path[3].querySelector(".value");
-      parent_filter_value.setAttribute(
-        "val",
-        e.currentTarget.getAttribute("val")
-      );
+      parent_filter_value.setAttribute("val", e.currentTarget.getAttribute("val"));
       parent_filter_value.innerText = e.currentTarget.innerText;
     },
   },

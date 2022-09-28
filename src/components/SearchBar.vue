@@ -4,14 +4,14 @@
     <button class="add" @click="add">+</button>
 
     <div class="bar-wrapper">
-      <input placeholder="請輸入關鍵詞" type="text" ref="text" />
-      <Droplist ref="drop-list" :attr_list="attr_list" />
+      <input placeholder="請輸入關鍵詞" type="text" ref="text-single" />
+      <Droplist ref="drop-list-single" :attr_list="attr_list" />
     </div>
 
     <div class="more-bars">
       <div class="bar-wrapper" v-for="e in n - 1" :key="e">
-        <input placeholder="請輸入關鍵詞" type="text" ref="text" />
-        <Droplist ref="drop-list" :attr_list="attr_list" />
+        <input placeholder="請輸入關鍵詞" type="text" ref="text-multiple" />
+        <Droplist ref="drop-list-multiple" :attr_list="attr_list" />
       </div>
     </div>
 
@@ -36,17 +36,22 @@ export default {
   },
   methods: {
     search() {
+      console.log(document.querySelectorAll(".text"), this.$refs.text);
       let arr = [];
       if (this.n == 1) {
         arr.push({
-          value: this.$refs["text"].value,
-          attr: this.$refs["drop-list"].curr_value,
+          value: this.$refs["text-single"].value,
+          attr: this.$refs["drop-list-single"].curr_value,
         });
       } else {
-        for (let i = 0; i < this.n; i++) {
+        arr.push({
+          value: this.$refs["text-single"].value,
+          attr: this.$refs["drop-list-single"].curr_value,
+        });
+        for (let i = 0; i < this.$refs["text-multiple"].length; i++) {
           arr.push({
-            value: this.$refs["text"][i].value,
-            attr: this.$refs["drop-list"][i].curr_value,
+            value: this.$refs["text-multiple"][i].value,
+            attr: this.$refs["drop-list-multiple"][i].curr_value,
           });
         }
       }

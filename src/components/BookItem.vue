@@ -19,7 +19,6 @@ export default {
     openBookDetail() {
       axios.get(`/data/get-book-data/${this.id}`).then((d) => {
         this.$emit("openBookDetail", d.data[0]);
-        console.log(d.data);
       });
     },
   },
@@ -34,7 +33,7 @@ export default {
 <style lang="less" scoped>
 .book-item {
   flex: 6rem 1 1;
-  margin: 0.2rem;
+  margin: 0.5rem;
   cursor: pointer;
 
   div {
@@ -64,4 +63,5 @@ export default {
     }
   }
 }
+
 </style>

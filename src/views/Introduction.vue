@@ -1,10 +1,5 @@
 <template>
-  <div
-    class="introduction"
-    @wheel.prevent="rowScroll"
-    ref="introduction"
-    v-if="complete"
-  >
+  <div class="introduction" @wheel.prevent="rowScroll" ref="introduction" v-if="complete">
     <section class="section-1">
       <!-- <FlowingParticles_new /> -->
       <div class="everyday-book">
@@ -13,12 +8,22 @@
           <p v-text="now.getDate()"></p>
           <p v-text="now.getFullYear() + '.' + (now.getMonth() + 1)"></p>
         </div>
-        <div @click="$emit('openBookDetail', '01523')">
+        <div
+          @click="
+            axios.get(`/data/get-book-data/01523`).then((d) => {
+              $emit('openBookDetail', d.data[0]);
+            })
+          "
+        >
           <p>01523</p>
           <p>鲍氏国策十卷</p>
         </div>
         <img
-          @click="$emit('openBookDetail', '01523')"
+          @click="
+            axios.get(`/data/get-book-data/01523`).then((d) => {
+              $emit('openBookDetail', d.data[0]);
+            })
+          "
           src="/images/placeholder.jpg"
           alt="今日古籍-书影"
         />
@@ -26,7 +31,7 @@
       <div class="cover">
         <div>
           <div>
-            <h1>國<br />家<br />珍<br />貴<br />古<br />籍<br />名<br />錄</h1>
+            <h1>國<br />家<br />珍<br />貴<br />古<br />籍<br />名<br />録</h1>
           </div>
         </div>
       </div>
@@ -34,7 +39,7 @@
       <div class="mouse-tip"></div>
     </section>
     <section class="section-2">
-      <Stack @openBookDetail="openBookDetail" />
+      <Batches @openBookDetail="openBookDetail" />
     </section>
     <section class="section-3">
       <BaiduMap />
@@ -57,7 +62,7 @@
 <script>
 import FlowingParticles from "@/components/FlowingParticles.vue";
 import BaiduMap from "@/views/Exploration-BaiduMap.vue";
-import Stack from "@/views/Exploration-Stack.vue";
+import Batches from "@/views/Batches.vue";
 import axios from "axios";
 
 export default {
@@ -65,7 +70,7 @@ export default {
   components: {
     FlowingParticles,
     BaiduMap,
-    Stack,
+    Batches,
   },
   data() {
     return {
@@ -79,13 +84,12 @@ export default {
     };
   },
   methods: {
-    openBookDetail(id) {
-      this.$emit("openBookDetail", id);
+    openBookDetail(book_info) {
+      this.$emit("openBookDetail", book_info);
     },
     calculateSectionOffsets() {
       let sections = document.querySelectorAll("section");
       let length = sections.length;
-      console.log(sections);
       for (let i = 0; i < length; i++) {
         let sectionOffset = sections[i].offsetRight;
         this.offsets.push(sectionOffset);
@@ -123,9 +127,7 @@ export default {
       this.current_page = id;
       this.scrolling = true;
 
-      document
-        .getElementsByTagName("section")
-        [id].scrollIntoView({ behavior: "smooth", inline: "nearest" });
+      document.getElementsByTagName("section")[id].scrollIntoView({ behavior: "smooth", inline: "nearest" });
 
       clearTimeout(timeout);
       timeout = setTimeout(() => {
@@ -139,9 +141,7 @@ export default {
       this.$store.commit("loadIntroductionData", res.data);
 
       for (let e of this.$store.state.all_institution) {
-        let r = this.$store.state.all_province.find(
-          (el) => el.id == e.province_id
-        );
+        let r = this.$store.state.all_province.find((el) => el.id == e.province_id);
         if (!r.child) r.child = [];
         r.child.push(e.id);
       }
