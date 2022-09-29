@@ -14,26 +14,23 @@
       <div class="content">
         <div class="info">
           <div class="col-1">
-            <h3 v-if="current_batch == 0" v-animate="'tempStyle'">國家珍貴古籍名録</h3>
-            <h3 v-else v-text="`國家珍貴古籍名録 第${batchInfo[current_batch].name}批`"></h3>
+            <h3 v-if="current_batch == 0" v-animate="'tempStyle'">
+              國家珍貴古籍名録
+            </h3>
+            <h3
+              v-else
+              v-text="`國家珍貴古籍名録 第${batchInfo[current_batch].name}批`"
+            ></h3>
 
             <!-- 批次描述 -->
-            <p class="batch-description" v-text="batchInfo[current_batch].description"></p>
+            <p
+              class="batch-description"
+              v-text="batchInfo[current_batch].description"
+            ></p>
           </div>
 
           <div class="col-2">
             <div class="left">
-              <div class="chart-wrapper edition-dynasties">
-                <BarChart
-                  title="版本朝代"
-                  ref="edition_dynasty"
-                  bar_color="#76978F"
-                  :canvasWidth="17 * $store.state.rem"
-                  :canvasHeight="6 * $store.state.rem"
-                  :margin_left="0.35"
-                  :info="statistics.edition_dynasty"
-                />
-              </div>
               <div class="chart-wrapper document-types">
                 <BarChart
                   title="文獻類型"
@@ -43,6 +40,17 @@
                   :canvasHeight="7.5 * $store.state.rem"
                   :margin_left="0.35"
                   :info="statistics.document_type"
+                />
+              </div>
+              <div class="chart-wrapper edition-dynasties">
+                <BarChart
+                  title="版本朝代"
+                  ref="edition_dynasty"
+                  bar_color="#76978F"
+                  :canvasWidth="17 * $store.state.rem"
+                  :canvasHeight="6 * $store.state.rem"
+                  :margin_left="0.35"
+                  :info="statistics.edition_dynasty"
                 />
               </div>
               <div class="chart-wrapper edition-types">
@@ -77,11 +85,16 @@
         <div class="featured-books">
           <div class="show-more">
             <span class="icon"></span>
-            <span @click="showMore">換一組</span>
+            <span @click="showMore">换一組</span>
           </div>
           <transition name="fade">
             <div class="books">
-              <BookItem @openBookDetail="openBookDetail" v-for="b in showing_books" :key="b" :id="b" />
+              <BookItem
+                @openBookDetail="openBookDetail"
+                v-for="b in showing_books"
+                :key="b"
+                :id="b"
+              />
             </div>
           </transition>
         </div>
@@ -157,8 +170,8 @@ export default {
     ...mapState(["rem"]),
   },
   methods: {
-    openBookDetail(book_info) {
-      this.$emit("openBookDetail", book_info);
+    openBookDetail(book_id) {
+      this.$emit("openBookDetail", book_id);
     },
     toWidth(p) {
       return window.innerWidth * p;
@@ -170,20 +183,25 @@ export default {
       let arr =
         this.current_batch == 0
           ? this.$store.state.books
-          : this.$store.state.books.filter((el) => el.batch == this.current_batch);
+          : this.$store.state.books.filter(
+              (el) => el.batch == this.current_batch
+            );
 
       this.showing_books = [];
-      for (let i = 0; i < 6; i++) this.showing_books.push(arr[Math.floor(Math.random() * arr.length)].id);
+      for (let i = 0; i < 6; i++)
+        this.showing_books.push(arr[Math.floor(Math.random() * arr.length)].id);
     },
     updateBatch(index) {
       this.current_batch = index;
       for (let n in this.statistics) {
-        axios.get(`/data/batch-data?batch=${this.current_batch}&attr=${n}`).then((d) => {
-          this.statistics[n] = d.data;
-          this.statistics[n].sort((a, b) => {
-            return a - b;
+        axios
+          .get(`/data/batch-data?batch=${this.current_batch}&attr=${n}`)
+          .then((d) => {
+            this.statistics[n] = d.data;
+            this.statistics[n].sort((a, b) => {
+              return a - b;
+            });
           });
-        });
       }
       this.showMore();
     },
@@ -193,9 +211,11 @@ export default {
   },
   mounted() {
     for (let n in this.statistics)
-      axios.get(`/data/batch-data?batch=${this.current_batch}&attr=${n}`).then((d) => {
-        this.statistics[n] = d.data;
-      });
+      axios
+        .get(`/data/batch-data?batch=${this.current_batch}&attr=${n}`)
+        .then((d) => {
+          this.statistics[n] = d.data;
+        });
   },
 };
 </script>

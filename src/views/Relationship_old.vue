@@ -3,7 +3,7 @@
     <div class="left">
       <!-- 檢索工具 -->
       <div class="search">
-        <input type="text" value="史記" ref="text" />
+        <input type="text" value="周易" ref="text" />
         <Droplist ref="drop-list" :attr_list="display_attrs" />
         <button id="search-button" @click="search"></button>
         <button id="tip-button"></button>
@@ -35,7 +35,7 @@
           <!-- <li v-for="r in relation_list" :key="r">
             <router-link :to="'/book-detail/' + convertBookId(r.book_id)" v-text="r"></router-link>
           </li> -->
-          <li v-for="r in relation_list" :key="r" @click="$emit('openBookDetail', convertBookId(r.book_id))">
+          <li v-for="r in relation_list" :key="r" @click="openBookDetail(convertBookId(r.book_id))">
             <!-- 古籍信息 -->
             <div class="book">
               <span v-text="convertBookId(r.book_id)"></span>
@@ -56,7 +56,8 @@
 
     <div ref="tooltip" class="tooltip" v-show="show_tooltip">
       <h5 v-text="selected_info.name"></h5>
-      <router-link :to="/person-detail/ + selected_info.id">詳情</router-link>
+      <span @click="openPersonDetail(selected_info.id)">详情</span>
+      <!-- <router-link :to="/person-detail/ + selected_info.id">詳情</router-link> -->
     </div>
   </div>
 </template>
@@ -109,6 +110,7 @@ export default {
         );
         arr = r;
       }
+      console.log(this.$store.state);
       return arr;
     },
   },
@@ -141,8 +143,13 @@ export default {
       if (r) return r.name;
       else return "未知行为";
     },
+    openBookDetail(id) {
+      this.$emit("openBookDetail", id);
+    },
+    openPersonDetail(id) {
+      this.$emit("openPersonDetail", id);
+    },
     search() {
-      console.log(this.$refs);
       // 按书名检索
       if (this.$refs["drop-list"].curr_value == "book_name")
         axios
@@ -403,7 +410,9 @@ export default {
       this.complete = true;
       this.$emit("endLoading");
 
-      this.search();
+      this.$nextTick(() => {
+        this.search();
+      });
     });
   },
   unmounted() {
@@ -550,9 +559,11 @@ export default {
     box-sizing: border-box;
     padding: 1rem;
     border-radius: 0.3rem;
-    a {
+    span {
       color: #fff;
       font-size: 0.7rem;
+      cursor: pointer;
+      text-decoration: underline;
     }
   }
 }

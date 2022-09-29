@@ -27,7 +27,13 @@
           class="book-name"
           v-for="e in result_books"
           :key="e"
-          v-text="$store.state.persons.find((el) => el.id == e.person_id).name + '(' + e.count + ')' + ' '"
+          v-text="
+            $store.state.persons.find((el) => el.id == e.person_id).name +
+            '(' +
+            e.count +
+            ')' +
+            ' '
+          "
         ></span>
       </div>
     </div>
@@ -50,14 +56,20 @@ export default {
   },
   methods: {
     search() {
-      axios.get(`/data/get-person-by-keyword?kwd=${this.person_name}`).then((res) => {
-        this.result_persons = res.data;
-      });
+      axios
+        .get(`/data/get-person-by-keyword?kwd=${this.person_name}`)
+        .then((res) => {
+          this.result_persons = res.data;
+        });
     },
     test(id) {
-      axios.get(`/data/related-persons?personID=${id}&minRelations=${this.min_books}`).then((res) => {
-        this.result_books = res.data;
-      });
+      axios
+        .get(
+          `/data/related-persons?personID=${id}&minRelations=${this.min_books}`
+        )
+        .then((res) => {
+          this.result_books = res.data;
+        });
     },
   },
   mounted() {

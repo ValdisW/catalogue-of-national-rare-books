@@ -8,25 +8,11 @@
           <p v-text="now.getDate()"></p>
           <p v-text="now.getFullYear() + '.' + (now.getMonth() + 1)"></p>
         </div>
-        <div
-          @click="
-            axios.get(`/data/get-book-data/01523`).then((d) => {
-              $emit('openBookDetail', d.data[0]);
-            })
-          "
-        >
+        <div @click="$emit('openBookDetail', '01523')">
           <p>01523</p>
-          <p>鲍氏国策十卷</p>
+          <p>鮑氏國策十卷</p>
         </div>
-        <img
-          @click="
-            axios.get(`/data/get-book-data/01523`).then((d) => {
-              $emit('openBookDetail', d.data[0]);
-            })
-          "
-          src="/images/placeholder.jpg"
-          alt="今日古籍-书影"
-        />
+        <img @click="$emit('openBookDetail', d.data[0])" src="/images/placeholder.jpg" alt="今日古籍-书影" />
       </div>
       <div class="cover">
         <div>
@@ -137,8 +123,8 @@ export default {
   },
 
   mounted() {
-    axios.get("/data/introduction-load").then((res) => {
-      this.$store.commit("loadIntroductionData", res.data);
+    axios.get("/data/introduction-preload").then((res) => {
+      this.$store.commit("preloadIntroductionData", res.data);
 
       for (let e of this.$store.state.all_institution) {
         let r = this.$store.state.all_province.find((el) => el.id == e.province_id);
@@ -160,6 +146,11 @@ export default {
         passive: false,
       }); // mobile devices
       window.addEventListener("touchmove", this.touchMove, { passive: false }); // mobile devices
+
+      // 浏览过程中加载
+      axios.get("/data/introduction-load").then((res) => {
+        this.$store.commit("loadIntroductionData", res.data);
+      });
     });
   },
   unmounted() {

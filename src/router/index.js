@@ -10,25 +10,25 @@ const routes = [
   {
     path: "/exploration",
     name: "Exploration",
-    meta: { title: "古籍瀏覽" },
+    meta: { title: "名録瀏覽" },
     component: () => import("../views/Exploration.vue"),
   },
   {
     path: "/relationship-old",
     name: "Relationship_old",
-    meta: { title: "書目分析" },
+    meta: { title: "名録分析" },
     component: () => import("../views/Relationship_old.vue"),
   },
   {
     path: "/relationship",
     name: "Relationship",
-    meta: { title: "流传分析" },
+    meta: { title: "流傳分析" },
     component: () => import("../views/Relationship.vue"),
   },
   {
     path: "/about",
     name: "About",
-    meta: { title: "關於我們" },
+    meta: { title: "開發團隊" },
     component: () => import("../views/About.vue"),
   },
   // {
@@ -37,18 +37,18 @@ const routes = [
   //   meta: { title: "古籍详情" },
   //   component: () => import("../views/BookDetail.vue"),
   // },
-  {
-    path: "/person-detail/:personID",
-    name: "PersonDetail",
-    meta: { title: "人物详情" },
-    component: () => import("../views/PersonDetail.vue"),
-  },
-  {
-    path: "/institution-detail/:institutionID",
-    name: "InstitutionDetail",
-    meta: { title: "机构详情" },
-    component: () => import("../views/InstitutionDetail.vue"),
-  },
+  // {
+  //   path: "/person-detail/:personID",
+  //   name: "PersonDetail",
+  //   meta: { title: "人物详情" },
+  //   component: () => import("../views/PersonDetail.vue"),
+  // },
+  // {
+  //   path: "/institution-detail/:institutionID",
+  //   name: "InstitutionDetail",
+  //   meta: { title: "机构详情" },
+  //   component: () => import("../views/InstitutionDetail.vue"),
+  // },
   // {
   //   path: "/streamgraph",
   //   name: "StreamGraph",

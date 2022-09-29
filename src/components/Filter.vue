@@ -3,19 +3,12 @@
     <p class="title" v-text="attr_name"></p>
     <div class="content">
       <ul>
-        <li
-          v-for="e in attrs"
-          :class="{ selected: e.selected }"
-          :key="e"
-          :val="e.value"
-          @click="toggleSelect(e)"
-        >
+        <li v-for="e in attrs" :class="{ selected: e.selected }" :key="e" :val="e.value" @click="toggleSelect(e)">
           <!-- 条形-->
           <div
             class="bar"
             :style="{
-              width:
-                (Math.log(e.value + 1) / Math.log(max_value + 1)) * 100 + '%',
+              width: (Math.log(e.value + 1) / Math.log(max_value + 1)) * 100 + '%',
             }"
           ></div>
 
@@ -24,8 +17,7 @@
             <span
               v-text="
                 $store.state['all_' + attr_id].find((el) => el.id == e.name)
-                  ? $store.state['all_' + attr_id].find((el) => el.id == e.name)
-                      .name
+                  ? $store.state['all_' + attr_id].find((el) => el.id == e.name).name
                   : '未知'
               "
             ></span>
@@ -60,9 +52,7 @@ export default {
       e.selected = !e.selected;
       this.$emit("filter", {
         attr: this.attr_id,
-        value: this.attrs
-          .filter((el) => el.selected)
-          .map((el) => (el = el.name)),
+        value: this.attrs.filter((el) => el.selected).map((el) => (el = el.name)),
       });
     },
   },
@@ -110,7 +100,10 @@ export default {
         }
       }
       li.selected {
-        background: #c1ae78;
+        background: #e1b74b;
+        .bar {
+          background: #c78320;
+        }
       }
       li:hover {
         filter: brightness(80%);

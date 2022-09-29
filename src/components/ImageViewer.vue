@@ -5,16 +5,13 @@
       <div class="scale-to-height" @click="scaleToHeight">适应高度</div>
       <div class="scale-to-origin" @click="scaleToOrigin">原始尺寸</div>
     </div>
-    <div class="close" @click="close">关闭</div>
+    <div class="close" @click="close">
+      <div></div>
+      <div></div>
+    </div>
 
     <div class="img-wrapper">
-      <img
-        class="image"
-        :src="imageUrl"
-        :alt="imageText"
-        v-drag
-        @mousewheel.prevent="scaleFun"
-      />
+      <img class="image" :src="imageUrl" :alt="imageText" v-drag @mousewheel.prevent="scaleFun" />
     </div>
   </div>
 </template>
@@ -120,10 +117,27 @@ export default {
     z-index: 1;
   }
   .close {
-    width: 10vw;
     position: absolute;
+    right: 3rem;
+    top: 3rem;
     z-index: 2;
-    top: 10vh;
+    width: 2rem;
+    height: 2rem;
+    color: #fff;
+    cursor: pointer;
+    div {
+      width: 100%;
+      height: 0.1rem;
+      background-color: #fff;
+      border-radius: 0.05rem;
+    }
+    div:nth-child(1) {
+      transform: translateY(1.5vmax) rotate(45deg);
+    }
+    div:nth-child(2) {
+      transform: translateY(1.5vmax) rotate(135deg);
+      margin-top: -2px;
+    }
   }
   .button {
     width: 10vw;

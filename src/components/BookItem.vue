@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import axios from "axios";
+// import axios from "axios";
 
 export default {
   name: "BookItem",
@@ -17,9 +17,7 @@ export default {
   },
   methods: {
     openBookDetail() {
-      axios.get(`/data/get-book-data/${this.id}`).then((d) => {
-        this.$emit("openBookDetail", d.data[0]);
-      });
+      this.$emit("openBookDetail", this.id);
     },
   },
   data() {
@@ -63,5 +61,4 @@ export default {
     }
   }
 }
-
 </style>

@@ -9,17 +9,8 @@
 
         <table class="detail">
           <tr>
-            <td class="detail-title">文種：</td>
-            <td
-              class="detail-content language"
-              v-text="
-                id2name(
-                  this.$store.state.all_language,
-                  book_data.language_id,
-                  '-'
-                )
-              "
-            ></td>
+            <td class="detail-title">名録號：</td>
+            <td class="detail-content document-type" v-text="book_data.id"></td>
           </tr>
           <tr>
             <td class="detail-title">文獻類型：</td>
@@ -29,6 +20,19 @@
                 id2name(
                   this.$store.state.all_document_type,
                   book_data.document_type_id,
+                  '-'
+                )
+              "
+            ></td>
+          </tr>
+          <tr>
+            <td class="detail-title">文種：</td>
+            <td
+              class="detail-content language"
+              v-text="
+                id2name(
+                  this.$store.state.all_language,
+                  book_data.language_id,
                   '-'
                 )
               "
@@ -153,10 +157,9 @@
               "
               v-text="`[${person.dynasty_or_nation}]佚名`"
             ></span>
-            <router-link
+            <span
               v-else
-              @click="close"
-              :to="'/person-detail/' + person.person_id"
+              @click="$emit('openPersonDetail', person.person_id)"
               class="person"
               v-text="
                 `[${person.dynasty_or_nation}]${id2name(
@@ -165,8 +168,8 @@
                   '佚名'
                 )}`
               "
-              :title="JSON.stringify(person)"
-            ></router-link>
+            >
+            </span>
           </li>
         </ul>
       </div>
@@ -225,14 +228,14 @@ export default {
     close() {
       this.show = false;
     },
-    open(book_data) {
+    open(book_id) {
       this.show = true;
 
-      this.book_data = book_data;
-
-      axios.get(`/data/book-detail/${book_data.id}`).then((d) => {
-        this.related_person = d.data[0];
-        this.seals = d.data[1];
+      axios.get(`/data/book-detail/${book_id}`).then((d) => {
+        console.log(d.data);
+        this.book_data = d.data[0][0];
+        this.related_person = d.data[1];
+        this.seals = d.data[2];
       });
     },
     openImageViewer() {
@@ -277,7 +280,6 @@ export default {
   .content {
     width: 80%;
     display: flex;
-    // align-items: center;
     justify-content: center;
 
     .close-button {
@@ -331,7 +333,7 @@ export default {
       }
 
       .img-wrapper {
-        background: #dec4a4;
+        background: #3331;
         height: 60vh;
         margin: 1rem 0 0 0;
         display: flex;

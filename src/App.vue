@@ -19,6 +19,7 @@
       @startLoading="complete = false"
       @endLoading="complete = true"
       @openBookDetail="openBookDetail"
+      @openPersonDetail="openPersonDetail"
       @openInstitutionDetail="openInstitutionDetail"
     >
       <keep-alive>
@@ -26,7 +27,8 @@
       </keep-alive>
     </router-view>
 
-    <BookDetail ref="book-detail" />
+    <BookDetail @openPersonDetail="openPersonDetail" ref="book-detail" />
+    <PersonDetail @openBookDetail="openBookDetail" ref="person-detail" />
     <InstitutionDetail
       ref="institution-detail"
       institutionID="201"
@@ -37,29 +39,34 @@
 <script>
 import Loading from "@/components/Loading";
 import BookDetail from "@/views/BookDetail";
+import PersonDetail from "@/views/PersonDetail";
 import InstitutionDetail from "@/views/InstitutionDetail";
 
 const baseSize = 20;
 
 export default {
   name: "App",
-  components: { Loading, BookDetail, InstitutionDetail },
+  components: { Loading, BookDetail, PersonDetail, InstitutionDetail },
   data() {
     return {
       complete: false,
 
       nav_pages: [
         { name: "名録介紹", router: "/" },
-        { name: "古籍瀏覽", router: "/exploration" },
-        { name: "書目分析", router: "/relationship-old" },
-        { name: "流传分析", router: "/relationship" },
-        { name: "關於我們", router: "/about" },
+        { name: "名録瀏覽", router: "/exploration" },
+        { name: "名録分析", router: "/relationship-old" },
+        { name: "研發團隊", router: "/about" },
       ],
     };
   },
   methods: {
-    openBookDetail(book_data) {
-      this.$refs["book-detail"].open(book_data);
+    openBookDetail(book_id) {
+      this.$refs["book-detail"].open(book_id);
+      this.$refs["person-detail"].close();
+    },
+    openPersonDetail(person_id) {
+      this.$refs["book-detail"].close();
+      this.$refs["person-detail"].open(person_id);
     },
     openInstitutionDetail(institution_id) {
       this.$refs["institution-detail"].open(institution_id);

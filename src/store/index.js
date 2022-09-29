@@ -1,6 +1,4 @@
 import { createStore } from "vuex";
-import Vue from "vue";
-console.log(Vue);
 
 export default createStore({
   state: {
@@ -22,26 +20,15 @@ export default createStore({
     getData: (state) => state.books,
   },
   mutations: {
-    loadData(state, _data) {
-      [
-        state.books,
-        state.persons,
-        state.person_ralations,
-        state.all_action,
-        state.all_document_type,
-        state.all_edition_type,
-        state.all_language,
-        state.all_edition_dynasty,
-        state.all_institution,
-        state.all_province,
-        state.all_catalogue,
-      ] = _data;
-    },
     loadIntroductionData(state, _data) {
+      [state.all_action, state.persons] = _data;
+    },
+    preloadIntroductionData(state, _data) {
       [
         state.books,
         state.all_edition_dynasty,
         state.all_document_type,
+        state.all_catalogue,
         state.all_edition_type,
         state.all_language,
         state.all_province,
@@ -67,6 +54,8 @@ export default createStore({
         state.all_edition_dynasty,
         state.all_province,
         state.all_institution,
+        state.person_ralations,
+        state.all_action,
       ] = _data;
     },
     changeRem(state, payload) {

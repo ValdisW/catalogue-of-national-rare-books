@@ -6,10 +6,15 @@
     <svg id="particles-svg" ref="particles-svg" @click="pause"></svg>
 
     <div class="comment">
-      <p>*金、遼、蒙古入宋</p>
+      <p>*宋（遼、西夏、金）</p>
+      <p>*元（蒙古）</p>
     </div>
 
-    <BookDetailTooltip @openBookDetail="$emit('openBookDetail', tooltip_id)" ref="book-detail-tooltip" :id="tooltip_id" />
+    <BookDetailTooltip
+      @openBookDetail="$emit('openBookDetail', tooltip_id)"
+      ref="book-detail-tooltip"
+      :id="tooltip_id"
+    />
   </div>
 </template>
 
@@ -110,7 +115,7 @@ export default {
     randomNormal(o) {
       if (
         ((o = Object.assign({ mean: 0, dev: 1, pool: [] }, o)),
-          Array.isArray(o.pool) && o.pool.length > 0)
+        Array.isArray(o.pool) && o.pool.length > 0)
       )
         return this.normalPool(o);
       let r,
@@ -211,8 +216,8 @@ export default {
       // 计时器
       this.curr_time += 17;
     },
-    reset() { },
-    init() { },
+    reset() {},
+    init() {},
     start() {
       // 配置画布
       this.svg = d3

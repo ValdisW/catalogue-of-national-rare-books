@@ -64,16 +64,24 @@ router.get("/", function (req, res) {
 });
 
 // 名录介绍页的预加载
-router.get("/introduction-load", (req, res) => {
+router.get("/introduction-preload", (req, res) => {
   query(
     "select id,batch,name,language_id,document_type_id,edition_dynasty_id,institution_id from rare.books;" +
       "select id,name,type_p from rare.dynasties;" +
       "select * from rare.document_types;" +
+      "select * from rare.catalogues;" +
       "select * from rare.edition_types;" +
       "select * from rare.languages;" +
       "select * from rare.provinces;" +
       "select * from rare.institutions;"
   ).then((result) => {
+    res.send(result);
+  });
+});
+
+// 名录介绍页浏览过程中的加载项
+router.get("/introduction-load", (req, res) => {
+  query("select * from rare.actions;" + "select * from rare.persons;").then((result) => {
     res.send(result);
   });
 });
@@ -101,7 +109,9 @@ router.get("/relationship-load", (req, res) => {
       "select id,name from rare.languages;" +
       "select id,name,type_p from rare.dynasties;" +
       "select * from rare.provinces;" +
-      "select * from rare.institutions;"
+      "select * from rare.institutions;" +
+      "select * from rare.person_person where person1_id!=person2_id;" +
+      "select * from rare.actions;"
   ).then((result) => {
     res.send(result);
   });
@@ -110,7 +120,8 @@ router.get("/relationship-load", (req, res) => {
 // 古籍详情页所需数据
 router.get("/book-detail/:bookID", (req, res) => {
   // query(`select book_id,count(book_id) count from rare.book_person where book_id!="${req.params.bookID}" and person in (select person from rare.persons where book_id="${req.params.bookID}" and person!="") group by book_id;`),
-  query(`select dynasty_or_nation,person_id,action_id from rare.book_person where book_id="${req.params.bookID}";
+  query(`select * from rare.books where id="${req.params.bookID}";
+    select dynasty_or_nation,person_id,action_id from rare.book_person where book_id="${req.params.bookID}";
     select book_id,inner_id,text,person_name from rare.book_seal where book_id="${req.params.bookID}";`).then(
     (result) => {
       res.send(result);
@@ -120,8 +131,9 @@ router.get("/book-detail/:bookID", (req, res) => {
 
 // 人物详情页所需数据
 router.get("/person-detail/:personID", (req, res) => {
-  query(`select * from rare.book_person where person_id='${req.params.personID}';
-    select person_id,count(person_id) count from rare.book_person where person_id not in ("${req.params.personID}","") and book_id in (select book_id from rare.book_person where person_id="${req.params.personID}") group by person_id;`).then(
+  query(`select * from persons where id ="${req.params.personID}";
+    select * from rare.book_person where person_id='${req.params.personID}';
+    select person_id,count(person_id) count from rare.book_person where person_id not in ("${req.params.personID}","","P000000") and book_id in (select book_id from rare.book_person where person_id="${req.params.personID}") group by person_id;`).then(
     (result) => {
       res.send(result);
     }
@@ -175,7 +187,7 @@ router.get("/batch-data", (req, res) => {
     query(
       `select type name,count(*) value from rare.dynasties a,(SELECT batch,rare.dynasties.id from rare.books,rare.dynasties where rare.dynasties.id=rare.books.edition_dynasty_id order by id) b where a.id=b.id ${
         req.query.batch == 0 ? "" : "AND batch=" + req.query.batch
-      } group by type;`
+      } group by type order by value desc;`
     ).then((result) => {
       res.send(result);
     });
@@ -212,6 +224,14 @@ router.get("/batch-data", (req, res) => {
 // 根据古籍名录号，获取古籍信息
 router.get("/get-book-data/:id", (req, res) => {
   query(`select * from books where id=${req.params.id};`).then((result) => {
+    res.send(result);
+  });
+});
+
+
+// 根据人物ID，获取人物信息
+router.get("/get-person-data/:id", (req, res) => {
+  query(`select * from persons where id="${req.params.id}";`).then((result) => {
     res.send(result);
   });
 });

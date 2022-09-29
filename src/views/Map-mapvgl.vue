@@ -1,23 +1,27 @@
 <template>
-  <div class="spatialSampling">
-    <div id="map_container" @wheel.stop=""></div>
+  <div class="spatial-sampling">
+    <!-- 左侧地图 -->
+    <div id="map-container" @wheel.stop=""></div>
+    <!-- 右侧列表 -->
     <div id="map-list">
-      <ul>
+      <!-- 省份列表 -->
+      <ul class="provinces">
         <li
           v-for="(city, index) in province_info"
           :key="index"
-          @click.stop="clickProvince($event, city, index)"
+          @click.self="expandProvince(city)"
           :id="`list-${index}`"
           :show="false"
         >
           <span v-text="`${city.name} - ${city.count}`"></span>
-          <ul class="sublist" v-show="false">
+          <!-- 机构列表 -->
+          <ul class="institutions" v-show="city.selected">
             <li
               v-for="e in city.child"
               :key="e"
+              @click="flyToInstitution(this.$store.state.all_institution.find((el) => el.id == e))"
               v-text="
-                this.$store.state.all_institution.find((el) => el.id == e)
-                  .name +
+                this.$store.state.all_institution.find((el) => el.id == e).name +
                 ' - ' +
                 this.$store.state.all_institution.find((el) => el.id == e).books
               "
@@ -53,6 +57,7 @@ export default {
           count: null,
           child: [],
           pos: null,
+          selected: false,
         },
       ],
       insititution_info: {
@@ -71,11 +76,13 @@ export default {
     },
   },
   methods: {
+    // 显示省份点
     drawProvinceMap() {
       this.pointLayer = this.provinceLayer;
       this.view.removeLayer(this.institutionLayer);
       this.view.addLayer(this.provinceLayer);
     },
+    // 显示机构点
     drawInstitutionMap() {
       this.pointLayer = this.institutionLayer;
       this.view.removeLayer(this.provinceLayer);
@@ -103,6 +110,7 @@ export default {
           count: city["books"],
           child: city["child"],
           pos: { lng: city["lng"], lat: city["lat"] },
+          selected: false,
         });
       }
 
@@ -111,10 +119,7 @@ export default {
         max: 3081,
         min: 0,
         gradient: {
-          0: "rgb(25, 66, 102, 0.8)",
-          0.3: "rgb(145, 102, 129, 0.8)",
-          0.7: "rgb(210, 131, 137, 0.8)",
-          1: "rgb(248, 177, 149, 0.8)",
+          0: "rgba(106, 50, 63, 0.7)",
         },
         maxSize: this.zoom * 6,
         minSize: this.zoom * 2,
@@ -126,16 +131,13 @@ export default {
         size: (data) => intensity.getSize(data.properties.count),
         color: (data) => intensity.getColor(data.properties.count),
         enablePicked: true,
-        selectedColor: "#ff0000",
+        selectedColor: "#ff000088",
         autoSelect: true,
         onClick: (e) => {
           // 点击事件
           let id = e.dataIndex;
           if (id == -1) this.map.reset();
-          else this.clickProvince(this.province_info[id], id);
-        },
-        onMousemove: (e) => {
-          console.log("hover", e);
+          else this.expandProvince(this.province_info[id]);
         },
       });
 
@@ -164,10 +166,10 @@ export default {
         max: 3081,
         min: 0,
         gradient: {
-          0: "rgb(25, 66, 102, 0.8)",
-          0.3: "rgb(145, 102, 129, 0.8)",
-          0.7: "rgb(210, 131, 137, 0.8)",
-          1: "rgb(248, 177, 149, 0.8)",
+          0: "rgba(106, 50, 63, 0.7)",
+          // 0.3: "rgb(145, 102, 129)",
+          // 0.7: "rgb(210, 131, 137)",
+          // 1: "rgb(248, 177, 149)",
         },
         maxSize: this.zoom * 6,
         minSize: this.zoom * 1.5,
@@ -179,14 +181,10 @@ export default {
         size: (data) => intensity.getSize(data.properties.count),
         color: (data) => intensity.getColor(data.properties.count),
         enablePicked: true,
-        selectedColor: "#ff0000",
+        selectedColor: "#ff000088",
         autoSelect: true,
         onClick: (e) => {
           // 点击机构点
-          // this.$router.push(`/institution-detail/${e.dataItem.properties.name}`); // 跳转至机构详情页
-          // this.$emit("openInstituionDetail", );
-          console.log(e.dataItem.properties);
-
           let id = e.dataIndex;
           if (id == -1) {
             this.map.reset();
@@ -207,7 +205,7 @@ export default {
         options
       );
       /* eslint-disable */
-      let map = new BMapGL.Map("map_container", {
+      let map = new BMapGL.Map("map-container", {
         restrictCenter: false,
         // style: {styleJson: options.style || darkStyle }
       });
@@ -261,7 +259,7 @@ export default {
 
       // 保证 Tooltip 提示框不会超出浏览器的窗口
       if (left + this.tooltipBox.offsetWidth > document.body.clientWidth) {
-        let demoLeft = document.getElementById("map_container").offsetLeft;
+        let demoLeft = document.getElementById("map-container").offsetLeft;
         left = document.body.clientWidth - toolTipBox.offsetWidth - demoLeft;
         if (left < 0) left = 0;
       }
@@ -281,44 +279,21 @@ export default {
       this.tooltipBox.style.visibility = "hidden";
     },
     // 点击省份列表的省份项
-    clickProvince(e, d, i) {
-      if (e.target.getAttribute("show") == "false") {
-        // draw
-        this.removeAllSublist();
-        this.showSublist(d, e.target);
-      } else {
-        // remove
-        e.target.removeChild(e.target.children[1]);
-        e.target.setAttribute("show", false);
+    expandProvince(d) {
+      this.province_info.forEach((el) => (el.selected = false));
+      if (d.selected) {
         this.map.reset();
+        d.selected = false;
+      } else {
+        this.zoom = 7;
+        this.map.flyTo(d.pos, 7);
+        d.selected = true;
       }
     },
-    // 显示机构菜单
-    showSublist(d, list) {
-      let sublist = document.createElement("ul");
-      let self = this;
-      // sublist.setAttribute("id", "sublist");
-      for (let i in d.child) {
-        let child_id = d.child[i];
-        let child = this.$store.state.all_institution.find((el) => el.id == child_id);
-        if (!child) {
-          console.log(child_id);
-          continue;
-        }
-        let li = document.createElement("li");
-        li.innerHTML = `${child.name} - ${child.books}`;
-        li.onclick = function () {
-          self.zoom = 10;
-          self.map.flyTo({ lng: child["lng"], lat: child["lat"] }, 10);
-        };
-        sublist.appendChild(li);
-      }
-      list.appendChild(sublist);
-      list.setAttribute("show", true);
-
-      // zoom in and center
-      this.zoom = 7;
-      this.map.flyTo(d.pos, 7);
+    flyToInstitution(e) {
+      this.zoom = 10;
+      console.log(e);
+      this.map.flyTo({ lat: e.lat, lng: e.lng }, this.zoom);
     },
     removeAllSublist() {
       for (let i in this.province_info) {
@@ -352,7 +327,7 @@ export default {
 </script>
 
 <style lang="less">
-.spatialSampling {
+.spatial-sampling {
   display: flex;
   position: absolute;
   top: 10vh;
@@ -360,7 +335,7 @@ export default {
   width: 90vw;
   height: 80vh;
 
-  #map_container {
+  #map-container {
     // position: fixed;
     width: 80%;
     height: 100%;
@@ -392,7 +367,8 @@ export default {
   }
 
   #map-list {
-    // position: absolute;
+    border: 2px solid rgb(177, 117, 68);
+    border-left: none;
     width: 20%;
     top: 0%;
     right: 0%;
@@ -400,18 +376,25 @@ export default {
     cursor: pointer;
     overflow-y: scroll;
     font-size: 0.7rem;
-    text-align: center;
+    text-align: left;
 
-    ul {
+    ul.provinces {
       li {
-        padding: 0.3rem 0;
+        // background: rgb(255, 255, 255);
+        padding: 0.3rem 0 0.3rem 0.3rem;
+        ul.institutions {
+          padding: 0.5rem 0 0;
+          font-size: 0.6rem;
+          li {
+            padding: 0.2rem 0 0.2rem 0.6rem;
+            // color:  rgba(106, 50, 63, 0.7);
+          }
+        }
       }
     }
-
-    .sublist {
-      background-color: rgb(102, 80, 52);
-      // overflow: scroll;
-    }
   }
+}
+.anchorBL {
+  filter: saturate(0.7);
 }
 </style>

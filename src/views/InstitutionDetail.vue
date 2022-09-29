@@ -49,8 +49,8 @@ export default {
       this.book_data = this.$store.state.books.find((ele) => ele.id == book_id);
 
       axios.get(`/data/book-detail/${book_id}`).then((d) => {
-        this.related_person = d.data[0];
-        this.seals = d.data[1];
+        this.related_person = d.data[1];
+        this.seals = d.data[2];
       });
     },
   },

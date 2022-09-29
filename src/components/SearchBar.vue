@@ -8,12 +8,13 @@
       <Droplist ref="drop-list-single" :attr_list="attr_list" />
     </div>
 
-    <div class="more-bars">
+    <div class="more-bars" v-show="show_more_bars">
       <div class="bar-wrapper" v-for="e in n - 1" :key="e">
         <input placeholder="請輸入關鍵詞" type="text" ref="text-multiple" />
         <Droplist ref="drop-list-multiple" :attr_list="attr_list" />
       </div>
     </div>
+    <div class="hide" v-show="n > 1" @click="show_more_bars = !show_more_bars"></div>
 
     <!-- 检索按鈕 -->
     <button class="search-button" @click="search"></button>
@@ -32,6 +33,7 @@ export default {
   data() {
     return {
       n: 1,
+      show_more_bars: true,
     };
   },
   methods: {
@@ -91,6 +93,12 @@ export default {
     .bar-wrapper {
       margin: 0.3rem 0 0 0;
     }
+  }
+  .hide {
+    width: 3rem;
+    height: 1rem;
+    background: red;
+    cursor: pointer;
   }
 
   button {
