@@ -177,7 +177,10 @@
       <!-- 书影 -->
       <div class="book-image">
         <div class="img-wrapper" @click="openImageViewer">
-          <img :src="image_filenames[image_showed_index]" />
+          <img
+            :src="image_filenames[image_showed_index]"
+            :alt="image_filenames[image_showed_index]"
+          />
         </div>
 
         <div class="switch_pic" style="text-align: center">
@@ -191,7 +194,6 @@
 
         <div class="display">
           <div>
-            <!-- <p>名录内容</p> -->
             <p v-text="book_data.content_sc"></p>
           </div>
         </div>
@@ -216,7 +218,7 @@ export default {
     return {
       show: false,
       bookID: "",
-      image_filenames: ["/images/placeholder.jpg", "/images/placeholder2.jpg"],
+      image_filenames: [],
       image_showed_index: 0,
       book_data: { content: "" },
       related_person: [],
@@ -229,13 +231,23 @@ export default {
       this.show = false;
     },
     open(book_id) {
+      this.image_filenames = [];
       this.show = true;
 
       axios.get(`/data/book-detail/${book_id}`).then((d) => {
-        console.log(d.data);
         this.book_data = d.data[0][0];
         this.related_person = d.data[1];
         this.seals = d.data[2];
+
+        let img_res = this.$store.state.all_image.filter(
+          (el) => el.id == book_id
+        );
+        if (img_res && img_res[0].filename) {
+          console.log(this.book_data.batch, img_res[0].filename);
+          for (let e of img_res) {
+            this.image_filenames.push(`/data/images/${e.folder}/${e.filename}`);
+          }
+        }
       });
     },
     openImageViewer() {
@@ -275,7 +287,7 @@ export default {
   position: fixed;
   top: 0;
   left: 0;
-  background: #f1e8db;
+  background: #f0e9dd;
 
   .content {
     width: 80%;
@@ -294,16 +306,13 @@ export default {
     }
 
     .display {
-      // height: 80vh;
       font-size: 0.7rem;
       margin-top: 5vh;
-
       div {
-        // p:first-child {
-        //   font-weight: bold;
-        //   margin: 0.7rem 0 0;
-        //   font-size: 0.8rem;
-        // }
+        p {
+          height: 4rem;
+          overflow-y: hidden;
+        }
       }
     }
 
@@ -334,24 +343,21 @@ export default {
 
       .img-wrapper {
         background: #3331;
+        width: 100%;
         height: 60vh;
-        margin: 1rem 0 0 0;
+        margin: 0.5rem 0 0 0;
         display: flex;
         justify-content: center;
         align-items: center;
 
         img {
-          // margin: 0 auto;
-          // display: block;
+          width: 100%;
           height: 60vh;
-          width: 60vh;
           object-fit: contain;
           transition: all 1s ease-in-out;
-          // max-width: 100%;
         }
       }
     }
-
     .info {
       margin-right: 5vh;
       width: 40%;
@@ -383,10 +389,13 @@ export default {
 
         tr {
           line-height: 1.3rem;
+          td:first-child {
+            // width: 3.6rem;
+          }
         }
 
         .detail-title {
-          width: 3.5rem;
+          width: 3.6rem;
           text-align: right;
           font-weight: bold;
           margin: 0 0.5rem 0 0;
@@ -402,9 +411,10 @@ export default {
         list-style-type: none;
         display: flex;
         max-width: 70%;
-        align-items: center;
         justify-content: center;
-
+        overflow-x: scroll;
+        overflow-y: hidden;
+        height: 6rem;
         li {
           float: left;
           min-width: 25%;
@@ -418,30 +428,33 @@ export default {
           text-align: center;
           font-weight: bold;
           font-size: 0.6rem;
-          height: 2.25rem;
+          height: 2rem;
           margin-bottom: 0.7rem;
           border-bottom: 0.15rem solid #4f4545;
         }
 
         .person {
           text-align: center;
-          margin-top: 0.7rem;
+          margin: 0.4rem 0 0;
           font-size: 0.6rem;
           color: #333;
+          display: block;
+          position: absolute;
+          width: 100%;
         }
       }
 
       .timeline li b:before {
         content: "";
         position: absolute;
-        top: 2.25rem;
+        top: 2.1rem;
         width: 0.8rem;
-        left: 0%;
+        left: 0;
         height: 0.8rem;
         border: 0.1rem solid #9f6666;
         border-radius: 50%;
         background: #ffffff;
-        margin-left: 40%;
+        margin-left: 37%;
       }
     }
 

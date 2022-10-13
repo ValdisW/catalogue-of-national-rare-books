@@ -1,20 +1,33 @@
 <template>
   <div id="flow">
-    <DynastySelector @changeDynastyIDs="changeDynasty" />
-    <div class="pause" @click="pause"></div>
+    <div class="content">
+      <div class="section-name">
+        <span></span>
+        <span>全部名録版本朝代</span>
+        <span></span>
+      </div>
+      <div class="main">
+        <DynastySelector @changeDynastyIDs="changeDynasty" />
+        <div
+          class="togglePause"
+          :class="{ continue: !playing }"
+          @click="togglePause"
+        ></div>
 
-    <svg id="particles-svg" ref="particles-svg" @click="pause"></svg>
+        <svg id="particles-svg" ref="particles-svg" @click="togglePause"></svg>
 
-    <div class="comment">
-      <p>*宋（遼、西夏、金）</p>
-      <p>*元（蒙古）</p>
+        <div class="comment">
+          <p>*宋（遼、西夏、金）</p>
+          <p>*元（蒙古）</p>
+        </div>
+
+        <BookDetailTooltip
+          @openBookDetail="$emit('openBookDetail', tooltip_id)"
+          ref="book-detail-tooltip"
+          :id="tooltip_id"
+        />
+      </div>
     </div>
-
-    <BookDetailTooltip
-      @openBookDetail="$emit('openBookDetail', tooltip_id)"
-      ref="book-detail-tooltip"
-      :id="tooltip_id"
-    />
   </div>
 </template>
 
@@ -97,12 +110,27 @@ export default {
         this.$refs["book-detail-tooltip"].open();
         this.tooltip_id = d.info.id;
       });
+
+      if (!this.playing) {
+        this.animation_handler = requestAnimationFrame(this.draw);
+        this.playing = true;
+      }
     },
     pause() {
-      if (this.playing) cancelAnimationFrame(this.animation_handler);
-      else this.animation_handler = requestAnimationFrame(this.draw);
-
-      this.playing = !this.playing;
+      if (this.playing) {
+        cancelAnimationFrame(this.animation_handler);
+        this.playing = false;
+      }
+    },
+    continue() {
+      if (!this.playing) {
+        this.animation_handler = requestAnimationFrame(this.draw);
+        this.playing = true;
+      }
+    },
+    togglePause() {
+      if (this.playing) this.pause();
+      else this.continue();
     },
     normalPool(o) {
       let r = 0;
@@ -202,32 +230,42 @@ export default {
         .attr("cursor", "pointer");
 
       // 交互
-      this.svg.selectAll("circle").on("click", (e, d) => {
-        event.stopPropagation();
-        this.$refs["book-detail-tooltip"].$el.style.left =
-          e.clientX + 30 + "px";
-        this.$refs["book-detail-tooltip"].$el.style.top =
-          e.clientY - 140 + "px";
-        this.$refs["book-detail-tooltip"].$el.style.display = "block";
-        this.$refs["book-detail-tooltip"].open();
-        this.tooltip_id = d.info.id;
-      });
+      this.svg
+        .selectAll("circle")
+        .on("click", (e, d) => {
+          event.stopPropagation();
+          this.$refs["book-detail-tooltip"].$el.style.left =
+            e.clientX + 30 + "px";
+          this.$refs["book-detail-tooltip"].$el.style.top =
+            e.clientY - 140 + "px";
+          this.$refs["book-detail-tooltip"].$el.style.display = "block";
+          this.$refs["book-detail-tooltip"].open();
+          this.tooltip_id = d.info.id;
+        })
+        .on("mousemove", (e) => {
+          console.log(e);
+        });
 
       // 计时器
-      this.curr_time += 17;
+      this.curr_time += 16;
     },
-    reset() {},
-    init() {},
     start() {
       // 配置画布
       this.svg = d3
         .select("#particles-svg")
-        .attr("width", window.innerWidth)
-        .attr("height", window.innerHeight);
+        .attr("width", window.innerWidth * 0.9)
+        .attr("height", window.innerHeight * 0.8);
 
       // 生成某数量的粒子
       for (let i = 0; i < this.NUM_PARTICLES; i++)
-        this.particles.push(this.generateParticleData());
+        this.particles_original_data.push(
+          this.$store.state.books[
+            Math.floor(Math.random() * this.$store.state.books.length)
+          ]
+        );
+
+      for (let e of this.particles_original_data)
+        this.particles.push(this.generateParticleData(e));
 
       // 绘制
       this.svg
@@ -247,6 +285,7 @@ export default {
       document.addEventListener("DOMContentLoaded", () => {
         this.start();
       });
+    this.pause();
   },
   unmounted() {
     cancelAnimationFrame(this.animation_handler);
@@ -258,28 +297,46 @@ export default {
 #flow {
   width: 100vw;
   height: 100vh;
-  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  .content {
+    width: 90%;
+    height: 80%;
+    display: flex;
+    align-items: center;
+    .main {
+      position: relative;
+      border: 0.1rem solid #201d1d;
+      .comment {
+        position: absolute;
+        bottom: 1.5rem;
+        left: 1rem;
 
-  .comment {
-    position: absolute;
-    bottom: 2rem;
-    left: 1rem;
+        p {
+          font-size: 0.7rem;
+        }
+      }
 
-    p {
-      font-size: 0.7rem;
+      .togglePause {
+        user-select: none;
+        background: url(../assets/icons/pause.svg) center no-repeat;
+        background-size: 30%;
+        border: 0.13rem solid #201d1d;
+        cursor: pointer;
+        position: absolute;
+        right: 2rem;
+        bottom: 1.5rem;
+        width: 2rem;
+        height: 2rem;
+        border-radius: 50%;
+        opacity: 0.6;
+      }
+      .togglePause.continue {
+        background: url(../assets/icons/continue.svg) center no-repeat;
+        background-size: 30%;
+      }
     }
-  }
-
-  .pause {
-    user-select: none;
-    background: rgb(108, 108, 108);
-    cursor: pointer;
-    position: absolute;
-    right: 3rem;
-    bottom: 5rem;
-    width: 2rem;
-    height: 2rem;
-    border-radius: 50%;
   }
 }
 </style>

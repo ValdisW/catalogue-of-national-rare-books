@@ -1,9 +1,15 @@
 <template>
   <div class="dynasty-selector">
     <ul>
-      <li v-for="e in list" :key="e.name">
+      <li
+        class="has-data"
+        v-for="(e, i) in list"
+        :key="e.name"
+        @click="changeEra(e.ids, i)"
+        :class="{ active: i == current_dynasty }"
+      >
         <span class="icon"></span>
-        <span v-text="e.name" @click="changeEra(e.ids)"></span>
+        <span v-text="e.name"></span>
       </li>
       <li class="no-data">
         <span class="icon"></span>
@@ -19,16 +25,18 @@ export default {
   data() {
     return {
       list: [],
+      current_dynasty: -1,
     };
   },
   methods: {
-    changeEra(ids) {
+    changeEra(ids, i) {
+      this.current_dynasty = i;
       this.$emit("changeDynastyIDs", ids);
     },
   },
   created() {
     this.$store.state.all_edition_dynasty.forEach((el) => {
-      if (el.type_p != "未知") {
+      if (el.type_p != "其他") {
         if (!this.list.find((e) => e.name == el.type_p))
           this.list.push({ name: el.type_p, ids: [el.id] });
         else this.list.find((e) => e.name == el.type_p).ids.push(el.id);
@@ -43,25 +51,25 @@ export default {
   z-index: 5;
   user-select: none;
   position: absolute;
-  top: 4rem;
-  left: 0;
+  top: 1.5rem;
+  left: 0.5rem;
 
   ul {
     display: flex;
     li {
       list-style: none;
-      margin: 0 0.5rem;
-      padding: 0.5rem;
+      padding: 0.5rem 1rem;
       display: flex;
       flex-direction: column;
       align-items: center;
+      cursor: pointer;
       span:first-child {
-        cursor: pointer;
-        background: #5b898a;
+        border: 0.05rem solid #9f7777;
         transform: rotate(45deg);
         margin: 0 0 0.3rem;
         width: 0.7rem;
         height: 0.7rem;
+        transition: 0.3s;
       }
       span:last-child {
         font-size: 0.7rem;
@@ -69,13 +77,23 @@ export default {
         text-align: center;
       }
     }
-    li.no-data {
+    li.active {
       span:first-child {
-        cursor: pointer;
-        background: #929292;
-        transform: rotate(45deg);
-        width: 0.7rem;
-        height: 0.7rem;
+        background: #9f7777;
+      }
+    }
+    li.no-data {
+      cursor: default;
+      span:first-child {
+        border: 0.04rem solid #0006;
+      }
+      span:last-child {
+        color: #0006;
+      }
+    }
+    li.has-data:hover {
+      span:first-child {
+        background: #9f7777;
       }
     }
   }

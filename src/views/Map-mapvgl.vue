@@ -1,5 +1,11 @@
 <template>
   <div class="spatial-sampling">
+    <div class="section-name">
+      <span></span>
+      <span>全部古籍館藏地理分佈</span>
+      <span></span>
+    </div>
+
     <!-- 左侧地图 -->
     <div id="map-container" @wheel.stop=""></div>
     <!-- 右侧列表 -->
@@ -13,15 +19,23 @@
           :id="`list-${index}`"
           :show="false"
         >
-          <span v-text="`${city.name} - ${city.count}`"></span>
+          <span
+            v-text="`${city.name} - ${city.count}`"
+            @click.self="expandProvince(city)"
+          ></span>
           <!-- 机构列表 -->
           <ul class="institutions" v-show="city.selected">
             <li
               v-for="e in city.child"
               :key="e"
-              @click="flyToInstitution(this.$store.state.all_institution.find((el) => el.id == e))"
+              @click="
+                flyToInstitution(
+                  this.$store.state.all_institution.find((el) => el.id == e)
+                )
+              "
               v-text="
-                this.$store.state.all_institution.find((el) => el.id == e).name +
+                this.$store.state.all_institution.find((el) => el.id == e)
+                  .name +
                 ' - ' +
                 this.$store.state.all_institution.find((el) => el.id == e).books
               "
@@ -148,13 +162,13 @@ export default {
       let institution_list = this.$store.state.all_institution; // 机构id数组
 
       for (let inst of institution_list) {
-        // let inst = Data.get_institution_info(institution_list[i]);
         data.push({
           geometry: {
             type: "Point",
             coordinates: [inst["lng"], inst["lat"]],
           },
           properties: {
+            id: inst["id"],
             count: inst.books,
             name: inst["name"],
           },
@@ -215,14 +229,6 @@ export default {
       map.enableContinuousZoom();
       map.setDefaultCursor("default");
 
-      // map.setDisplayOptions(options.displayOptions || {
-      //         indoor: false,
-      //         poi: true,
-      //         skyColors: options.skyColors || [
-      //             'rgba(5, 5, 30, 0.01)',
-      //             'rgba(5, 5, 30, 1.0)'
-      //         ]
-      //     });
       if (options.center && options.zoom) {
         let center = options.center;
         if (center instanceof Array) {
@@ -267,10 +273,9 @@ export default {
       this.tooltipBox.style.top = top + 20 + "px";
       // text
       this.current_institution_name = d.name;
-      this.current_institution_intro =
-        d.name.length > 3
-          ? "国家图书馆前身是筹建于1909年9月9日的京师图书馆，1998年更名为国家图书馆。该馆收藏古籍200万册件，其中善本古籍27万册件。宋元善本、敦煌遗书、赵城金藏、永乐大典、四库全书、方志家谱等是其特色藏品，另有金石拓片、舆图、少数民族语文等特藏古籍。专用古籍书库5个，总面积8493平方米。由古籍馆全面管理，工作人员130余人，专设典藏阅览、文献保护、古籍特藏修复等机构管理、保护、修复古籍。"
-          : "";
+      this.current_institution_intro = this.$store.state.all_institution.find((el) => el.id == d.id)
+        ? this.$store.state.all_institution.find((el) => el.id == d.id).intro
+        : "";
       this.current_institution_books = `入选古籍数: ${d.count}`;
 
       this.tooltipBox.style.visibility = "visible";
@@ -280,19 +285,18 @@ export default {
     },
     // 点击省份列表的省份项
     expandProvince(d) {
-      this.province_info.forEach((el) => (el.selected = false));
       if (d.selected) {
         this.map.reset();
         d.selected = false;
       } else {
         this.zoom = 7;
         this.map.flyTo(d.pos, 7);
+        this.province_info.forEach((el) => (el.selected = false));
         d.selected = true;
       }
     },
     flyToInstitution(e) {
       this.zoom = 10;
-      console.log(e);
       this.map.flyTo({ lat: e.lat, lng: e.lng }, this.zoom);
     },
     removeAllSublist() {
@@ -329,6 +333,7 @@ export default {
 <style lang="less">
 .spatial-sampling {
   display: flex;
+  align-items: center;
   position: absolute;
   top: 10vh;
   left: 5vw;
@@ -339,14 +344,13 @@ export default {
     // position: fixed;
     width: 80%;
     height: 100%;
-    border: 2px solid rgb(177, 117, 68);
+    border: 2px solid #201d1d;
   }
 
   #tooltip {
     #tooltip-box {
       background-color: #333;
       z-index: 10;
-      color: #fff;
       padding: 0.6rem;
       font-size: 0.8rem;
       width: auto;
@@ -355,11 +359,11 @@ export default {
       display: block;
       visibility: hidden;
       max-width: 33%;
-
+      color: #efefef;
       h2 {
         font-size: 1rem;
+        color: #efefef;
       }
-
       .intro {
         font-size: 0.7rem;
       }
@@ -367,7 +371,7 @@ export default {
   }
 
   #map-list {
-    border: 2px solid rgb(177, 117, 68);
+    border: 2px solid #201d1d;
     border-left: none;
     width: 20%;
     top: 0%;

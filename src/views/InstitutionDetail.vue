@@ -155,7 +155,7 @@ export default {
       background: #3333;
       li {
         a {
-          color: #000;
+          color: #201d1d;
         }
       }
     }

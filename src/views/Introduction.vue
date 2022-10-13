@@ -1,18 +1,28 @@
 <template>
-  <div class="introduction" @wheel.prevent="rowScroll" ref="introduction" v-if="complete">
+  <div
+    class="introduction"
+    @wheel.prevent="rowScroll"
+    ref="introduction"
+    v-if="complete"
+  >
     <section class="section-1">
-      <!-- <FlowingParticles_new /> -->
       <div class="everyday-book">
         <div>
           <p>今日古籍</p>
           <p v-text="now.getDate()"></p>
           <p v-text="now.getFullYear() + '.' + (now.getMonth() + 1)"></p>
         </div>
-        <div @click="$emit('openBookDetail', '01523')">
-          <p>01523</p>
-          <p>鮑氏國策十卷</p>
+        <div @click="$emit('openBookDetail', recommendBook.id)">
+          <p v-text="recommendBook.id"></p>
+          <p v-text="recommendBook.name"></p>
         </div>
-        <img @click="$emit('openBookDetail', d.data[0])" src="/images/placeholder.jpg" alt="今日古籍-书影" />
+        <div class="image-wrapper">
+          <img
+            @click="$emit('openBookDetail', d.data[0])"
+            :src="`/data/images/thumbnails/${recommendBook.id}.jpg`"
+            alt="书影"
+          />
+        </div>
       </div>
       <div class="cover">
         <div>
@@ -31,7 +41,10 @@
       <BaiduMap />
     </section>
     <section class="section-4">
-      <FlowingParticles @openBookDetail="openBookDetail" />
+      <FlowingParticles
+        ref="flowing-particles"
+        @openBookDetail="openBookDetail"
+      />
     </section>
 
     <div class="badges">
@@ -58,10 +71,27 @@ export default {
     BaiduMap,
     Batches,
   },
+  computed: {
+    recommendBook() {
+      let t = this.$store.state.books.filter(
+        (el) =>
+          el.name.length > 3 &&
+          el.name.length < 8 &&
+          !el.name.match(/(·|\?|（|\[)/i)
+      );
+      let d_books = [];
+      for (let e of t) {
+        if (!d_books.find((el) => el.name == e.name)) d_books.push(e);
+      }
+      console.log(d_books);
+      return d_books[
+        Math.floor(new Date().getTime() / 8.64e7) % d_books.length
+      ];
+    },
+  },
   data() {
     return {
       now: new Date(),
-      everyday_book_list: ["01523", "01524", "01525", "01526"],
       scrolling: false,
       current_page: 0,
       page_width: Number,
@@ -83,16 +113,16 @@ export default {
     },
 
     rowScroll(e) {
-      // this.$refs.introduction.scrollLeft += e.deltaY; // 普通滚动
       if (e.deltaY > 0 && !this.scrolling) this.toNextPage();
       else if (e.deltaY < 0 && !this.scrolling) this.toPrevPage();
+      if (this.current_page == 3) this.$refs["flowing-particles"].continue();
+      else this.$refs["flowing-particles"].pause();
     },
 
     toNextPage() {
       this.scrolling = true;
       this.current_page++;
 
-      // if (this.current_page > this.offsets.length - 1) this.current_page = 3;
       if (this.current_page > 3) this.current_page = 3;
 
       this.scrollToSection(this.current_page, true);
@@ -113,7 +143,9 @@ export default {
       this.current_page = id;
       this.scrolling = true;
 
-      document.getElementsByTagName("section")[id].scrollIntoView({ behavior: "smooth", inline: "nearest" });
+      document
+        .getElementsByTagName("section")
+        [id].scrollIntoView({ behavior: "smooth", inline: "nearest" });
 
       clearTimeout(timeout);
       timeout = setTimeout(() => {
@@ -127,7 +159,9 @@ export default {
       this.$store.commit("preloadIntroductionData", res.data);
 
       for (let e of this.$store.state.all_institution) {
-        let r = this.$store.state.all_province.find((el) => el.id == e.province_id);
+        let r = this.$store.state.all_province.find(
+          (el) => el.id == e.province_id
+        );
         if (!r.child) r.child = [];
         r.child.push(e.id);
       }
@@ -266,7 +300,6 @@ export default {
   }
   .everyday-book {
     width: 5rem;
-    background-color: #0009;
     display: flex;
     flex-direction: column;
     margin: 0 3rem 0 0;
@@ -288,22 +321,34 @@ export default {
       }
     }
     div:nth-child(2) {
-      color: #fff;
       font-size: 0.8rem;
       display: flex;
       flex-direction: column;
       align-items: center;
+      background: #0009;
       p:nth-child(1) {
         margin: 0.5rem 0 0 0;
+        color: #efefef;
       }
       p:nth-child(2) {
         line-height: 0.9rem;
         width: 0.8rem;
         margin: 0.5rem 0 1rem;
+        color: #efefef;
       }
+    }
+    .image-wrapper {
+      width: 100%;
+      height: 5rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #00000012;
     }
     img {
       width: 100%;
+      height: 5rem;
+      object-fit: contain;
     }
   }
 }

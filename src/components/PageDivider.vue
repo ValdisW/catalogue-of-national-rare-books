@@ -89,7 +89,12 @@ export default {
   },
   watch: {
     current_page(n) {
+      if (n > this.pages_sum) this.current_page = this.pages_sum;
+      if (n < 1) this.current_page = 1;
       this.$emit("turnTo", n);
+    },
+    pages_sum(n) {
+      if (this.current_page > n) this.current_page = n;
     },
   },
   props: {
@@ -125,6 +130,7 @@ export default {
     margin: 0 0 0 1rem;
     input {
       width: 1.2rem;
+      text-align: center;
     }
   }
 
@@ -136,7 +142,7 @@ export default {
     padding: 0.3vmax;
     border-radius: 0.2vmax;
     text-align: center;
-    background: #4a3300;
+    background: #68563a;
     font-size: 1vmax;
     /* position: relative; */
     display: inline-block;
@@ -148,8 +154,8 @@ export default {
   }
 }
 .page-divider li.is_current_page {
-  background-color: rgb(212, 172, 62);
-  color: #4a3300;
+  background-color: #fbb03b;
+  color: #68563a;
 }
 .page-divider li:hover {
   filter: brightness(130%);

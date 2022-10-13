@@ -23,7 +23,7 @@ export default {
   }
   .content {
     background: #333;
-    color: #fff;
+    color: #efefef;
   }
 }
 </style>

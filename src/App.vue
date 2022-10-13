@@ -1,5 +1,6 @@
 <template>
-  <Loading :complete="complete" />
+  <MobileWarning v-if="mobileDetect()" />
+  <transition name="bg-fade"><Loading :complete="complete" /></transition>
   <div id="main-container">
     <nav>
       <ul>
@@ -38,6 +39,7 @@
 
 <script>
 import Loading from "@/components/Loading";
+import MobileWarning from "@/components/MobileWarning";
 import BookDetail from "@/views/BookDetail";
 import PersonDetail from "@/views/PersonDetail";
 import InstitutionDetail from "@/views/InstitutionDetail";
@@ -46,15 +48,20 @@ const baseSize = 20;
 
 export default {
   name: "App",
-  components: { Loading, BookDetail, PersonDetail, InstitutionDetail },
+  components: {
+    Loading,
+    MobileWarning,
+    BookDetail,
+    PersonDetail,
+    InstitutionDetail,
+  },
   data() {
     return {
       complete: false,
-
       nav_pages: [
         { name: "名録介紹", router: "/" },
         { name: "名録瀏覽", router: "/exploration" },
-        { name: "名録分析", router: "/relationship-old" },
+        { name: "名録分析", router: "/relationship" },
         { name: "研發團隊", router: "/about" },
       ],
     };
@@ -92,6 +99,12 @@ export default {
         this.init();
       };
     },
+
+    mobileDetect() {
+      return navigator.userAgent.match(
+        /(Android|webOS|iPhone|iPad|iPod|BlackBerry|Windows Phone)/i
+      );
+    },
   },
   mounted() {
     this.init();
@@ -103,11 +116,11 @@ export default {
 * {
   margin: 0;
   padding: 0;
-  font-family: "SourceHanSerif";
+  font-family: "SourceHanSerif", "宋体";
 }
 ::selection {
-  background: #77664b;
-  color: #fff;
+  background: #68563a;
+  color: #efefef;
 }
 ::-webkit-scrollbar {
   width: 12px;
@@ -123,17 +136,33 @@ export default {
 }
 
 html {
-  // font-size: 20px;
   overflow-y: hidden;
 }
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+  color: #201d1d;
+}
+
+.bg-fade-enter-active,
+.bg-fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.bg-fade-leave-to {
+  opacity: 0;
+}
+
 nav {
   position: fixed;
   width: 100%;
   user-select: none;
-  // left: 50%;
-  // transform: translateX(-50%);
   z-index: 10;
-  // background: rgb(202, 185, 167);
   ul {
     list-style: none;
     display: flex;
@@ -142,14 +171,11 @@ nav {
       margin: 1rem;
       position: relative;
       a {
-        color: #77664b66;
-        // color: #77664b;
+        color: #68563a88;
         text-decoration: none;
-        font-family: "SourceHanSerif";
-        font-weight: normal;
       }
       a.active {
-        color: #77664b;
+        color: #68563a;
       }
       ul {
         display: block;
@@ -168,7 +194,38 @@ nav {
   }
 }
 #main-container {
-  // background: #f2e0c4;
-  background: #f1e8db;
+  background: #f0e9dd;
+}
+
+.section-name {
+  display: flex;
+  flex-direction: column;
+  border-left: 0.1rem solid #201d1d;
+  border-right: none;
+  flex: 1.3rem 0 0;
+  height: fit-content;
+  align-items: center;
+  justify-content: space-between;
+  span {
+    display: block;
+  }
+  span:first-child {
+    width: 100%;
+    height: 1.2rem;
+    background: url(./assets/icons/side.svg) no-repeat;
+    background-size: 100%;
+  }
+  span:nth-child(2) {
+    width: 1rem;
+    font-size: 0.7rem;
+    text-align: center;
+  }
+  span:last-child {
+    width: 100%;
+    height: 1.2rem;
+    background: url(./assets/icons/side.svg) no-repeat;
+    background-size: 100%;
+    transform: scaleY(-1);
+  }
 }
 </style>

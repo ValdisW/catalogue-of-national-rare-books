@@ -22,11 +22,10 @@
               </div>
               <div class="person-title">
                 <p>
-                  字：
-                  <span v-text="person_data.courtesy_name || '不詳'"></span>
+                  字:<span v-text="person_data.courtesy_name || '不詳'"></span>
                 </p>
                 <p>
-                  號：
+                  號:
                   <span v-text="person_data.pseudonym_name || '不詳'"></span>
                 </p>
               </div>
@@ -65,15 +64,18 @@
       <div class="related-books">
         <div class="responsibility-select">
           <h4>責任目録</h4>
-          <button class="responsibility-type">創作</button>
-          <button class="responsibility-type">出版</button>
-          <button class="responsibility-type">批校題跋</button>
-          <button class="responsibility-type">收藏</button>
+          <button
+            v-for="n in action_types"
+            :key="n.name"
+            v-text="`${n.name}(${n.count})`"
+            class="responsibility-type"
+            @click="filterType(n.name)"
+          ></button>
         </div>
         <div class="book-responsibility">
           <ul>
             <li
-              v-for="e in relatedBooks"
+              v-for="e in filtered_related_books"
               :key="e"
               @click="$emit('openBookDetail', e.book_id)"
             >
@@ -104,7 +106,8 @@ export default {
   data() {
     return {
       show: false,
-      relatedBooks: [],
+      all_related_books: [],
+      filtered_related_books: [],
       related_person: [],
       hover_data: {
         id: "",
@@ -112,6 +115,12 @@ export default {
         detail: "",
       },
       person_data: {},
+      action_types: [
+        { name: "創作", count: 0 },
+        { name: "出版", count: 0 },
+        { name: "批校題跋", count: 0 },
+        { name: "收藏", count: 0 },
+      ],
     };
   },
   methods: {
@@ -119,15 +128,26 @@ export default {
       this.show = false;
     },
     open(person_id) {
-      console.log(23333);
       this.show = true;
 
       axios.get(`/data/person-detail/${person_id}`).then((d) => {
         this.person_data = d.data[0][0];
-        this.relatedBooks = d.data[1];
+        this.filtered_related_books = this.all_related_books = d.data[1];
         this.related_person = d.data[2];
         this.related_person.sort((a, b) => b.count - a.count);
+
+        for (let e of this.all_related_books)
+          e.type = this.$store.state.all_action.find(
+            (el) => el.id == e.action_id
+          ).type;
+        for (let e of this.action_types)
+          for (let f of this.all_related_books) if (e.name == f.type) e.count++;
       });
+    },
+    filterType(type) {
+      this.filtered_related_books = this.all_related_books.filter(
+        (el) => el.type == type
+      );
     },
   },
 };
@@ -144,7 +164,7 @@ export default {
   position: fixed;
   top: 0;
   left: 0;
-  background: #f1e8db;
+  background: #f0e9dd;
 
   .content {
     width: 70%;
@@ -166,16 +186,17 @@ export default {
       margin-bottom: 1.5rem;
       height: 11rem;
       position: relative;
-      justify-content: center;
       display: flex;
+      justify-content: space-between;
       .person-name {
         width: 7.5rem;
       }
       .person-brief {
         width: 25rem;
         display: flex;
+        align-items: center;
         .person-info-list {
-          // margin-left: 2.5rem;
+          height: fit-content;
           font-size: 0.8rem;
           .person-birth {
             display: flex;
@@ -190,6 +211,7 @@ export default {
             display: flex;
             p {
               font-weight: bold;
+              margin: 0 1rem 0 0;
               span {
                 font-weight: normal;
               }
@@ -200,13 +222,15 @@ export default {
       .person-intro {
         margin-top: 1rem;
         font-size: 0.7rem;
+        height: 7rem;
+        overflow-y: scroll;
       }
       .related-person {
         padding: 0.5rem;
         border-radius: 0.5rem;
         background: #3331;
         a {
-          color: #000;
+          color: #201d1d;
         }
         .person-responsibility {
           position: relative;
@@ -229,7 +253,7 @@ export default {
           background: #5e524a;
           border-radius: 0.3rem;
           border: none;
-          width: 80px;
+          padding: 0 0.5rem;
           color: #ffffff;
           height: 1.3rem;
           font-size: 0.7rem;
@@ -264,7 +288,7 @@ export default {
         }
       }
       a {
-        color: #000;
+        color: #201d1d;
       }
     }
   }

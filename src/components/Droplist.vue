@@ -62,7 +62,7 @@ export default {
       display: inline-block;
       width: 0;
       height: 0;
-      border: 0.3rem solid #000;
+      border: 0.3rem solid #201d1d;
       border-bottom-width: 0;
       border-left-color: transparent;
       border-right-color: transparent;
@@ -73,11 +73,12 @@ export default {
     position: absolute;
     list-style: none;
     background-color: #333;
-    color: #fff;
+    color: #efefef;
     border-radius: 0.3rem;
     text-align: center;
     z-index: 200;
     width: 4rem;
+    overflow: hidden;
     li {
       height: 1.5rem;
       line-height: 1.5rem;
@@ -85,7 +86,8 @@ export default {
   }
   .list > li:hover {
     background: #333;
-    color: #fff;
+    color: #efefef;
+    filter: brightness(160%);
   }
 }
 </style>

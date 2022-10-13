@@ -1,5 +1,10 @@
 <template>
-  <div class="exploration-stack">
+  <div class="batches">
+    <div class="section-name">
+      <span></span>
+      <span>批次選擇</span>
+      <span></span>
+    </div>
     <div class="container">
       <div class="batch-buttons">
         <button
@@ -14,9 +19,7 @@
       <div class="content">
         <div class="info">
           <div class="col-1">
-            <h3 v-if="current_batch == 0" v-animate="'tempStyle'">
-              國家珍貴古籍名録
-            </h3>
+            <h3 v-if="current_batch == 0">國家珍貴古籍名録</h3>
             <h3
               v-else
               v-text="`國家珍貴古籍名録 第${batchInfo[current_batch].name}批`"
@@ -36,10 +39,10 @@
                   title="文獻類型"
                   ref="document_type"
                   bar_color="#C4A1A1"
-                  :canvasWidth="17 * $store.state.rem"
+                  :canvasWidth="15 * $store.state.rem"
                   :canvasHeight="7.5 * $store.state.rem"
-                  :margin_left="0.35"
-                  :info="statistics.document_type"
+                  :margin_left="0.46"
+                  :info="statistics[current_batch].document_type"
                 />
               </div>
               <div class="chart-wrapper edition-dynasties">
@@ -47,10 +50,10 @@
                   title="版本朝代"
                   ref="edition_dynasty"
                   bar_color="#76978F"
-                  :canvasWidth="17 * $store.state.rem"
+                  :canvasWidth="15 * $store.state.rem"
                   :canvasHeight="6 * $store.state.rem"
-                  :margin_left="0.35"
-                  :info="statistics.edition_dynasty"
+                  :margin_left="0.46"
+                  :info="statistics[current_batch].edition_dynasty"
                 />
               </div>
               <div class="chart-wrapper edition-types">
@@ -58,10 +61,10 @@
                   title="版本類型"
                   ref="edition_type"
                   bar_color="#B1B098"
-                  :canvasWidth="17 * $store.state.rem"
+                  :canvasWidth="15 * $store.state.rem"
                   :canvasHeight="10 * $store.state.rem"
-                  :margin_left="0.35"
-                  :info="statistics.edition_type"
+                  :margin_left="0.46"
+                  :info="statistics[current_batch].edition_type"
                 />
               </div>
             </div>
@@ -71,10 +74,10 @@
                   title="文種"
                   ref="language"
                   bar_color="#B0A1B8"
-                  :canvasWidth="12 * $store.state.rem"
+                  :canvasWidth="14 * $store.state.rem"
                   :canvasHeight="25 * $store.state.rem"
-                  :margin_left="0.35"
-                  :info="statistics.language"
+                  :margin_left="0.55"
+                  :info="statistics[current_batch].language"
                 />
               </div>
             </div>
@@ -87,16 +90,14 @@
             <span class="icon"></span>
             <span @click="showMore">换一組</span>
           </div>
-          <transition name="fade">
-            <div class="books">
-              <BookItem
-                @openBookDetail="openBookDetail"
-                v-for="b in showing_books"
-                :key="b"
-                :id="b"
-              />
-            </div>
-          </transition>
+          <TransitionGroup name="fade1" class="books" tag="div">
+            <BookItem
+              @openBookDetail="openBookDetail"
+              v-for="b in showing_books"
+              :key="b"
+              :id="b"
+            />
+          </TransitionGroup>
         </div>
       </div>
     </div>
@@ -107,7 +108,7 @@
 import { mapState } from "vuex";
 import BarChart from "@/components/BarChart.vue";
 import BookItem from "@/components/BookItem.vue";
-import axios from "axios";
+import sta from "@/data/statistics.json";
 
 import AOS from "aos";
 import "aos/dist/aos.css";
@@ -157,12 +158,7 @@ export default {
         },
       ],
       current_batch: 0,
-      statistics: {
-        document_type: [],
-        edition_dynasty: [],
-        edition_type: [],
-        language: [],
-      },
+      statistics: [],
       showing_books: [],
     };
   },
@@ -188,76 +184,46 @@ export default {
             );
 
       this.showing_books = [];
-      for (let i = 0; i < 6; i++)
-        this.showing_books.push(arr[Math.floor(Math.random() * arr.length)].id);
+      setTimeout(() => {
+        for (let i = 0; i < 6; i++)
+          this.showing_books.push(
+            arr[Math.floor(Math.random() * arr.length)].id
+          );
+      }, 50);
     },
     updateBatch(index) {
       this.current_batch = index;
-      for (let n in this.statistics) {
-        axios
-          .get(`/data/batch-data?batch=${this.current_batch}&attr=${n}`)
-          .then((d) => {
-            this.statistics[n] = d.data;
-            this.statistics[n].sort((a, b) => {
-              return a - b;
-            });
-          });
-      }
       this.showMore();
     },
   },
   created() {
     this.showMore();
-  },
-  mounted() {
-    for (let n in this.statistics)
-      axios
-        .get(`/data/batch-data?batch=${this.current_batch}&attr=${n}`)
-        .then((d) => {
-          this.statistics[n] = d.data;
-        });
+    this.statistics = sta;
   },
 };
 </script>
 
 <style lang="less" scoped>
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 1s;
+.fade1-enter-active {
+  transition: all 0.5s;
 }
 
-.fade-enter {
+.fade1-enter-from {
   opacity: 0;
+  transform: translateY(1rem);
 }
 
-@keyframes test {
-  from {
-    background: red;
-  }
-
-  from {
-    background: yellow;
-  }
-}
-
-.tempStyle {
-  // transform: scale(1.5);
-  // transition: 0.5s;
-  animation-name: test;
-}
-
-.exploration-stack {
+.batches {
   width: 100vw;
   height: 100vh;
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-
   .container {
     width: 90%;
     height: 80%;
-    border: 0.1rem solid #000;
+    border: 0.1rem solid #201d1d;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -269,7 +235,7 @@ export default {
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      border-right: 0.05rem solid #000;
+      border-right: 0.05rem solid #201d1d;
 
       button {
         cursor: pointer;
@@ -283,6 +249,7 @@ export default {
         text-align: center;
         margin: 1rem 0;
         font-size: 0.8rem;
+        transition: 0.3s;
       }
 
       button:hover {
@@ -366,7 +333,6 @@ export default {
 
         .books {
           display: flex;
-          flex-wrap: wrap;
         }
       }
     }

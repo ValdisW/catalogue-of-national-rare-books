@@ -39,19 +39,24 @@ export default {
       this.initializeBarchart();
     },
   },
+  computed: {
+    displayed_data() {
+      return this.info.filter((el) => el.value > 0);
+    },
+  },
   methods: {
     rescale(width, height) {
       this.initializeBarchart(width, height);
     },
     get_name() {
       let lst = [];
-      this.info.forEach((e) => {
+      this.displayed_data.forEach((e) => {
         lst.push(e.name);
       });
       return lst;
     },
     initializeBarchart() {
-      if (this.info) {
+      if (this.displayed_data) {
         let svgHeight =
             this.canvasHeight * (1 - this.margin.top - this.margin.bottom),
           svgWidth =
@@ -66,7 +71,7 @@ export default {
 
         let x = d3
           .scaleLinear()
-          .domain([0, Math.log(d3.max(this.info, (l) => l.value))])
+          .domain([0, Math.log(d3.max(this.displayed_data, (l) => l.value))])
           .range([0, svgWidth]);
         let y = d3
           .scaleBand()
@@ -76,7 +81,7 @@ export default {
 
         this.chart = this.svg
           .selectAll("g")
-          .data(this.info)
+          .data(this.displayed_data)
           .join("g")
           .attr("class", (d) => {
             "bar " + d.name;
@@ -112,8 +117,9 @@ export default {
         let axis_y = d3
           .axisLeft()
           .scale(y)
-          .ticks(this.info.length)
-          .tickFormat((d) => d);
+          .ticks(this.displayed_data.length)
+          .tickFormat((d) => d)
+          .tickSizeOuter(0);
 
         this.svg
           .append("g")
@@ -125,11 +131,14 @@ export default {
             })`
           )
           .call(axis_y) // 将g作为函数参数调用函数
-          .attr("font-size", "0.6rem")
+          .attr("font-size", "0.55rem")
           .selectAll("text")
           .text((d) => d);
       }
     },
+  },
+  mounted() {
+    this.initializeBarchart();
   },
 };
 </script>
@@ -143,11 +152,11 @@ export default {
     left: 0;
     top: 0;
     font-weight: bold;
-    border: 0.05rem solid #000;
+    border: 0.05rem solid #201d1d;
     font-size: 0.8rem;
     width: 0.8rem;
     line-height: 0.9rem;
-    padding: 0.1rem;
+    padding: 0.2rem 0.15rem;
   }
 
   .chart {

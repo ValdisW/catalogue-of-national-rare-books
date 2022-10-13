@@ -3,8 +3,8 @@
     <div class="left">
       <!-- 檢索工具 -->
       <div class="search">
-        <input type="text" value="周易" ref="text" />
-        <Droplist ref="drop-list" :attr_list="display_attrs" />
+        <input type="text" value="資治通鑒" ref="text" />
+        <!-- <Droplist ref="drop-list" :attr_list="display_attrs" /> -->
         <button id="search-button" @click="search"></button>
         <button id="tip-button"></button>
       </div>
@@ -23,41 +23,38 @@
             v-for="n in node_list"
             :name="n.id"
             :key="n.id"
-            v-text="n.name"
+            v-text="`${n.name}(${n.curr_books})`"
             :class="[`n${n.id}`, { active: n.active }]"
             @mouseover="nodeHighlight(n.id, false)"
           ></li>
-        </ul>
-      </div>
-      <div class="list relationship-detail">
-        <h4>相關古籍</h4>
-        <ul>
-          <!-- <li v-for="r in relation_list" :key="r">
-            <router-link :to="'/book-detail/' + convertBookId(r.book_id)" v-text="r"></router-link>
-          </li> -->
-          <li v-for="r in relation_list" :key="r" @click="openBookDetail(convertBookId(r.book_id))">
-            <!-- 古籍信息 -->
-            <div class="book">
-              <span v-text="convertBookId(r.book_id)"></span>
-              <span v-text="getBookNameById(convertBookId(r.book_id))"></span>
-            </div>
-
-            <!-- 人物信息 -->
-            <div class="person">
-              <span class="name" v-text="getPersonNameById(r.person1_id)"></span
-              ><span class="action" v-text="getActionNameById(r.action1_id)"></span>&nbsp;&nbsp;&nbsp;&nbsp;
-              <span class="name" v-text="getPersonNameById(r.person2_id)"></span
-              ><span class="action" v-text="getActionNameById(r.action2_id)"></span>
-            </div>
-          </li>
         </ul>
       </div>
     </div>
 
     <div ref="tooltip" class="tooltip" v-show="show_tooltip">
       <h5 v-text="selected_info.name"></h5>
-      <span @click="openPersonDetail(selected_info.id)">详情</span>
-      <!-- <router-link :to="/person-detail/ + selected_info.id">詳情</router-link> -->
+      <span @click="openPersonDetail(selected_info.id)">查看人物詳情</span>
+    </div>
+
+    <div class="list relationship-detail" ref="relationship-detail" v-show="show_relationship_detail">
+      <h4>相關古籍</h4>
+      <ul>
+        <li v-for="r in relation_list" :key="r" @click="openBookDetail(convertBookId(r.book_id))">
+          <!-- 古籍信息 -->
+          <div class="book">
+            <span v-text="convertBookId(r.book_id)"></span>
+            <span v-text="getBookNameById(convertBookId(r.book_id))"></span>
+          </div>
+
+          <!-- 人物信息 -->
+          <div class="person">
+            <span class="name" v-text="getPersonNameById(r.person1_id)"></span
+            ><span class="action" v-text="getActionNameById(r.action1_id)"></span>&nbsp;&nbsp;&nbsp;&nbsp;
+            <span class="name" v-text="getPersonNameById(r.person2_id)"></span
+            ><span class="action" v-text="getActionNameById(r.action2_id)"></span>
+          </div>
+        </li>
+      </ul>
     </div>
   </div>
 </template>
@@ -65,11 +62,11 @@
 <script>
 import * as d3 from "d3";
 import axios from "axios";
-import Droplist from "@/components/Droplist";
+// import Droplist from "@/components/Droplist";
 
 export default {
   name: "Relationship",
-  components: { Droplist },
+  // components: { Droplist },
   data() {
     return {
       complete: false,
@@ -82,6 +79,7 @@ export default {
         { name: "人名", value: "person_name" },
       ],
       show_tooltip: false,
+      show_relationship_detail: false,
       selected_id: 0,
       selected_info: {},
     };
@@ -92,8 +90,10 @@ export default {
       this.curr_nodes.forEach((e) => {
         let item = this.$store.state.persons.find((ele) => ele.id == e.id);
         item.active = false;
+        item.curr_books = e.books;
         arr.push(item);
       });
+      arr.sort((a, b) => b.curr_books - a.curr_books);
       return arr;
     },
     relation_list: function () {
@@ -110,7 +110,6 @@ export default {
         );
         arr = r;
       }
-      console.log(this.$store.state);
       return arr;
     },
   },
@@ -151,45 +150,46 @@ export default {
     },
     search() {
       // 按书名检索
-      if (this.$refs["drop-list"].curr_value == "book_name")
-        axios
-          .get(`/data/person?text=${this.$refs.text.value}`)
-          .then((d) => {
-            d.data[0].forEach((ele) => {
-              ele.value = 1.5 + Math.sqrt(ele.books); // 点的大小
-            });
-            this.curr_nodes = d.data[0];
-            this.curr_links = d.data[1];
-          })
-          .then(() => {
-            this.renderGraphChart({
-              nodes: this.curr_nodes,
-              links: this.curr_links,
-            });
+      // if (this.$refs["drop-list"].curr_value == "book_name")
+      axios
+        .get(`/data/person?text=${this.$refs.text.value}`)
+        .then((d) => {
+          d.data[0].forEach((ele) => {
+            // ele.value = 1.5 + Math.sqrt(ele.books); // 点的大小
+            ele.value = 3 + ele.books / 3; // 点的大小
           });
+          this.curr_nodes = d.data[0];
+          this.curr_links = d.data[1];
+        })
+        .then(() => {
+          this.renderGraphChart({
+            nodes: this.curr_nodes,
+            links: this.curr_links,
+          });
+        });
       // 按人名检索
-      else if (this.$refs["drop-list"].curr_value == "person_name")
-        axios
-          .get(`/data/person-relationship?text=${this.$refs.text.value}`)
-          .then((d) => {
-            d.data[0].forEach((el) => {
-              el.related = 0;
-              el.value = 1.5 + Math.sqrt(el.books); // 点的大小
-            });
-            d.data[1].forEach((el) => {
-              el.related = 1;
-              el.value = 1.5 + Math.sqrt(el.books); // 点的大小
-            });
+      // else if (this.$refs["drop-list"].curr_value == "person_name")
+      //   axios
+      //     .get(`/data/person-relationship?text=${this.$refs.text.value}`)
+      //     .then((d) => {
+      //       d.data[0].forEach((el) => {
+      //         el.related = 0;
+      //         el.value = 1.5 + Math.sqrt(el.books); // 点的大小
+      //       });
+      //       d.data[1].forEach((el) => {
+      //         el.related = 1;
+      //         el.value = 1.5 + Math.sqrt(el.books); // 点的大小
+      //       });
 
-            this.curr_nodes = d.data[0].concat(d.data[1]);
-            this.curr_links = d.data[2];
-          })
-          .then(() => {
-            this.renderGraphChart({
-              nodes: this.curr_nodes,
-              links: [],
-            });
-          });
+      //       this.curr_nodes = d.data[0].concat(d.data[1]);
+      //       this.curr_links = d.data[2];
+      //     })
+      //     .then(() => {
+      //       this.renderGraphChart({
+      //         nodes: this.curr_nodes,
+      //         links: [],
+      //       });
+      //     });
     },
 
     intern(value) {
@@ -205,25 +205,26 @@ export default {
         nodeGroups, // an array of ordinal values representing the node groups
         nodeTitle, // given d in nodes, a title string
         nodeFill = "currentColor", // node stroke fill (if not using a group color encoding)
-        nodeStroke = "#000", // 點的描邊顔色
+        nodeStroke = "#201D1D", // 點的描邊顔色
         nodeStrokeWidth = 1.2, // 點的描邊寬度
         nodeStrokeOpacity = 1, // 點的描邊的不透明度
         nodeRadius = 10, // 點的直徑
         linkSource = ({ source }) => source, // given d in links, returns a node identifier string
         linkTarget = ({ target }) => target, // given d in links, returns a node identifier string
-        linkStroke = "#B8A4A483", // 邊的顔色
+        linkStroke = "#C4A1A199", // 邊的顔色
         linkStrokeOpacity = 1.0, // 邊的不透明度
         linkStrokeWidth = 1.5, // given d in links, returns a stroke width in pixels
         linkStrokeLinecap = "round", // link stroke linecap
-        nodeStrength = -2, // 斥力
-        linkStrength = 0.02, // 連綫的引力
-        colors = ["#93A7A7"], // an array of color strings, for the node groups
+        // nodeStrength = -2.1, // 斥力
+        // linkStrength = 0.02, // 連綫的引力
+        nodeStrength = 0, // 斥力
+        linkStrength = 0, // 連綫的引力
+        colors = ["#76978F"], // an array of color strings, for the node groups
         width = 640, // outer width, in pixels
         height = 640, // outer height, in pixels
         invalidation, // when this promise resolves, stop the simulation
       } = {}
     ) {
-      // let self = this;
       // Compute values.
       const N = d3.map(nodes, (d) => d.id).map(this.intern);
       const LS = d3.map(links, linkSource).map(this.intern);
@@ -236,7 +237,7 @@ export default {
       const R = typeof nodeRadius != "function" ? null : d3.map(nodes, nodeRadius);
 
       // Replace the input nodes and links with mutable objects for the simulation.
-      nodes = d3.map(nodes, (_, i) => ({ id: N[i] }));
+      nodes = d3.map(nodes, (_, i) => ({ id: N[i], value: nodes[i].value }));
       links = d3.map(links, (_, i) => ({ source: LS[i], target: LT[i] }));
 
       // Compute default domains.
@@ -257,7 +258,7 @@ export default {
         .force("charge", forceNode)
         .force(
           "collide",
-          d3.forceCollide().radius(() => (2 * height) / nodes.length)
+          d3.forceCollide().radius((e) => e.value * 1.5 + 3)
         )
         .force("center", d3.forceCenter())
         .on("tick", ticked);
@@ -281,8 +282,23 @@ export default {
         .data(links)
         .join("line")
         .attr("cursor", "pointer")
-        .on("click", (_, d) => {
+        .attr("class", (d) => `l-${d.index}`)
+        .on("click", (e, d) => {
+          e.stopPropagation();
+          d3.selectAll("circle").attr("fill", colors[0]);
+          d3.select(`circle.n${d.source.id}`).attr("fill", "#FBB03B");
+          d3.select(`circle.n${d.target.id}`).attr("fill", "#FBB03B");
+
+          d3.selectAll("line").attr("stroke", linkStroke);
+          d3.select(`line.l-${d.index}`).attr("stroke", "#FBB03B99");
+
+          this.show_relationship_detail = true;
+          this.show_tooltip = false;
+
           this.curr_relation = d;
+
+          this.$refs["relationship-detail"].style.left = `${e.clientX + 40}px`;
+          this.$refs["relationship-detail"].style.top = `${e.clientY - 40}px`;
         });
 
       // 添加结点
@@ -299,6 +315,7 @@ export default {
         .attr("cursor", "pointer")
         .attr("class", (d) => `n${d.id}`)
         .on("click", (e, d) => {
+          e.stopPropagation();
           this.nodeHighlight(d.id, true);
         })
         // .on("mousemove", (e) => {
@@ -330,6 +347,7 @@ export default {
       // 滚轮缩放
       svg.on("wheel", (e) => {
         this.show_tooltip = false;
+        this.show_relationship_detail = false;
 
         let scale = e.deltaY / 2e3;
 
@@ -344,6 +362,33 @@ export default {
         h = Number(h) + nh;
 
         svg.attr("viewBox", [x, y, w, h].toString());
+      });
+
+      // 拖拽交互
+      let mousedown = false;
+
+      svg.on("click", () => {
+        this.show_tooltip = false;
+        this.show_relationship_detail = false;
+      });
+
+      svg.on("mousedown", () => {
+        mousedown = true;
+      });
+
+      svg.on("mousemove", (e) => {
+        if (mousedown) {
+          this.show_tooltip = false;
+          this.show_relationship_detail = false;
+          let [x, y, w, h] = svg.attr("viewBox").split(",");
+          x = Number(x) - e.movementX;
+          y = Number(y) - e.movementY;
+          svg.attr("viewBox", [x, y, w, h].toString());
+        }
+      });
+
+      svg.on("mouseup", () => {
+        mousedown = false;
       });
 
       // 拖拽交互
@@ -382,7 +427,7 @@ export default {
           nodeRadius: (d) => d.value,
           linkStrokeWidth: (l) => Math.sqrt(l.value) + 1,
           width: this.$refs["svg-wrapper"].parentNode.parentNode.offsetWidth,
-          height: this.$refs["svg-wrapper"].parentNode.parentNode.offsetHight,
+          height: this.$refs["svg-wrapper"].parentNode.parentNode.offsetHeight,
           // invalidation, // a promise to stop the simulation when the cell is re-run
         })
       );
@@ -390,11 +435,13 @@ export default {
 
     nodeHighlight(node_id, scroll) {
       this.selected_id = node_id;
+      this.show_relationship_detail = false;
       this.show_tooltip = true;
       this.node_list.forEach((e) => (e.active = false));
       this.node_list.find((e) => e.id == node_id).active = true;
-      d3.selectAll(`circle`).attr("fill", "#93A7A7");
-      d3.select(`circle.n${node_id}`).attr("fill", "#fc1");
+      d3.selectAll(`circle`).attr("fill", "#76978F");
+      d3.selectAll("line").attr("stroke", "#C4A1A199");
+      d3.select(`circle.n${node_id}`).attr("fill", "#FBB03B");
       let box = document.querySelector(`circle.n${node_id}`).getBoundingClientRect();
 
       this.$refs.tooltip.style.left = `${box.x + 40}px`;
@@ -432,8 +479,9 @@ export default {
     flex: 70% 1 1;
     .search {
       input[type="text"] {
-        height: 2rem;
+        padding: 0 0 0 0.3rem;
         width: 15rem;
+        height: 2rem;
         border-radius: 0.5rem;
         font-size: 0.9rem;
         outline: none;
@@ -466,11 +514,11 @@ export default {
     .results-relation {
       margin: 0.8rem 1.2rem 0 0;
       .graph {
-        height: 31rem;
+        height: 78vh;
         width: 37rem;
         overflow: hidden;
         background: #3331;
-        border-radius: 0.5rem;
+        // border-radius: 0.5rem;
       }
     }
   }
@@ -480,21 +528,21 @@ export default {
     .list {
       box-sizing: border-box;
       padding: 0.5rem;
-      background: #3331;
-      border-radius: 0.5rem;
+      // border-radius: 0.5rem;
       h4 {
         margin: 0 0 0.3rem;
       }
     }
     .nodes-list {
+      background: #3331;
       ul {
         font-size: 0.7rem;
         list-style: none;
         overflow-y: scroll;
-        height: 18rem;
+        height: 79vh;
         li {
           cursor: pointer;
-          padding: 0.1rem 0;
+          padding: 0.15rem 0;
         }
         li:hover {
           background: #3333;
@@ -504,53 +552,11 @@ export default {
         }
       }
     }
-    .relationship-detail {
-      margin: 1.2rem 0 0;
-      ul {
-        font-size: 0.7rem;
-        list-style: none;
-        overflow-y: scroll;
-        height: 9.3rem;
-        li {
-          padding: 0.3rem 0;
-          cursor: pointer;
-          .book {
-            font-size: 0.9rem;
-            span:nth-child(1) {
-              color: rgb(168, 124, 79);
-              margin: 0 0.2rem 0 0;
-            }
-            margin: 0 0 0.1rem;
-          }
-          .person {
-            .name {
-              margin: 0 0.1rem 0 0;
-            }
-            .action {
-              background: rgba(63, 40, 82, 0.413);
-              color: #eee;
-              padding: 0 0.1rem;
-              border-radius: 0.1rem;
-            }
-          }
-        }
-        li:hover {
-          background: #3333;
-        }
-        li:nth-child(2n + 1) {
-          background: #42210b0a;
-        }
-        li:nth-child(2n) {
-          background: #42210b14;
-        }
-      }
-    }
   }
 
   .tooltip {
     position: absolute;
     background: #333;
-    color: #fff;
     width: 8rem;
     height: 5rem;
     top: 0;
@@ -558,12 +564,62 @@ export default {
     z-index: 10;
     box-sizing: border-box;
     padding: 1rem;
-    border-radius: 0.3rem;
+    // border-radius: 0.3rem;
+    h5 {
+      color: #efefef;
+    }
     span {
-      color: #fff;
+      color: #efefef;
       font-size: 0.7rem;
       cursor: pointer;
       text-decoration: underline;
+    }
+  }
+  .relationship-detail {
+    position: absolute;
+    padding: 0.5rem;
+    background: #333;
+    h4 {
+      color: #efefef;
+    }
+    ul {
+      color: #efefef;
+      font-size: 0.7rem;
+      list-style: none;
+      overflow-y: scroll;
+      height: 9.3rem;
+      li {
+        padding: 0.3rem 0;
+        cursor: pointer;
+        .book {
+          // font-size: 0.7rem;
+          span:nth-child(1) {
+            color: rgb(168, 124, 79);
+            margin: 0 0.2rem 0 0;
+          }
+          margin: 0 0 0.1rem;
+        }
+        .person {
+          .name {
+            margin: 0 0.1rem 0 0;
+          }
+          .action {
+            background: #b0a1b8;
+            color: #eee;
+            padding: 0 0.1rem;
+            border-radius: 0.1rem;
+          }
+        }
+      }
+      li:hover {
+        background: #555;
+      }
+      // li:nth-child(2n + 1) {
+      //   background: #42210b0a;
+      // }
+      // li:nth-child(2n) {
+      //   background: #42210b14;
+      // }
     }
   }
 }

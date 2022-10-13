@@ -13,8 +13,8 @@ export default createStore({
     all_institution: [],
     all_province: [],
     all_catalogue: [],
+    all_image: [],
     rem: null,
-    batchTitle: "第1批",
   },
   getters: {
     getData: (state) => state.books,
@@ -33,6 +33,7 @@ export default createStore({
         state.all_language,
         state.all_province,
         state.all_institution,
+        state.all_image,
       ] = _data;
     },
     loadExplorationData(state, _data) {
@@ -43,6 +44,7 @@ export default createStore({
         state.all_edition_dynasty,
         state.all_province,
         state.all_institution,
+        state.all_image,
       ] = _data;
     },
     loadRelationshipData(state, _data) {
@@ -56,15 +58,13 @@ export default createStore({
         state.all_institution,
         state.person_ralations,
         state.all_action,
+        state.all_image,
       ] = _data;
     },
     changeRem(state, payload) {
       state.rem = payload;
     },
-    changeBatchTitle(state, payload) {
-      state.batchTitle = payload;
-    },
   },
-  actions: {},
-  modules: {},
+  // actions: {},
+  // modules: {},
 });

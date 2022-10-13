@@ -1,9 +1,7 @@
 <template>
   <div class="image-viewer" v-show="show">
     <div class="button">
-      <div class="scale-to-width" @click="scaleToWidth">适应宽度</div>
-      <div class="scale-to-height" @click="scaleToHeight">适应高度</div>
-      <div class="scale-to-origin" @click="scaleToOrigin">原始尺寸</div>
+      <!-- <div class="scale-to-origin" @click="scaleToOrigin">還原</div> -->
     </div>
     <div class="close" @click="close">
       <div></div>
@@ -11,7 +9,13 @@
     </div>
 
     <div class="img-wrapper">
-      <img class="image" :src="imageUrl" :alt="imageText" v-drag @mousewheel.prevent="scaleFun" />
+      <img
+        class="image"
+        :src="imageUrl"
+        :alt="imageText"
+        v-drag
+        @mousewheel.prevent="scaleFun"
+      />
     </div>
   </div>
 </template>
@@ -37,14 +41,6 @@ export default {
       this.img.style.left = left + "px";
       this.img.style.top = top + "px";
     },
-    scaleToWidth() {
-      this.imgScale = 1;
-      this.img.style = "width:100%;height:auto;";
-    },
-    scaleToHeight() {
-      this.imgScale = 1;
-      this.img.style = "height:100%;width:auto;";
-    },
     scaleToOrigin() {
       this.imgScale = 1;
       this.img.style = "width:auto;height:auto;max-height:100%;max-width:100%;";
@@ -54,6 +50,7 @@ export default {
     },
     close() {
       this.show = false;
+      this.scaleToOrigin();
     },
   },
   directives: {
@@ -62,7 +59,6 @@ export default {
         e.preventDefault();
         let disX = e.pageX - dragItem.offsetLeft;
         let disY = e.pageY - dragItem.offsetTop;
-        // console.log('down', e.pageX, e.pageY, dragItem.offsetLeft, dragItem.offsetTop)
         document.onmousemove = (e) => {
           e.preventDefault();
           let left = e.pageX - disX;
@@ -123,12 +119,12 @@ export default {
     z-index: 2;
     width: 2rem;
     height: 2rem;
-    color: #fff;
+    color: #efefef;
     cursor: pointer;
     div {
       width: 100%;
       height: 0.1rem;
-      background-color: #fff;
+      background-color: #efefef;
       border-radius: 0.05rem;
     }
     div:nth-child(1) {

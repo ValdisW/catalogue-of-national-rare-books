@@ -1,5 +1,17 @@
 <template>
-  <div class="loading" v-show="!complete">loading...</div>
+  <div class="loading" v-show="!complete">
+    <div class="content">
+      <div class="center">
+        <h2>加載中</h2>
+        <p>《國家珍貴古籍名錄》知識庫</p>
+        <p>國家古籍數字化工程專項經費資助項目</p>
+      </div>
+      <div class="bottom">
+        <p>中國國家圖書館（中國國家古籍保護中心）</p>
+        <p>北京大學數字人文研究中心</p>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -19,9 +31,30 @@ export default {
   position: fixed;
   top: 0;
   left: 0;
-  background-color: #333;
-  color: #efefef;
-  text-align: center;
-  line-height: 100vh;
+  background: #333;
+  .content {
+    text-align: center;
+    h2 {
+      color: #efefef;
+      font-weight: normal;
+      margin: 0 0 0.3rem;
+    }
+    p {
+      font-size: 0.7rem;
+      color: #9c9c9c;
+    }
+    .center {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+    }
+    .bottom {
+      position: absolute;
+      left: 50%;
+      bottom: 0;
+      transform: translate(-50%, -50%);
+    }
+  }
 }
 </style>

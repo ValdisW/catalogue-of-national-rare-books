@@ -77,7 +77,7 @@ export default {
     width: 2rem;
     height: 2rem;
     background-color: #fff7;
-    border: 2px solid #000;
+    border: 2px solid #201d1d;
     position: absolute;
     top: 50%;
     left: 0;

@@ -1,7 +1,7 @@
 <template>
   <div class="book-item" @click="openBookDetail">
     <div>
-      <img src="/images/placeholder.jpg" alt="書影" />
+      <img :src="cover_url" :alt="id" />
     </div>
     <p v-text="title"></p>
   </div>
@@ -14,6 +14,11 @@ export default {
   name: "BookItem",
   props: {
     id: String,
+  },
+  computed: {
+    cover_url() {
+      return `/data/images/thumbnails/${this.id}.jpg`;
+    },
   },
   methods: {
     openBookDetail() {
@@ -30,12 +35,12 @@ export default {
 
 <style lang="less" scoped>
 .book-item {
-  flex: 6rem 1 1;
+  flex: 7rem 1 1;
   margin: 0.5rem;
   cursor: pointer;
 
   div {
-    background: #6666;
+    background: #00000012;
     height: 5rem;
     width: 100%;
     display: flex;
@@ -43,6 +48,8 @@ export default {
 
     img {
       object-fit: contain;
+      width: 100%;
+      height: 100%;
     }
   }
 
@@ -54,11 +61,6 @@ export default {
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
     overflow: hidden;
-
-    a {
-      color: rgb(75, 28, 28);
-      text-decoration: none;
-    }
   }
 }
 </style>

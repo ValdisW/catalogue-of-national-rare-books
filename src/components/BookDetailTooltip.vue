@@ -89,14 +89,14 @@ export default {
       width: 13rem;
       background-color: #333;
       padding: 1.5rem;
-      color: #fff;
+      color: #efefef;
 
       h4 {
         font-size: 0.9rem;
 
         span {
           display: block;
-          color: #fff;
+          color: #efefef;
         }
       }
 
@@ -109,7 +109,9 @@ export default {
 
       .detail {
         font-size: 0.7rem;
-        color: #ccc;
+        p {
+          color: #ccc;
+        }
       }
     }
   }

@@ -1,34 +1,34 @@
-import { createRouter, createWebHistory } from "vue-router";
+import { createRouter, createWebHashHistory  } from "vue-router";
 
 const routes = [
   {
     path: "/",
     name: "Introduction",
-    meta: { title: "名録介紹" },
+    meta: { title: "名録介紹 | 國家珍貴古籍名録" },
     component: () => import("../views/Introduction.vue"),
   },
   {
     path: "/exploration",
     name: "Exploration",
-    meta: { title: "名録瀏覽" },
+    meta: { title: "名録瀏覽 | 國家珍貴古籍名録" },
     component: () => import("../views/Exploration.vue"),
   },
   {
-    path: "/relationship-old",
+    path: "/relationship",
     name: "Relationship_old",
-    meta: { title: "名録分析" },
+    meta: { title: "名録分析 | 國家珍貴古籍名録" },
     component: () => import("../views/Relationship_old.vue"),
   },
   {
-    path: "/relationship",
+    path: "/relationship-new",
     name: "Relationship",
-    meta: { title: "流傳分析" },
+    meta: { title: "流傳分析 | 國家珍貴古籍名録" },
     component: () => import("../views/Relationship.vue"),
   },
   {
     path: "/about",
     name: "About",
-    meta: { title: "開發團隊" },
+    meta: { title: "研發團隊 | 國家珍貴古籍名録" },
     component: () => import("../views/About.vue"),
   },
   // {
@@ -84,7 +84,7 @@ const routes = [
 ];
 
 const router = createRouter({
-  history: createWebHistory(process.env.BASE_URL),
+  history: createWebHashHistory(),
   routes,
 });
 

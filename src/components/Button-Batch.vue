@@ -37,13 +37,13 @@ export default {
   height: 1.8rem;
   line-height: 1.8rem;
   border-radius: 50%;
-  border: 1px solid #000;
+  border: 1px solid #201d1d;
   text-align: center;
   margin: 0.5rem;
   font-size: 0.8rem;
 }
 .activated {
-  background-color: #000;
-  color: #fff;
+  background-color: #201d1d;
+  color: #efefef;
 }
 </style>

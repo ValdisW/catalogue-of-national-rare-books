@@ -25,7 +25,7 @@ export default {
   padding: 1.5rem;
   max-width: 15rem;
   position: absolute;
-  color: #fff;
+  color: #efefef;
   display: none;
   z-index: 1000;
   h4 {
