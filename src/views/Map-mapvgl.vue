@@ -2,7 +2,7 @@
   <div class="spatial-sampling">
     <div class="section-name">
       <span></span>
-      <span>全部古籍館藏地理分佈</span>
+      <span>入選名録古籍藏地分布</span>
       <span></span>
     </div>
 

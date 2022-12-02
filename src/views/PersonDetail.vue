@@ -13,17 +13,11 @@
               <div class="person-birth">
                 <p>
                   生卒：
-                  <span
-                    v-text="
-                      `${person_data.year_of_birth} - ${person_data.year_of_death}`
-                    "
-                  ></span>
+                  <span v-text="`${person_data.year_of_birth} - ${person_data.year_of_death}`"></span>
                 </p>
               </div>
               <div class="person-title">
-                <p>
-                  字:<span v-text="person_data.courtesy_name || '不詳'"></span>
-                </p>
+                <p>字:<span v-text="person_data.courtesy_name || '不詳'"></span></p>
                 <p>
                   號:
                   <span v-text="person_data.pseudonym_name || '不詳'"></span>
@@ -33,10 +27,7 @@
               <span></span>
             </div>
           </div>
-          <div
-            class="person-intro"
-            v-text="person_data.introduction || ''"
-          ></div>
+          <div class="person-intro" v-text="person_data.introduction || ''"></div>
         </div>
 
         <div class="related-person">
@@ -46,12 +37,7 @@
               v-for="b in this.related_person"
               :key="b"
               @click="openPersonDetail(b.person_id)"
-              v-text="
-                $store.state.persons.find((ele) => ele.id == b.person_id).name +
-                '（' +
-                b.count +
-                '）'
-              "
+              v-text="$store.state.persons.find((ele) => ele.id == b.person_id).name + '（' + b.count + '）'"
             ></p>
             <!-- <router-link
                 :to="/person-detail/ + b.person_id"
@@ -74,11 +60,7 @@
         </div>
         <div class="book-responsibility">
           <ul>
-            <li
-              v-for="e in filtered_related_books"
-              :key="e"
-              @click="$emit('openBookDetail', e.book_id)"
-            >
+            <li v-for="e in filtered_related_books" :key="e" @click="$emit('openBookDetail', e.book_id)">
               <span v-text="e.book_id + ' '"></span>
               <span v-text="e.title + ' '"></span>
               <span v-text="e.action + ' '"></span>
@@ -87,12 +69,7 @@
         </div>
       </div>
     </div>
-    <BookInfoDialog
-      ref="book-info-dialog"
-      :id="hover_data.id"
-      :title="hover_data.title"
-      :detail="hover_data.detail"
-    />
+    <BookInfoDialog ref="book-info-dialog" :id="hover_data.id" :title="hover_data.title" :detail="hover_data.detail" />
   </div>
 </template>
 
@@ -115,20 +92,37 @@ export default {
         detail: "",
       },
       person_data: {},
-      action_types: [
+      action_types: [],
+    };
+  },
+  methods: {
+    init() {
+      this.action_types = [
         { name: "創作", count: 0 },
         { name: "出版", count: 0 },
         { name: "批校題跋", count: 0 },
         { name: "收藏", count: 0 },
-      ],
-    };
-  },
-  methods: {
+      ];
+
+      this.person_data = {
+        name: "加載中",
+        year_of_birth: "",
+        year_of_death: "",
+        courtesy_name: "-",
+        pseudonym_name: "-",
+        introduction: "-",
+      };
+
+      this.related_person = [];
+      this.filtered_related_books = [];
+    },
     close() {
       this.show = false;
     },
     open(person_id) {
       this.show = true;
+
+      this.init();
 
       axios.get(`/data/person-detail/${person_id}`).then((d) => {
         this.person_data = d.data[0][0];
@@ -137,17 +131,12 @@ export default {
         this.related_person.sort((a, b) => b.count - a.count);
 
         for (let e of this.all_related_books)
-          e.type = this.$store.state.all_action.find(
-            (el) => el.id == e.action_id
-          ).type;
-        for (let e of this.action_types)
-          for (let f of this.all_related_books) if (e.name == f.type) e.count++;
+          e.type = this.$store.state.all_action.find((el) => el.id == e.action_id).type;
+        for (let e of this.action_types) for (let f of this.all_related_books) if (e.name == f.type) e.count++;
       });
     },
     filterType(type) {
-      this.filtered_related_books = this.all_related_books.filter(
-        (el) => el.type == type
-      );
+      this.filtered_related_books = this.all_related_books.filter((el) => el.type == type);
     },
   },
 };

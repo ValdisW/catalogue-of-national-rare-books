@@ -37,11 +37,11 @@ export default {
   created() {
     this.$store.state.all_edition_dynasty.forEach((el) => {
       if (el.type_p != "其他") {
-        if (!this.list.find((e) => e.name == el.type_p))
-          this.list.push({ name: el.type_p, ids: [el.id] });
+        if (!this.list.find((e) => e.name == el.type_p)) this.list.push({ name: el.type_p, ids: [el.id] });
         else this.list.find((e) => e.name == el.type_p).ids.push(el.id);
       }
     });
+    console.log(this.ids);
   },
 };
 </script>

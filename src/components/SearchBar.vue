@@ -1,9 +1,13 @@
 <template>
   <div class="search-bar">
     <div class="toggle-mode">
-      <span @click="all_attr_mode = true" :class="{ active: all_attr_mode }">全字段檢索</span>
+      <span @click="all_attr_mode = true" :class="{ active: all_attr_mode }"
+        >全字段檢索</span
+      >
       <span> | </span>
-      <span @click="all_attr_mode = false" :class="{ active: !all_attr_mode }">指定字段檢索</span>
+      <span @click="all_attr_mode = false" :class="{ active: !all_attr_mode }"
+        >指定字段檢索</span
+      >
     </div>
     <div class="content">
       <div class="mode" v-if="all_attr_mode">
@@ -22,15 +26,28 @@
 
         <!-- <div class="more-bars" v-show="show_more_bars"> -->
         <Transition name="fade">
-          <TransitionGroup name="fade1" class="more-bars" tag="div" v-show="show_more_bars">
+          <TransitionGroup
+            name="fade1"
+            class="more-bars"
+            tag="div"
+            v-show="show_more_bars"
+          >
             <div class="bar-wrapper" v-for="e in n - 1" :key="e">
-              <input placeholder="請輸入關鍵詞" type="text" ref="text-multiple" />
+              <input
+                placeholder="請輸入關鍵詞"
+                type="text"
+                ref="text-multiple"
+              />
               <Droplist ref="drop-list-multiple" :attr_list="attr_list" />
             </div>
           </TransitionGroup>
         </Transition>
         <!-- </div> -->
-        <div class="hide" v-show="n > 1" @click="show_more_bars = !show_more_bars"></div>
+        <div
+          class="hide"
+          v-show="n > 1"
+          @click="show_more_bars = !show_more_bars"
+        ></div>
 
         <button class="search-button" @click="search"></button>
       </div>

@@ -1,7 +1,7 @@
 <template>
   <div class="book-item" @click="openBookDetail">
     <div>
-      <img :src="cover_url" :alt="id" />
+      <img :src="cover_url" :alt="id" @error="showDefaultImg" />
     </div>
     <p v-text="title"></p>
   </div>
@@ -23,6 +23,9 @@ export default {
   methods: {
     openBookDetail() {
       this.$emit("openBookDetail", this.id);
+    },
+    showDefaultImg(e) {
+      e.target.src = '/data/images/thumbnails/placeholder.jpg';
     },
   },
   data() {

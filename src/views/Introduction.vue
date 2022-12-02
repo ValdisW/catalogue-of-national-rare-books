@@ -1,10 +1,5 @@
 <template>
-  <div
-    class="introduction"
-    @wheel.prevent="rowScroll"
-    ref="introduction"
-    v-if="complete"
-  >
+  <div class="introduction" @wheel.prevent="rowScroll" ref="introduction" v-if="complete">
     <section class="section-1">
       <div class="everyday-book">
         <div>
@@ -41,10 +36,7 @@
       <BaiduMap />
     </section>
     <section class="section-4">
-      <FlowingParticles
-        ref="flowing-particles"
-        @openBookDetail="openBookDetail"
-      />
+      <FlowingParticles ref="flowing-particles" @openBookDetail="openBookDetail" />
     </section>
 
     <div class="badges">
@@ -74,19 +66,13 @@ export default {
   computed: {
     recommendBook() {
       let t = this.$store.state.books.filter(
-        (el) =>
-          el.name.length > 3 &&
-          el.name.length < 8 &&
-          !el.name.match(/(·|\?|（|\[)/i)
+        (el) => el.name.length > 3 && el.name.length < 8 && !el.name.match(/(·|\?|（|\[)/i)
       );
       let d_books = [];
       for (let e of t) {
         if (!d_books.find((el) => el.name == e.name)) d_books.push(e);
       }
-      console.log(d_books);
-      return d_books[
-        Math.floor(new Date().getTime() / 8.64e7) % d_books.length
-      ];
+      return d_books[Math.floor(new Date().getTime() / 8.64e7) % d_books.length];
     },
   },
   data() {
@@ -143,9 +129,7 @@ export default {
       this.current_page = id;
       this.scrolling = true;
 
-      document
-        .getElementsByTagName("section")
-        [id].scrollIntoView({ behavior: "smooth", inline: "nearest" });
+      document.getElementsByTagName("section")[id].scrollIntoView({ behavior: "smooth", inline: "nearest" });
 
       clearTimeout(timeout);
       timeout = setTimeout(() => {
@@ -159,11 +143,9 @@ export default {
       this.$store.commit("preloadIntroductionData", res.data);
 
       for (let e of this.$store.state.all_institution) {
-        let r = this.$store.state.all_province.find(
-          (el) => el.id == e.province_id
-        );
+        let r = this.$store.state.all_province.find((el) => el.id == e.province_id);
         if (!r.child) r.child = [];
-        r.child.push(e.id);
+        if (e.id != "0000") r.child.push(e.id);
       }
 
       this.complete = true;

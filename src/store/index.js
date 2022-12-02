@@ -45,6 +45,8 @@ export default createStore({
         state.all_province,
         state.all_institution,
         state.all_image,
+        state.persons,
+        state.all_action,
       ] = _data;
     },
     loadRelationshipData(state, _data) {

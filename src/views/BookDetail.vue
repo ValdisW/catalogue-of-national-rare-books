@@ -16,39 +16,21 @@
             <td class="detail-title">文獻類型：</td>
             <td
               class="detail-content document-type"
-              v-text="
-                id2name(
-                  this.$store.state.all_document_type,
-                  book_data.document_type_id,
-                  '-'
-                )
-              "
+              v-text="id2name(this.$store.state.all_document_type, book_data.document_type_id, '-')"
             ></td>
           </tr>
           <tr>
             <td class="detail-title">文種：</td>
             <td
               class="detail-content language"
-              v-text="
-                id2name(
-                  this.$store.state.all_language,
-                  book_data.language_id,
-                  '-'
-                )
-              "
+              v-text="id2name(this.$store.state.all_language, book_data.language_id, '-')"
             ></td>
           </tr>
           <tr>
             <td class="detail-title">分類：</td>
             <td
               class="detail-content name"
-              v-text="
-                id2name(
-                  this.$store.state.all_catalogue,
-                  book_data.catalogue_id,
-                  '-'
-                )
-              "
+              v-text="id2name(this.$store.state.all_catalogue, book_data.catalogue_id, '-')"
             ></td>
           </tr>
           <tr>
@@ -64,17 +46,11 @@
           </tr> -->
           <tr>
             <td class="detail-title">版本：</td>
-            <td
-              class="detail-content edition"
-              v-text="book_data.edition || '-'"
-            ></td>
+            <td class="detail-content edition" v-text="book_data.edition || '-'"></td>
           </tr>
           <tr>
             <td class="detail-title">數量：</td>
-            <td
-              class="detail-content quantity"
-              v-text="book_data.quantity + book_data.measurement || '-'"
-            ></td>
+            <td class="detail-content quantity" v-text="book_data.quantity + book_data.measurement || '-'"></td>
           </tr>
           <tr>
             <td class="detail-title">裝幀形式：</td>
@@ -82,24 +58,15 @@
           </tr>
           <tr>
             <td class="detail-title">開本尺寸：</td>
-            <td
-              class="detail-content book-size"
-              v-text="book_data.book_size || '-'"
-            ></td>
+            <td class="detail-content book-size" v-text="book_data.book_size || '-'"></td>
           </tr>
           <tr>
             <td class="detail-title">板框尺寸：</td>
-            <td
-              class="detail-content frame-size"
-              v-text="book_data.frame_size || '-'"
-            ></td>
+            <td class="detail-content frame-size" v-text="book_data.frame_size || '-'"></td>
           </tr>
           <tr>
             <td class="detail-title">版式：</td>
-            <td
-              class="detail-content typeset"
-              v-text="book_data.typeset || '-'"
-            ></td>
+            <td class="detail-content typeset" v-text="book_data.typeset || '-'"></td>
           </tr>
           <tr>
             <td class="detail-title">牌記：</td>
@@ -109,65 +76,37 @@
             <td class="detail-title">收藏省份：</td>
             <td
               class="detail-content institute"
-              v-text="
-                id2name(
-                  this.$store.state.all_province,
-                  book_data.province_id,
-                  '-'
-                )
-              "
+              v-text="id2name(this.$store.state.all_province, book_data.province_id, '-')"
             ></td>
           </tr>
           <tr>
             <td class="detail-title">收藏單位：</td>
             <td
               class="detail-content institute"
-              v-text="
-                id2name(
-                  this.$store.state.all_institution,
-                  book_data.institution_id,
-                  '-'
-                )
-              "
+              v-text="id2name(this.$store.state.all_institution, book_data.institution_id, '-')"
             ></td>
           </tr>
           <tr>
             <td class="detail-title">索書號：</td>
-            <td
-              class="detail-content"
-              v-text="book_data.call_number || '-'"
-            ></td>
+            <td class="detail-content" v-text="book_data.call_number || '-'"></td>
           </tr>
         </table>
 
         <!-- 责任者 -->
         <ul class="timeline">
           <li v-for="person in related_person" :key="person">
-            <div
-              class="actions"
-              v-text="
-                id2name($store.state.all_action, person.action_id, '未知行爲')
-              "
-            ></div>
+            <div class="actions" v-text="id2name($store.state.all_action, person.action_id, '未知行爲')"></div>
             <b></b>
             <span
               class="person"
-              v-if="
-                id2name($store.state.persons, person.person_id, '□□') == '□□'
-              "
+              v-if="id2name($store.state.persons, person.person_id, '□□') == '□□'"
               v-text="`[${person.dynasty_or_nation}]佚名`"
             ></span>
             <span
               v-else
               @click="$emit('openPersonDetail', person.person_id)"
               class="person"
-              v-text="
-                `[${person.dynasty_or_nation}]${id2name(
-                  $store.state.persons,
-                  person.person_id,
-                  '佚名'
-                )}`
-              "
+              v-text="`[${person.dynasty_or_nation}]${id2name($store.state.persons, person.person_id, '佚名')}`"
             >
             </span>
           </li>
@@ -180,6 +119,7 @@
           <img
             :src="image_filenames[image_showed_index]"
             :alt="image_filenames[image_showed_index]"
+            @error="showDefaultImg"
           />
         </div>
 
@@ -199,10 +139,7 @@
         </div>
       </div>
     </div>
-    <ImageViewer
-      ref="image-viewer"
-      :imageUrl="image_filenames[image_showed_index]"
-    />
+    <ImageViewer ref="image-viewer" :imageUrl="image_filenames[image_showed_index]" />
   </div>
 </template>
 
@@ -239,16 +176,14 @@ export default {
         this.related_person = d.data[1];
         this.seals = d.data[2];
 
-        let img_res = this.$store.state.all_image.filter(
-          (el) => el.id == book_id
-        );
-        if (img_res && img_res[0].filename) {
-          console.log(this.book_data.batch, img_res[0].filename);
-          for (let e of img_res) {
-            this.image_filenames.push(`/data/images/${e.folder}/${e.filename}`);
-          }
-        }
+        let img_res = this.$store.state.all_image.filter((el) => el.id == book_id);
+        if (img_res && img_res[0].filename)
+          for (let e of img_res) this.image_filenames.push(`/data/images/${e.folder}/${e.filename}`);
+        else this.image_filenames[0] = "2333";
       });
+    },
+    showDefaultImg(e) {
+      e.target.src = "/images/placeholder.jpg";
     },
     openImageViewer() {
       this.$refs["image-viewer"].open();

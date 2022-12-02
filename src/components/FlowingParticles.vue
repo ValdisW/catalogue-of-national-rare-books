@@ -3,7 +3,7 @@
     <div class="content">
       <div class="section-name">
         <span></span>
-        <span>全部名録版本朝代</span>
+        <span>入選名録古籍版本朝代分布</span>
         <span></span>
       </div>
       <div class="main">

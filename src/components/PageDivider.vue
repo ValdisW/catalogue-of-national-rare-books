@@ -1,5 +1,5 @@
 <template>
-  <div class="page-divider">
+  <div class="page-divider" v-show="pages_sum > 0">
     <!-- 总页码数超过12时 -->
     <div class="all-pages" v-if="pages_sum > 12">
       <li class="prev-page" @click="toPrevPage">上一頁</li>
@@ -79,7 +79,7 @@ export default {
   name: "PageDivider",
   computed: {
     pages_sum: function () {
-      return Math.ceil(this.items_sum / this.each_page_items);
+      return this.items_sum ? Math.ceil(this.items_sum / this.each_page_items) : 1; // 暂时这样处理，如果没有任何内容，就有1页而不是0页
     },
   },
   data: function () {
@@ -109,8 +109,7 @@ export default {
       if (this.current_page < this.pages_sum) this.current_page++;
     },
     turnTo(page_index) {
-      if (page_index >= 1 && page_index <= this.pages_sum)
-        this.current_page = page_index;
+      if (page_index >= 1 && page_index <= this.pages_sum) this.current_page = page_index;
     },
   },
 };

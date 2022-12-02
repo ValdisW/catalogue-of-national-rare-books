@@ -58,61 +58,11 @@
                   <td v-text="item.id || '-'"></td>
                   <td v-text="item.name || '-'"></td>
                   <td v-text="item.edition || '-'"></td>
-                  <td
-                    v-text="
-                      $store.state.all_edition_dynasty.find(
-                        (ele) => ele.id == item.edition_dynasty_id
-                      )
-                        ? $store.state.all_edition_dynasty.find(
-                            (ele) => ele.id == item.edition_dynasty_id
-                          ).name
-                        : '-'
-                    "
-                  ></td>
-                  <td
-                    v-text="
-                      $store.state.all_document_type.find(
-                        (ele) => ele.id == item.document_type_id
-                      )
-                        ? $store.state.all_document_type.find(
-                            (ele) => ele.id == item.document_type_id
-                          ).name
-                        : '-'
-                    "
-                  ></td>
-                  <td
-                    v-text="
-                      $store.state.all_language.find(
-                        (ele) => ele.id == item.language_id
-                      )
-                        ? $store.state.all_language.find(
-                            (ele) => ele.id == item.language_id
-                          ).name
-                        : '-'
-                    "
-                  ></td>
-                  <td
-                    v-text="
-                      $store.state.all_province.find(
-                        (ele) => ele.id == item.province_id
-                      )
-                        ? $store.state.all_province.find(
-                            (ele) => ele.id == item.province_id
-                          ).name
-                        : '-'
-                    "
-                  ></td>
-                  <td
-                    v-text="
-                      $store.state.all_institution.find(
-                        (ele) => ele.id == item.institution_id
-                      )
-                        ? $store.state.all_institution.find(
-                            (ele) => ele.id == item.institution_id
-                          ).name
-                        : '-'
-                    "
-                  ></td>
+                  <td v-text="item.edition_dynasty"></td>
+                  <td v-text="item.document_type"></td>
+                  <td v-text="item.language"></td>
+                  <td v-text="item.province"></td>
+                  <td v-text="item.institution"></td>
                 </tr>
               </tbody>
             </table>
@@ -194,6 +144,7 @@ export default {
         .then((res) => {
           this.search_result = res.data;
           this.curr_d = this.search_result.slice(0, this.each_page_items); // 当前页数据
+          this.convertResult();
           this.updateFilter();
           this.show_results = true;
         })
@@ -210,6 +161,7 @@ export default {
         .then((res) => {
           this.search_result = res.data;
           this.curr_d = this.search_result.slice(0, this.each_page_items); // 当前页数据
+          this.convertResult();
           this.updateFilter();
           this.show_results = true;
         })
@@ -255,6 +207,26 @@ export default {
       }
     },
 
+    convertResult() {
+      this.curr_d.forEach((e) => {
+        [
+          "edition_dynasty",
+          "document_type",
+          "language",
+          "province",
+          "institution",
+        ].map((attr) => {
+          e[attr] = this.$store.state[`all_${attr}`].find(
+            (ele) => ele.id == e[`${attr}_id`]
+          )
+            ? this.$store.state[`all_${attr}`].find(
+                (ele) => ele.id == e[`${attr}_id`]
+              ).name
+            : "-";
+        });
+      });
+    },
+
     // Filter发生变化
     filterResult(e) {
       this.curr_filter[e.attr] = e.value;
@@ -269,7 +241,10 @@ export default {
         }
         return flag;
       });
+
       this.curr_d = this.filtered_result.slice(0, this.each_page_items); // 当前页数据
+      this.convertResult();
+
       this.has_filtered = true;
       this.$refs["page-divider"].turnTo(1);
     },
@@ -323,6 +298,8 @@ export default {
       this.display_attrs.find((e) => e.value == attr).order = !t;
 
       this.curr_d = this.search_result.slice(0, this.each_page_items);
+      this.convertResult();
+
       this.$refs["page-divider"].turnTo(1);
     },
     alterPage(page_index) {
@@ -336,6 +313,7 @@ export default {
           this.each_page_items * (page_index - 1),
           this.each_page_items * page_index
         );
+      this.convertResult();
     },
     showFilterOptions(e) {
       let b =
@@ -367,7 +345,9 @@ export default {
       this.$emit("endLoading");
 
       this.filtered_result = this.search_result = this.$store.state.books;
+
       this.curr_d = this.search_result.slice(0, this.each_page_items); // 当前页数据
+      this.convertResult();
 
       this.updateFilter();
     });

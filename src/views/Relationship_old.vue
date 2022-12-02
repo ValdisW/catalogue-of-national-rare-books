@@ -6,7 +6,7 @@
         <input type="text" value="資治通鑒" ref="text" />
         <!-- <Droplist ref="drop-list" :attr_list="display_attrs" /> -->
         <button id="search-button" @click="search"></button>
-        <button id="tip-button"></button>
+        <!-- <button id="tip-button"></button> -->
       </div>
 
       <!-- 關係圖 -->
@@ -36,10 +36,18 @@
       <span @click="openPersonDetail(selected_info.id)">查看人物詳情</span>
     </div>
 
-    <div class="list relationship-detail" ref="relationship-detail" v-show="show_relationship_detail">
+    <div
+      class="list relationship-detail"
+      ref="relationship-detail"
+      v-show="show_relationship_detail"
+    >
       <h4>相關古籍</h4>
       <ul>
-        <li v-for="r in relation_list" :key="r" @click="openBookDetail(convertBookId(r.book_id))">
+        <li
+          v-for="r in relation_list"
+          :key="r"
+          @click="openBookDetail(convertBookId(r.book_id))"
+        >
           <!-- 古籍信息 -->
           <div class="book">
             <span v-text="convertBookId(r.book_id)"></span>
@@ -49,9 +57,16 @@
           <!-- 人物信息 -->
           <div class="person">
             <span class="name" v-text="getPersonNameById(r.person1_id)"></span
-            ><span class="action" v-text="getActionNameById(r.action1_id)"></span>&nbsp;&nbsp;&nbsp;&nbsp;
+            ><span
+              class="action"
+              v-text="getActionNameById(r.action1_id)"
+            ></span
+            >&nbsp;&nbsp;&nbsp;&nbsp;
             <span class="name" v-text="getPersonNameById(r.person2_id)"></span
-            ><span class="action" v-text="getActionNameById(r.action2_id)"></span>
+            ><span
+              class="action"
+              v-text="getActionNameById(r.action2_id)"
+            ></span>
           </div>
         </li>
       </ul>
@@ -99,14 +114,16 @@ export default {
     relation_list: function () {
       let arr = [];
       if (this.curr_relation) {
-        arr = `${this.getPersonNameById(this.curr_relation.source.id)} -- ${this.getPersonNameById(
-          this.curr_relation.target.id
-        )}`;
+        arr = `${this.getPersonNameById(
+          this.curr_relation.source.id
+        )} -- ${this.getPersonNameById(this.curr_relation.target.id)}`;
 
         let r = this.$store.state.person_ralations.filter(
           (e) =>
-            (e.person1_id == this.curr_relation.source.id && e.person2_id == this.curr_relation.target.id) ||
-            (e.person2_id == this.curr_relation.source.id && e.person1_id == this.curr_relation.target.id)
+            (e.person1_id == this.curr_relation.source.id &&
+              e.person2_id == this.curr_relation.target.id) ||
+            (e.person2_id == this.curr_relation.source.id &&
+              e.person1_id == this.curr_relation.target.id)
         );
         arr = r;
       }
@@ -115,7 +132,9 @@ export default {
   },
   watch: {
     selected_id(value) {
-      this.selected_info = this.$store.state.persons.find((ele) => ele.id == value);
+      this.selected_info = this.$store.state.persons.find(
+        (ele) => ele.id == value
+      );
     },
   },
   methods: {
@@ -133,7 +152,9 @@ export default {
       else return "未知人名";
     },
     getBookNameById(id) {
-      let r = this.$store.state.books.find((e) => e.id == this.convertBookId(id));
+      let r = this.$store.state.books.find(
+        (e) => e.id == this.convertBookId(id)
+      );
       if (r) return r.name;
       else return "未知书名";
     },
@@ -193,7 +214,9 @@ export default {
     },
 
     intern(value) {
-      return value !== null && typeof value === "object" ? value.valueOf() : value;
+      return value !== null && typeof value === "object"
+        ? value.valueOf()
+        : value;
     },
     forceGraph(
       {
@@ -231,10 +254,16 @@ export default {
       const LT = d3.map(links, linkTarget).map(this.intern);
       if (nodeTitle === undefined) nodeTitle = (_, i) => N[i];
       // const T = nodeTitle == null ? null : d3.map(nodes, nodeTitle);
-      const G = nodeGroup == null ? null : d3.map(nodes, nodeGroup).map(this.intern);
-      const W = typeof linkStrokeWidth !== "function" ? null : d3.map(links, linkStrokeWidth);
-      const L = typeof linkStroke !== "function" ? null : d3.map(links, linkStroke);
-      const R = typeof nodeRadius != "function" ? null : d3.map(nodes, nodeRadius);
+      const G =
+        nodeGroup == null ? null : d3.map(nodes, nodeGroup).map(this.intern);
+      const W =
+        typeof linkStrokeWidth !== "function"
+          ? null
+          : d3.map(links, linkStrokeWidth);
+      const L =
+        typeof linkStroke !== "function" ? null : d3.map(links, linkStroke);
+      const R =
+        typeof nodeRadius != "function" ? null : d3.map(nodes, nodeRadius);
 
       // Replace the input nodes and links with mutable objects for the simulation.
       nodes = d3.map(nodes, (_, i) => ({ id: N[i], value: nodes[i].value }));
@@ -244,7 +273,8 @@ export default {
       if (G && nodeGroups === undefined) nodeGroups = d3.sort(G);
 
       // Construct the scales.
-      const color = nodeGroup == null ? null : d3.scaleOrdinal(nodeGroups, colors);
+      const color =
+        nodeGroup == null ? null : d3.scaleOrdinal(nodeGroups, colors);
 
       // Construct the forces.
       const forceNode = d3.forceManyBody();
@@ -276,7 +306,10 @@ export default {
         .append("g")
         .attr("stroke", typeof linkStroke !== "function" ? linkStroke : null)
         .attr("stroke-opacity", linkStrokeOpacity)
-        .attr("stroke-width", typeof linkStrokeWidth !== "function" ? linkStrokeWidth : null)
+        .attr(
+          "stroke-width",
+          typeof linkStrokeWidth !== "function" ? linkStrokeWidth : null
+        )
         .attr("stroke-linecap", linkStrokeLinecap)
         .selectAll("line")
         .data(links)
@@ -410,7 +443,11 @@ export default {
           event.subject.fy = null;
         }
 
-        return d3.drag().on("start", dragstarted).on("drag", dragged).on("end", dragended);
+        return d3
+          .drag()
+          .on("start", dragstarted)
+          .on("drag", dragged)
+          .on("end", dragended);
       }
 
       return Object.assign(svg.node(), { scales: { color } });
@@ -442,12 +479,17 @@ export default {
       d3.selectAll(`circle`).attr("fill", "#76978F");
       d3.selectAll("line").attr("stroke", "#C4A1A199");
       d3.select(`circle.n${node_id}`).attr("fill", "#FBB03B");
-      let box = document.querySelector(`circle.n${node_id}`).getBoundingClientRect();
+      let box = document
+        .querySelector(`circle.n${node_id}`)
+        .getBoundingClientRect();
 
       this.$refs.tooltip.style.left = `${box.x + 40}px`;
       this.$refs.tooltip.style.top = `${box.y - 40}px`;
 
-      if (scroll) document.querySelector(`li.n${node_id}`).scrollIntoView({ behavior: "smooth" });
+      if (scroll)
+        document
+          .querySelector(`li.n${node_id}`)
+          .scrollIntoView({ behavior: "smooth" });
     },
   },
   mounted() {

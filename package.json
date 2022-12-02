@@ -1,6 +1,6 @@
 {
-  "name": "catalogue-of-national-rare-books",
-  "version": "0.1.0",
+  "name": "rarebib",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -31,6 +31,7 @@
     "eslint-plugin-prettier": "^3.3.1",
     "eslint-plugin-vue": "^7.0.0",
     "less": "^3.0.4",
-    "less-loader": "^5.0.0"
+    "less-loader": "^5.0.0",
+    "vue-loader-v16": "^16.0.0-beta.5.4"
   }
 }

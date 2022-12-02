@@ -40,7 +40,7 @@
                   ref="document_type"
                   bar_color="#C4A1A1"
                   :canvasWidth="15 * $store.state.rem"
-                  :canvasHeight="7.5 * $store.state.rem"
+                  :canvasHeight="7 * $store.state.rem"
                   :margin_left="0.46"
                   :info="statistics[current_batch].document_type"
                 />
@@ -51,7 +51,7 @@
                   ref="edition_dynasty"
                   bar_color="#76978F"
                   :canvasWidth="15 * $store.state.rem"
-                  :canvasHeight="6 * $store.state.rem"
+                  :canvasHeight="5.6 * $store.state.rem"
                   :margin_left="0.46"
                   :info="statistics[current_batch].edition_dynasty"
                 />
@@ -62,7 +62,7 @@
                   ref="edition_type"
                   bar_color="#B1B098"
                   :canvasWidth="15 * $store.state.rem"
-                  :canvasHeight="10 * $store.state.rem"
+                  :canvasHeight="9.6 * $store.state.rem"
                   :margin_left="0.46"
                   :info="statistics[current_batch].edition_type"
                 />
@@ -75,7 +75,7 @@
                   ref="language"
                   bar_color="#B0A1B8"
                   :canvasWidth="14 * $store.state.rem"
-                  :canvasHeight="25 * $store.state.rem"
+                  :canvasHeight="23.7 * $store.state.rem"
                   :margin_left="0.55"
                   :info="statistics[current_batch].language"
                 />
@@ -270,7 +270,7 @@ export default {
 
       .info {
         display: flex;
-        height: 70%;
+        flex: 70% 1 1;
         padding: 3% 0 0;
 
         .col-1 {
