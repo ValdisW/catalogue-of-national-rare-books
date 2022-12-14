@@ -8,16 +8,18 @@
 </template>
 
 <script>
-// import axios from "axios";
-
 export default {
   name: "BookItem",
   props: {
     id: String,
   },
   computed: {
+    /**
+     * 计算书影缩略图的url
+     */
     cover_url() {
-      return `/data/images/thumbnails/${this.id}.jpg`;
+      let img_res = this.$store.state.all_image.filter((el) => el.id == this.id); // 从vuex获取书影数据
+      return img_res[0].allowed ? `/data/images/thumbnails/${this.id}.jpg` : "/data/images/thumbnails/placeholder.jpg";
     },
   },
   methods: {
@@ -25,7 +27,7 @@ export default {
       this.$emit("openBookDetail", this.id);
     },
     showDefaultImg(e) {
-      e.target.src = '/data/images/thumbnails/placeholder.jpg';
+      e.target.src = "/data/images/thumbnails/placeholder.jpg";
     },
   },
   data() {

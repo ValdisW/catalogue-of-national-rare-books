@@ -18,6 +18,7 @@
 
       <div class="content">
         <div class="info">
+          <!-- 基本文字介绍 -->
           <div class="col-1">
             <h3 v-if="current_batch == 0">國家珍貴古籍名録</h3>
             <h3
@@ -32,6 +33,7 @@
             ></p>
           </div>
 
+          <!-- 条形图表 -->
           <div class="col-2">
             <div class="left">
               <div class="chart-wrapper document-types">

@@ -115,6 +115,7 @@
 
       <!-- 书影 -->
       <div class="book-image">
+        <!-- 书影图片 -->
         <div class="img-wrapper" @click="openImageViewer">
           <img
             :src="image_filenames[image_showed_index]"
@@ -123,6 +124,7 @@
           />
         </div>
 
+        <!-- 切换书影图片 -->
         <div class="switch_pic" style="text-align: center">
           <button
             v-for="(u, i) in image_filenames"
@@ -132,6 +134,7 @@
           ></button>
         </div>
 
+        <!-- 名录内容 -->
         <div class="display">
           <div>
             <p v-text="book_data.content_sc"></p>
@@ -176,8 +179,8 @@ export default {
         this.related_person = d.data[1];
         this.seals = d.data[2];
 
-        let img_res = this.$store.state.all_image.filter((el) => el.id == book_id);
-        if (img_res && img_res[0].filename)
+        let img_res = this.$store.state.all_image.filter((el) => el.id == book_id); // 从vuex获取书影数据
+        if (img_res && img_res[0].filename && img_res[0].allowed)
           for (let e of img_res) this.image_filenames.push(`/data/images/${e.folder}/${e.filename}`);
         else this.image_filenames[0] = "2333";
       });
