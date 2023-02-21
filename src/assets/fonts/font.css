@@ -1,9 +1,18 @@
+/* 华文楷体。仅限封面“國家珍貴古籍名録” */
+@font-face {
+  font-family: "huawenkaiti";
+  font-weight: normal;
+  src: url("./huawenkaiti.ttf");
+}
+
+/* 思源宋体-粗体 */
 @font-face {
   font-family: "SourceHanSerif";
   font-weight: bold;
   src: url("./SourceHanSerifCN-Bold.ttf");
 }
 
+/* 思源宋体-常规 */
 @font-face {
   font-family: "SourceHanSerif";
   font-weight: normal;

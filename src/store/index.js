@@ -21,7 +21,7 @@ export default createStore({
   },
   mutations: {
     loadIntroductionData(state, _data) {
-      [state.all_action, state.persons] = _data;
+      state.persons = _data;
     },
     preloadIntroductionData(state, _data) {
       [

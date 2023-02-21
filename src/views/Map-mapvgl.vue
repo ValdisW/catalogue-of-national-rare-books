@@ -4,6 +4,7 @@
       <span></span>
       <span>入選名録古籍藏地分布</span>
       <span></span>
+      <span></span>
     </div>
 
     <!-- 左侧地图 -->
@@ -276,7 +277,7 @@ export default {
       this.current_institution_intro = this.$store.state.all_institution.find((el) => el.id == d.id)
         ? this.$store.state.all_institution.find((el) => el.id == d.id).intro
         : "";
-      this.current_institution_books = `入选古籍数: ${d.count}`;
+      this.current_institution_books = `入選古籍數: ${d.count}`;
 
       this.tooltipBox.style.visibility = "visible";
     },
@@ -366,6 +367,11 @@ export default {
       }
       .intro {
         font-size: 0.7rem;
+        margin: 0.1rem 0 0.1rem;
+      }
+      .books {
+        font-size: 0.7rem;
+        color: #bbb;
       }
     }
   }

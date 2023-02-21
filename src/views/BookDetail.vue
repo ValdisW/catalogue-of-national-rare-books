@@ -4,7 +4,7 @@
       <div class="close-button" @click="close"></div>
       <div class="info">
         <div class="title">
-          <span v-text="this.book_data.name"></span>
+          <span v-text="this.book_data.name" :title="this.book_data.name"></span>
         </div>
 
         <table class="detail">
@@ -34,7 +34,7 @@
             ></td>
           </tr>
           <tr>
-            <td class="detail-title">题名：</td>
+            <td class="detail-title">題名：</td>
             <td class="detail-content name" v-text="book_data.name || '-'"></td>
           </tr>
           <!-- <tr>
@@ -94,19 +94,20 @@
 
         <!-- 责任者 -->
         <ul class="timeline">
-          <li v-for="person in related_person" :key="person">
-            <div class="actions" v-text="id2name($store.state.all_action, person.action_id, '未知行爲')"></div>
+          <li v-for="person in related_person" :key="person" @click="clickPerson($event)">
+            <!-- 责任行为名称 -->
+            <div class="actions" v-text="person.action_name"></div>
+
+            <!-- 圆点 -->
             <b></b>
+
+            <!-- 责任者名称 -->
+            <span class="person" v-if="person.person_name == '□□'" v-text="`[${person.dynasty_or_nation}]佚名`"></span>
             <span
               class="person"
-              v-if="id2name($store.state.persons, person.person_id, '□□') == '□□'"
-              v-text="`[${person.dynasty_or_nation}]佚名`"
-            ></span>
-            <span
               v-else
               @click="$emit('openPersonDetail', person.person_id)"
-              class="person"
-              v-text="`[${person.dynasty_or_nation}]${id2name($store.state.persons, person.person_id, '佚名')}`"
+              v-text="(person.dynasty_or_nation ? '[' + person.dynasty_or_nation + ']' : '') + person.person_name"
             >
             </span>
           </li>
@@ -148,7 +149,7 @@
 
 <script>
 import axios from "axios";
-import ImageViewer from "@/components/ImageViewer";
+import ImageViewer from "@/components/ImageViewer.vue";
 import { id2name } from "@/utils/id2name.js";
 
 export default {
@@ -167,6 +168,9 @@ export default {
   },
   methods: {
     id2name,
+    clickPerson(e) {
+      e.currentTarget.lastElementChild.click();
+    },
     close() {
       this.show = false;
     },
@@ -174,6 +178,7 @@ export default {
       this.image_filenames = [];
       this.show = true;
 
+      // 获取书影数据
       axios.get(`/data/book-detail/${book_id}`).then((d) => {
         this.book_data = d.data[0][0];
         this.related_person = d.data[1];
@@ -182,11 +187,11 @@ export default {
         let img_res = this.$store.state.all_image.filter((el) => el.id == book_id); // 从vuex获取书影数据
         if (img_res && img_res[0].filename && img_res[0].allowed)
           for (let e of img_res) this.image_filenames.push(`/data/images/${e.folder}/${e.filename}`);
-        else this.image_filenames[0] = "2333";
+        else this.image_filenames[0] = "none";
       });
     },
     showDefaultImg(e) {
-      e.target.src = "/images/placeholder.jpg";
+      e.target.src = "/data/images/placeholder.jpg";
     },
     openImageViewer() {
       this.$refs["image-viewer"].open();
@@ -235,7 +240,7 @@ export default {
     .close-button {
       position: absolute;
       left: 0;
-      top: 0.5rem;
+      top: 0.15rem;
       width: 2rem;
       height: 2rem;
       background: url(../assets/icons/back.svg) center no-repeat;
@@ -247,9 +252,12 @@ export default {
       font-size: 0.7rem;
       margin-top: 5vh;
       div {
+        ::-webkit-scrollbar {
+          width: 0.4rem;
+        }
         p {
-          height: 4rem;
-          overflow-y: hidden;
+          max-height: 4rem;
+          overflow-y: scroll;
         }
       }
     }
@@ -269,13 +277,14 @@ export default {
           width: 0.75rem;
           height: 0.75rem;
           border-radius: 50%;
-          border: 0.05rem solid #42230f;
+          border: 0.07rem solid rgba(0, 0, 0, 0.632);
           background: transparent;
+          box-sizing: border-box;
           cursor: pointer;
         }
 
         button.active {
-          background: #42230f;
+          background: rgba(0, 0, 0, 0.632);
         }
       }
 
@@ -300,6 +309,9 @@ export default {
       margin-right: 5vh;
       width: 40%;
       height: 80vh;
+      // display: flex;
+      // flex-direction: column;
+      // justify-content: space-between;
 
       .title {
         text-overflow: ellipsis;
@@ -307,7 +319,7 @@ export default {
         overflow: hidden;
         font-family: "SourceHanSerif";
         font-weight: bold;
-        font-size: 2rem;
+        font-size: 1.6rem;
         margin: 0 0 1rem 0;
 
         span:first-child {
@@ -344,15 +356,17 @@ export default {
           line-height: 1rem;
         }
       }
-
+      ::-webkit-scrollbar {
+        height: 0.4rem;
+      }
       .timeline {
         list-style-type: none;
         display: flex;
         max-width: 70%;
-        justify-content: center;
         overflow-x: scroll;
         overflow-y: hidden;
         height: 6rem;
+
         li {
           float: left;
           min-width: 25%;
@@ -360,6 +374,10 @@ export default {
           position: relative;
           text-align: center;
           padding-top: 0.5rem;
+          cursor: pointer;
+          &:hover {
+            background: #00000012;
+          }
         }
 
         .actions {

@@ -2,11 +2,7 @@
   <div class="exploration" :class="{ new: !show_results }" v-if="complete">
     <div class="container">
       <div class="search" :class="{ new: !show_results }">
-        <SearchBar
-          :attr_list="display_attrs"
-          @search="search"
-          @allAttrSearch="allAttrSearch"
-        />
+        <SearchBar :wait="wait" :attr_list="display_attrs" @search="search" @allAttrSearch="allAttrSearch" />
       </div>
 
       <div class="main-content" v-show="show_results">
@@ -34,11 +30,7 @@
             <table class="results-list">
               <thead>
                 <tr>
-                  <th
-                    v-for="e in display_attrs"
-                    :key="e.name"
-                    @click="toggleRank(e.value, e.order)"
-                  >
+                  <th v-for="e in display_attrs" :key="e.name" @click="toggleRank(e.value, e.order)">
                     <span class="attr-title" v-text="e.name"></span>
                     <span class="rank">
                       <span :class="{ active: e.order == false }"></span>
@@ -48,12 +40,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr
-                  v-for="item in curr_d"
-                  :key="item.id"
-                  class="item-block"
-                  @click="$emit('openBookDetail', item.id)"
-                >
+                <tr v-for="item in curr_d" :key="item.id" class="item-block" @click="$emit('openBookDetail', item.id)">
                   <td v-text="'第' + item.batch + '批'"></td>
                   <td v-text="item.id || '-'"></td>
                   <td v-text="item.name || '-'"></td>
@@ -69,9 +56,7 @@
           </div>
           <PageDivider
             @turnTo="alterPage"
-            :items_sum="
-              has_filtered ? filtered_result.length : search_result.length
-            "
+            :items_sum="has_filtered ? filtered_result.length : search_result.length"
             :each_page_items="each_page_items"
             ref="page-divider"
           />
@@ -83,9 +68,9 @@
 
 <script>
 import axios from "axios";
-import SearchBar from "@/components/SearchBar";
-import PageDivider from "@/components/PageDivider";
-import Filter from "@/components/Filter";
+import SearchBar from "@/components/SearchBar.vue";
+import PageDivider from "@/components/PageDivider.vue";
+import Filter from "@/components/Filter.vue";
 
 export default {
   name: "Exploration",
@@ -97,6 +82,8 @@ export default {
       search_result: [], // 所有检索结果
       curr_d: [], // 当前页的检索结果
       each_page_items: 50, // 每页的检索结果数量
+
+      wait: false, // 点击搜索按钮的等待，防止重复点击
 
       curr_filter: {}, // 当前的筛选条件
 
@@ -137,47 +124,58 @@ export default {
     };
   },
   methods: {
-    // 指定字段的检索。根据检索词及筛选条件
+    /**
+     * 多个指定字段的检索
+     * @param {*} values 检索词及筛选条件
+     */
     search(values) {
-      axios
-        .post("/data/search-for-books", { values })
-        .then((res) => {
-          this.search_result = res.data;
-          this.curr_d = this.search_result.slice(0, this.each_page_items); // 当前页数据
-          this.convertResult();
-          this.updateFilter();
-          this.show_results = true;
-        })
-        .then((err) => {
-          if (err) console.error(err);
-        });
-      this.has_filtered = false;
+      if (!this.wait) {
+        this.wait = true;
+        axios
+          .post("/data/search-for-books", { values })
+          .then((res) => {
+            this.search_result = res.data;
+            this.curr_d = this.search_result.slice(0, this.each_page_items); // 当前页数据
+            this.convertResult();
+            this.updateFilter();
+            this.show_results = true;
+            this.wait = false;
+          })
+          .then((err) => {
+            if (err) console.error(err);
+          });
+        this.has_filtered = false;
+      }
     },
 
-    // 多字段检索。根据某个字符串
+    /**
+     * 全字段检索
+     * @param {*} query 输入框中的内容
+     */
     allAttrSearch(query) {
-      axios
-        .post("/data/search-all", { query })
-        .then((res) => {
-          this.search_result = res.data;
-          this.curr_d = this.search_result.slice(0, this.each_page_items); // 当前页数据
-          this.convertResult();
-          this.updateFilter();
-          this.show_results = true;
-        })
-        .then((err) => {
-          if (err) console.error(err);
-        });
-      this.has_filtered = false;
+      if (!this.wait) {
+        this.wait = true;
+        axios
+          .post("/data/search-all", { query })
+          .then((res) => {
+            this.search_result = res.data;
+            this.curr_d = this.search_result.slice(0, this.each_page_items); // 当前页数据
+            this.convertResult();
+            this.updateFilter();
+            this.show_results = true;
+            this.wait = false;
+          })
+          .then((err) => {
+            if (err) console.error(err);
+          });
+        this.has_filtered = false;
+      }
     },
 
     // 更新统计数据
     updateFilter() {
       for (let i in this.filter_data) {
-        this.filter_data[i].value = this.getSum(
-          this.search_result,
-          this.filter_data[i].id + "_id"
-        );
+        this.filter_data[i].value = this.getSum(this.search_result, this.filter_data[i].id + "_id");
 
         // 根据大类，作进一步统计
         let temp = [],
@@ -186,9 +184,9 @@ export default {
           temp.push({
             id: e.name,
             value: e.value,
-            type: this.$store.state["all_" + this.filter_data[i].id].find(
-              (el) => el.id == e.name
-            )[this.filter_data[i].db_column],
+            type: this.$store.state["all_" + this.filter_data[i].id].find((el) => el.id == e.name)[
+              this.filter_data[i].db_column
+            ],
           });
         for (let i in temp) {
           if (!result.find((el) => el.name == temp[i].type))
@@ -209,19 +207,9 @@ export default {
 
     convertResult() {
       this.curr_d.forEach((e) => {
-        [
-          "edition_dynasty",
-          "document_type",
-          "language",
-          "province",
-          "institution",
-        ].map((attr) => {
-          e[attr] = this.$store.state[`all_${attr}`].find(
-            (ele) => ele.id == e[`${attr}_id`]
-          )
-            ? this.$store.state[`all_${attr}`].find(
-                (ele) => ele.id == e[`${attr}_id`]
-              ).name
+        ["edition_dynasty", "document_type", "language", "province", "institution"].map((attr) => {
+          e[attr] = this.$store.state[`all_${attr}`].find((ele) => ele.id == e[`${attr}_id`])
+            ? this.$store.state[`all_${attr}`].find((ele) => ele.id == e[`${attr}_id`]).name
             : "-";
         });
       });
@@ -235,8 +223,7 @@ export default {
         for (let i in this.curr_filter) {
           if (!this.curr_filter[i].length) continue;
           let _flag = false;
-          for (let v of this.curr_filter[i])
-            _flag = _flag || "" + el[i + "_id"] == v;
+          for (let v of this.curr_filter[i]) _flag = _flag || "" + el[i + "_id"] == v;
           flag = flag && _flag;
         }
         return flag;
@@ -316,24 +303,14 @@ export default {
       this.convertResult();
     },
     showFilterOptions(e) {
-      let b =
-        e.currentTarget.querySelector(".options").style.display == "block";
-      document
-        .querySelectorAll(".options")
-        .forEach((e) => (e.style.display = "none"));
-      e.currentTarget.querySelector(".options").style.display = b
-        ? "none"
-        : "block";
+      let b = e.currentTarget.querySelector(".options").style.display == "block";
+      document.querySelectorAll(".options").forEach((e) => (e.style.display = "none"));
+      e.currentTarget.querySelector(".options").style.display = b ? "none" : "block";
     },
     choose(e) {
-      document
-        .querySelectorAll(".options")
-        .forEach((e) => (e.style.display = "none"));
+      document.querySelectorAll(".options").forEach((e) => (e.style.display = "none"));
       let parent_filter_value = e.path[3].querySelector(".value");
-      parent_filter_value.setAttribute(
-        "val",
-        e.currentTarget.getAttribute("val")
-      );
+      parent_filter_value.setAttribute("val", e.currentTarget.getAttribute("val"));
       parent_filter_value.innerText = e.currentTarget.innerText;
     },
   },
@@ -431,15 +408,18 @@ export default {
             tr.item-block {
               user-select: none;
               cursor: pointer;
+              &:hover {
+                background: #29150733;
+              }
               td {
                 text-align: center;
                 padding: 4px 8px;
                 a {
                   text-decoration: none;
                   color: #4a0400;
-                }
-                a:hover {
-                  text-decoration: underline;
+                  &:hover {
+                    text-decoration: underline;
+                  }
                 }
               }
               td:nth-of-type(3) {
@@ -448,9 +428,6 @@ export default {
             }
             .item-block:nth-child(2n + 1) {
               background: #42210b12;
-            }
-            .item-block:hover {
-              background: #29150733;
             }
           }
         }

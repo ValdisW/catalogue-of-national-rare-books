@@ -7,7 +7,6 @@
           <span v-text="id"></span>
           <span v-text="detail_data.name"></span>
         </h4>
-        <span class="to-detail" @click="openBookDetail">查看詳情</span>
         <div class="detail">
           <p>
             <span>批次：</span>
@@ -15,9 +14,7 @@
           </p>
           <p>
             <span>文獻類型：</span>
-            <span
-              v-text="getDocumentTypeNameById(detail_data.document_type_id)"
-            ></span>
+            <span v-text="getDocumentTypeNameById(detail_data.document_type_id)"></span>
           </p>
           <p>
             <span>文種：</span>
@@ -25,24 +22,21 @@
           </p>
           <p>
             <span>版本朝代：</span>
-            <span
-              v-text="getEditionDynastyNameById(detail_data.edition_dynasty_id)"
-            ></span>
+            <span v-text="getEditionDynastyNameById(detail_data.edition_dynasty_id)"></span>
           </p>
           <p>
             <span>收藏單位：</span>
-            <span
-              v-text="getInstitutionNameById(detail_data.institution_id)"
-            ></span>
+            <span v-text="getInstitutionNameById(detail_data.institution_id)"></span>
           </p>
         </div>
+        <span class="to-detail" @click="openBookDetail">查看詳情</span>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import Utils from "@/Utils";
+import Utils from "@/Utils.vue";
 
 export default {
   name: "bookDetailTooltip",
@@ -79,7 +73,7 @@ export default {
 <style lang="less" scoped>
 .book-detail-tooltip {
   position: absolute;
-  display: none;
+  // display: none;
   z-index: 1000;
 
   .container {
@@ -88,7 +82,7 @@ export default {
     .content {
       width: 13rem;
       background-color: #333;
-      padding: 1.5rem;
+      padding: 1rem;
       color: #efefef;
 
       h4 {
@@ -101,7 +95,7 @@ export default {
       }
 
       span.to-detail {
-        color: #ccc;
+        color: #bbb;
         font-size: 0.7rem;
         text-decoration: underline;
         cursor: pointer;
@@ -109,6 +103,7 @@ export default {
 
       .detail {
         font-size: 0.7rem;
+        margin: 0.2rem 0 0;
         p {
           color: #ccc;
         }

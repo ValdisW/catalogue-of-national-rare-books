@@ -44,7 +44,7 @@
 import axios from "axios";
 
 export default {
-  name: "2333",
+  name: "Relationship",
   data() {
     return {
       person_name: "黄",

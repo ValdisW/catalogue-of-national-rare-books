@@ -5,22 +5,22 @@
         <span></span>
         <span>入選名録古籍版本朝代分布</span>
         <span></span>
+        <span></span>
       </div>
       <div class="main">
+        <!-- 年代选择组件 -->
         <DynastySelector @changeDynastyIDs="changeDynasty" />
-        <div
-          class="togglePause"
-          :class="{ continue: !playing }"
-          @click="togglePause"
-        ></div>
 
+        <!-- 暂停/继续 -->
+        <div class="togglePause" :class="{ continue: !playing }" @click="togglePause"></div>
+
+        <!-- 画布 -->
         <svg id="particles-svg" ref="particles-svg" @click="togglePause"></svg>
 
-        <div class="comment">
-          <p>*宋（遼、西夏、金）</p>
-          <p>*元（蒙古）</p>
-        </div>
+        <!-- 右下角文字 -->
+        <div class="comment" v-text="curr_comment"></div>
 
+        <!-- 悬浮窗 -->
         <BookDetailTooltip
           @openBookDetail="$emit('openBookDetail', tooltip_id)"
           ref="book-detail-tooltip"
@@ -34,7 +34,7 @@
 <script>
 import * as d3 from "d3";
 import DynastySelector from "@/components/DynastySelector.vue";
-import BookDetailTooltip from "@/components/BookDetailTooltip";
+import BookDetailTooltip from "@/components/BookDetailTooltip.vue";
 
 export default {
   name: "FlowingParticles",
@@ -49,7 +49,7 @@ export default {
   },
   data() {
     return {
-      max_particles: 300,
+      max_particles: 250,
       NUM_PARTICLES: 100,
       PARTICLE_SIZE: 0.5, // View heights
       SPEED: 20000, // 毫秒数
@@ -64,13 +64,21 @@ export default {
       particles_original_data: [],
 
       tooltip_id: "",
+      curr_comment: "",
     };
   },
   methods: {
-    changeDynasty(ids) {
+    /**
+     * 点击年代名称，切换显示的粒子。
+     * 接收子组件传入的对象，包括id列表和要显示的备注
+     * @param {Object} o
+     */
+    changeDynasty(o) {
+      this.curr_comment = o.text;
+
       // 更新粒子数据
       this.particles_original_data = [];
-      ids.forEach((id) => {
+      o.ids.forEach((id) => {
         this.particles_original_data = this.particles_original_data.concat(
           this.$store.state.books.filter((el) => el.edition_dynasty_id == id)
         );
@@ -85,31 +93,23 @@ export default {
       if (this.particles_original_data.length > this.max_particles) {
         let temp_arr = JSON.parse(JSON.stringify(this.particles_original_data));
         this.particles_original_data = [];
-        for (let i = 0; i < this.max_particles; i++)
-          this.particles_original_data.push(temp_arr.pop());
+        for (let i = 0; i < this.max_particles; i++) this.particles_original_data.push(temp_arr.pop());
       }
 
       // 生成某数量的粒子
-      for (let e of this.particles_original_data)
-        this.particles.push(this.generateParticleData(e));
+      for (let e of this.particles_original_data) this.particles.push(this.generateParticleData(e));
 
       // 绘制
-      this.svg
-        .selectAll("circle")
-        .data(this.particles)
-        .enter()
-        .append("circle");
+      this.svg.selectAll("circle").data(this.particles).enter().append("circle");
 
-      this.svg.selectAll("circle").on("click", (e, d) => {
-        event.stopPropagation();
-        this.$refs["book-detail-tooltip"].$el.style.left =
-          e.clientX + 30 + "px";
-        this.$refs["book-detail-tooltip"].$el.style.top =
-          e.clientY - 140 + "px";
-        this.$refs["book-detail-tooltip"].$el.style.display = "block";
-        this.$refs["book-detail-tooltip"].open();
-        this.tooltip_id = d.info.id;
-      });
+      // this.svg.selectAll("circle").on("click", (e, d) => {
+      //   event.stopPropagation();
+      //   this.$refs["book-detail-tooltip"].$el.style.left = e.clientX + 30 + "px";
+      //   this.$refs["book-detail-tooltip"].$el.style.top = e.clientY - 140 + "px";
+      //   this.$refs["book-detail-tooltip"].$el.style.display = "block";
+      //   this.$refs["book-detail-tooltip"].open();
+      //   this.tooltip_id = d.info.id;
+      // });
 
       if (!this.playing) {
         this.animation_handler = requestAnimationFrame(this.draw);
@@ -141,10 +141,7 @@ export default {
       } while (r < 100);
     },
     randomNormal(o) {
-      if (
-        ((o = Object.assign({ mean: 0, dev: 1, pool: [] }, o)),
-        Array.isArray(o.pool) && o.pool.length > 0)
-      )
+      if (((o = Object.assign({ mean: 0, dev: 1, pool: [] }, o)), Array.isArray(o.pool) && o.pool.length > 0))
         return this.normalPool(o);
       let r,
         a,
@@ -196,15 +193,11 @@ export default {
 
     // 计算粒子的新位置
     moveParticle(particle) {
-      const progress =
-        ((this.curr_time - particle.startTime) % particle.duration) /
-        particle.duration;
+      const progress = ((this.curr_time - particle.startTime) % particle.duration) / particle.duration;
       return {
         ...particle,
         x: progress,
-        y:
-          Math.sin(progress * particle.arc) * particle.amplitude +
-          particle.offsetY,
+        y: Math.sin(progress * particle.arc) * particle.amplitude + particle.offsetY,
       };
     },
 
@@ -233,17 +226,16 @@ export default {
       this.svg
         .selectAll("circle")
         .on("click", (e, d) => {
+          this.pause();
           event.stopPropagation();
-          this.$refs["book-detail-tooltip"].$el.style.left =
-            e.clientX + 30 + "px";
-          this.$refs["book-detail-tooltip"].$el.style.top =
-            e.clientY - 140 + "px";
+          this.$refs["book-detail-tooltip"].$el.style.left = e.clientX + 30 + "px";
+          this.$refs["book-detail-tooltip"].$el.style.top = e.clientY - 140 + "px";
           this.$refs["book-detail-tooltip"].$el.style.display = "block";
           this.$refs["book-detail-tooltip"].open();
           this.tooltip_id = d.info.id;
         })
         .on("mousemove", (e) => {
-          console.log(e);
+          // console.log(e);
         });
 
       // 计时器
@@ -259,20 +251,13 @@ export default {
       // 生成某数量的粒子
       for (let i = 0; i < this.NUM_PARTICLES; i++)
         this.particles_original_data.push(
-          this.$store.state.books[
-            Math.floor(Math.random() * this.$store.state.books.length)
-          ]
+          this.$store.state.books[Math.floor(Math.random() * this.$store.state.books.length)]
         );
 
-      for (let e of this.particles_original_data)
-        this.particles.push(this.generateParticleData(e));
+      for (let e of this.particles_original_data) this.particles.push(this.generateParticleData(e));
 
       // 绘制
-      this.svg
-        .selectAll("circle")
-        .data(this.particles)
-        .enter()
-        .append("circle");
+      this.svg.selectAll("circle").data(this.particles).enter().append("circle");
 
       // 动画
       this.draw();
@@ -312,10 +297,7 @@ export default {
         position: absolute;
         bottom: 1.5rem;
         left: 1rem;
-
-        p {
-          font-size: 0.7rem;
-        }
+        font-size: 0.7rem;
       }
 
       .togglePause {

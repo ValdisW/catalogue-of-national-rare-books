@@ -1,7 +1,7 @@
 <template>
   <div class="book-item" @click="openBookDetail">
-    <div>
-      <img :src="cover_url" :alt="id" @error="showDefaultImg" />
+    <div :style="`background-image: url(${cover_url})`">
+      <!-- <img :src="cover_url" :alt="id" @error="showDefaultImg" /> -->
     </div>
     <p v-text="title"></p>
   </div>
@@ -41,30 +41,42 @@ export default {
 <style lang="less" scoped>
 .book-item {
   flex: 7rem 1 1;
+  display: flex;
+  flex-direction: column;
   margin: 0.5rem;
   cursor: pointer;
-
+  transition: 0.1s;
+  &:hover {
+    filter: brightness(0.9);
+    div {
+      background-color: #00000020;
+    }
+  }
   div {
     background: #00000012;
-    height: 5rem;
+    // background-image: url(/data/images/thumbnails/placeholder.jpg);
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    flex: auto 1 1;
     width: 100%;
     display: flex;
     justify-content: center;
-
-    img {
-      object-fit: contain;
-      width: 100%;
-      height: 100%;
-    }
+    // img {
+    //   object-fit: contain;
+    //   width: 100%;
+    //   height: 100%;
+    // }
   }
 
   p {
+    flex: auto 0 0;
     font-size: 0.6rem;
     text-align: center;
     margin: 0.1rem 0 0;
     display: -webkit-box;
     -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
+    -webkit-line-clamp: 1;
     overflow: hidden;
   }
 }

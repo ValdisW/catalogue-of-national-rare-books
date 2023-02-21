@@ -3,19 +3,12 @@
     <p class="title" v-text="attr_name"></p>
     <div class="content">
       <ul>
-        <li
-          v-for="e in attrs"
-          :class="{ selected: e.selected }"
-          :key="e"
-          :val="e.value"
-          @click="updateSelect(e)"
-        >
+        <li v-for="e in attrs" :class="{ selected: e.selected }" :key="e" :val="e.value" @click="updateSelect(e)">
           <!-- 条形-->
           <div
             class="bar"
             :style="{
-              width:
-                (Math.log(e.value + 1) / Math.log(max_value + 1)) * 100 + '%',
+              width: (Math.log(e.value + 1) / Math.log(max_value + 1)) * 100 + '%',
             }"
           ></div>
 
@@ -56,9 +49,7 @@ export default {
     updateSelect(e) {
       e.selected = !e.selected;
       let selected_ids = [];
-      for (let e of this.attrs
-        .filter((el) => el.selected)
-        .map((el) => (el = el.ids))) {
+      for (let e of this.attrs.filter((el) => el.selected).map((el) => (el = el.ids))) {
         selected_ids = selected_ids.concat(e);
       }
       this.$emit("filter", {
@@ -98,6 +89,10 @@ export default {
         font-size: 0.6rem;
         cursor: pointer;
         position: relative;
+        &:hover {
+          filter: brightness(80%);
+          background: rgb(153, 135, 105);
+        }
         .bar {
           background: rgb(88, 71, 44);
           height: 1rem;
@@ -115,10 +110,6 @@ export default {
         .bar {
           background: #c78320;
         }
-      }
-      li:hover {
-        filter: brightness(80%);
-        background: rgb(153, 135, 105);
       }
     }
   }

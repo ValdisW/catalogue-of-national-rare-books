@@ -1,8 +1,9 @@
 <template>
   <div class="person-detail" v-show="show">
-    <!-- <BackButton /> -->
     <div class="content">
       <div class="close-button" @click="close"></div>
+
+      <!-- 页面上半部分内容 -->
       <div class="person-card">
         <div class="person-info">
           <div class="person-brief">
@@ -55,7 +56,8 @@
             :key="n.name"
             v-text="`${n.name}(${n.count})`"
             class="responsibility-type"
-            @click="filterType(n.name)"
+            :class="{ invalid: !n.count }"
+            @click="if (n.count) filterType(n.name);"
           ></button>
         </div>
         <div class="book-responsibility">
@@ -75,7 +77,7 @@
 
 <script>
 import axios from "axios";
-import BookInfoDialog from "@/components/BookInfoDialog";
+import BookInfoDialog from "@/components/BookInfoDialog.vue";
 
 export default {
   name: "PersonDetail",
@@ -119,19 +121,21 @@ export default {
     close() {
       this.show = false;
     },
+    openPersonDetail(person_id) {
+      this.$emit("openPersonDetail", person_id);
+    },
     open(person_id) {
+      this.init(); // 把四个类型的行为数归零
+
       this.show = true;
-
-      this.init();
-
       axios.get(`/data/person-detail/${person_id}`).then((d) => {
         this.person_data = d.data[0][0];
         this.filtered_related_books = this.all_related_books = d.data[1];
         this.related_person = d.data[2];
         this.related_person.sort((a, b) => b.count - a.count);
 
-        for (let e of this.all_related_books)
-          e.type = this.$store.state.all_action.find((el) => el.id == e.action_id).type;
+        // for (let e of this.all_related_books)
+        //   e.type = this.$store.state.all_action.find((el) => el.id == e.action_id).type;
         for (let e of this.action_types) for (let f of this.all_related_books) if (e.name == f.type) e.count++;
       });
     },
@@ -177,43 +181,50 @@ export default {
       position: relative;
       display: flex;
       justify-content: space-between;
-      .person-name {
-        width: 7.5rem;
-      }
-      .person-brief {
-        width: 25rem;
-        display: flex;
-        align-items: center;
-        .person-info-list {
-          height: fit-content;
-          font-size: 0.8rem;
-          .person-birth {
-            display: flex;
-            p {
-              font-weight: bold;
-              span {
-                font-weight: normal;
+      .person-info {
+        margin: 0 1rem 0 0;
+        .person-brief {
+          width: 25rem;
+          display: flex;
+          align-items: flex-start;
+          overflow: hidden;
+          .person-name {
+            min-width: 7.5rem;
+          }
+          .person-info-list {
+            white-space: nowrap;
+            margin: 0.4rem 0 0 1rem;
+            height: fit-content;
+            font-size: 0.8rem;
+            .person-birth {
+              display: flex;
+              p {
+                font-weight: bold;
+                span {
+                  font-weight: normal;
+                }
               }
             }
-          }
-          .person-title {
-            display: flex;
-            p {
-              font-weight: bold;
-              margin: 0 1rem 0 0;
-              span {
-                font-weight: normal;
+            .person-title {
+              display: flex;
+              p {
+                font-weight: bold;
+                margin: 0 1rem 0 0;
+                span {
+                  font-weight: normal;
+                }
               }
             }
           }
         }
+        .person-intro {
+          margin-top: 1rem;
+          font-size: 0.7rem;
+          height: 7rem;
+          overflow-y: scroll;
+        }
       }
-      .person-intro {
-        margin-top: 1rem;
-        font-size: 0.7rem;
-        height: 7rem;
-        overflow-y: scroll;
-      }
+
       .related-person {
         padding: 0.5rem;
         border-radius: 0.5rem;
@@ -227,6 +238,12 @@ export default {
           width: 200px;
           height: 170px;
           overflow-y: scroll;
+          // p {
+          //   cursor: pointer;
+          //   &:hover {
+          //     background: #3331;
+          //   }
+          // }
         }
       }
     }
@@ -248,9 +265,17 @@ export default {
           font-size: 0.7rem;
           margin: 0.1rem 0 0.5rem 20px;
           cursor: pointer;
+          &:hover {
+            filter: brightness(80%);
+          }
         }
-        .responsibility-type:hover {
-          filter: brightness(80%);
+
+        .responsibility-type.invalid {
+          cursor: unset;
+          opacity: 0.5;
+          &:hover {
+            filter: none;
+          }
         }
       }
       .book-responsibility {
@@ -272,7 +297,7 @@ export default {
             }
           }
           li:hover {
-            background: #5e524a4c;
+            background: #3331;
           }
         }
       }

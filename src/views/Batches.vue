@@ -4,6 +4,7 @@
       <span></span>
       <span>批次選擇</span>
       <span></span>
+      <span></span>
     </div>
     <div class="container">
       <div class="batch-buttons">
@@ -21,16 +22,10 @@
           <!-- 基本文字介绍 -->
           <div class="col-1">
             <h3 v-if="current_batch == 0">國家珍貴古籍名録</h3>
-            <h3
-              v-else
-              v-text="`國家珍貴古籍名録 第${batchInfo[current_batch].name}批`"
-            ></h3>
+            <h3 v-else v-text="`國家珍貴古籍名録 第${batchInfo[current_batch].name}批`"></h3>
 
             <!-- 批次描述 -->
-            <p
-              class="batch-description"
-              v-text="batchInfo[current_batch].description"
-            ></p>
+            <p class="batch-description" v-text="batchInfo[current_batch].description"></p>
           </div>
 
           <!-- 条形图表 -->
@@ -93,25 +88,21 @@
             <span @click="showMore">换一組</span>
           </div>
           <TransitionGroup name="fade1" class="books" tag="div">
-            <BookItem
-              @openBookDetail="openBookDetail"
-              v-for="b in showing_books"
-              :key="b"
-              :id="b"
-            />
+            <BookItem @openBookDetail="openBookDetail" v-for="b in showing_books" :key="b" :id="b" />
           </TransitionGroup>
         </div>
       </div>
     </div>
+    <TooltipBubble ref="tooltip-bubble" :text="123" />
   </div>
 </template>
 
 <script>
 import { mapState } from "vuex";
+import TooltipBubble from "@/components/TooltipBubble.vue";
 import BarChart from "@/components/BarChart.vue";
 import BookItem from "@/components/BookItem.vue";
 import sta from "@/data/statistics.json";
-
 import AOS from "aos";
 import "aos/dist/aos.css";
 
@@ -119,7 +110,7 @@ AOS.init();
 
 export default {
   name: "Batches",
-  components: { BookItem, BarChart },
+  components: { BookItem, BarChart, TooltipBubble },
   data() {
     return {
       batchInfo: [
@@ -168,6 +159,10 @@ export default {
     ...mapState(["rem"]),
   },
   methods: {
+    /**
+     * 打开古籍详情页，逐级传递古籍id到App.vue
+     * @param {*} book_id 古籍id
+     */
     openBookDetail(book_id) {
       this.$emit("openBookDetail", book_id);
     },
@@ -177,22 +172,25 @@ export default {
     toHeight(p) {
       return window.innerHeight * p;
     },
+
+    /**
+     * 从store中随机抽取6本古籍，显示在页面上
+     */
     showMore() {
       let arr =
         this.current_batch == 0
           ? this.$store.state.books
-          : this.$store.state.books.filter(
-              (el) => el.batch == this.current_batch
-            );
+          : this.$store.state.books.filter((el) => el.batch == this.current_batch);
 
       this.showing_books = [];
       setTimeout(() => {
-        for (let i = 0; i < 6; i++)
-          this.showing_books.push(
-            arr[Math.floor(Math.random() * arr.length)].id
-          );
+        for (let i = 0; i < 6; i++) this.showing_books.push(arr[Math.floor(Math.random() * arr.length)].id);
       }, 50);
     },
+
+    /**
+     * 切换批次
+     */
     updateBatch(index) {
       this.current_batch = index;
       this.showMore();
@@ -200,9 +198,15 @@ export default {
   },
   created() {
     this.showMore();
-    this.statistics = sta;
+    this.statistics = sta; // 要求统计数据写死，因此直接读取json文件
   },
 };
+
+// 先秦兩漢時期	入選古籍涉及：商、戰國、秦、西漢、東漢
+// 魏晋南北朝隋唐五代時期	入選古籍涉及：晋（西晋、東晋）、北凉、西凉、南北朝（南朝梁、南朝陳、北魏、西魏、北齊）、六朝、高昌、隋、唐（武周）、吐蕃統治敦煌時期、歸義軍時期、五代（後梁、後唐、後周）、吴越
+// 宋遼夏金元時期	入選古籍涉及：宋（北宋、南宋）、遼、大理國、僞齊、西夏、金、蒙古、元
+// 明	入選古籍涉及：明、南明、北元
+// 清	入選古籍涉及：清、太平天國
 </script>
 
 <style lang="less" scoped>
@@ -252,10 +256,9 @@ export default {
         margin: 1rem 0;
         font-size: 0.8rem;
         transition: 0.3s;
-      }
-
-      button:hover {
-        border: 0.15rem solid #c94324;
+        &:hover {
+          border: 0.15rem solid #c94324;
+        }
       }
 
       button.selected {
@@ -272,9 +275,9 @@ export default {
 
       .info {
         display: flex;
-        flex: 70% 1 1;
+        flex: 70% 0 0;
         padding: 3% 0 0;
-
+        box-sizing: border-box;
         .col-1 {
           flex: 40% 0 0;
 
@@ -313,8 +316,9 @@ export default {
       }
 
       .featured-books {
-        flex: 30% 1 1;
-
+        flex: 30% 0 1;
+        display: flex;
+        flex-direction: column;
         .show-more {
           user-select: none;
           font-size: 0.7rem;
@@ -335,6 +339,7 @@ export default {
 
         .books {
           display: flex;
+          flex: auto 1 1;
         }
       }
     }

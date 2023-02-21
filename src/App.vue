@@ -1,7 +1,12 @@
 <template>
+  <!-- 不支持手机访问的提示 -->
   <MobileWarning v-if="mobileDetect()" />
+
+  <!-- 加载提示 -->
   <transition name="bg-fade"><Loading :complete="complete" /></transition>
+
   <div id="main-container">
+    <!-- 顶部导航 -->
     <nav>
       <ul>
         <li v-for="page in nav_pages" :key="page.name">
@@ -14,6 +19,7 @@
       </ul>
     </nav>
 
+    <!-- 用来显示四个主页面 -->
     <router-view
       v-slot="{ Component }"
       :key="$route.fullPath"
@@ -28,23 +34,25 @@
       </keep-alive>
     </router-view>
 
+    <!-- 古籍详情页 -->
     <BookDetail @openPersonDetail="openPersonDetail" ref="book-detail" />
+
+    <!-- 人物详情页 -->
     <PersonDetail @openBookDetail="openBookDetail" ref="person-detail" />
-    <InstitutionDetail
-      ref="institution-detail"
-      institutionID="201"
-    ></InstitutionDetail>
+
+    <!-- 机构详情页（未使用） -->
+    <InstitutionDetail ref="institution-detail" institutionID="201"></InstitutionDetail>
   </div>
 </template>
 
 <script>
-import Loading from "@/components/Loading";
-import MobileWarning from "@/components/MobileWarning";
-import BookDetail from "@/views/BookDetail";
-import PersonDetail from "@/views/PersonDetail";
-import InstitutionDetail from "@/views/InstitutionDetail";
+import Loading from "@/components/Loading.vue";
+import MobileWarning from "@/components/MobileWarning.vue";
+import BookDetail from "@/views/BookDetail.vue";
+import PersonDetail from "@/views/PersonDetail.vue";
+import InstitutionDetail from "@/views/InstitutionDetail.vue";
 
-const baseSize = 20;
+const baseSize = 20;  // 用于设置rem单位的基准值
 
 export default {
   name: "App",
@@ -72,6 +80,7 @@ export default {
       this.$refs["person-detail"].close();
     },
     openPersonDetail(person_id) {
+      console.log('openPersonDetail');
       this.$refs["book-detail"].close();
       this.$refs["person-detail"].open(person_id);
     },
@@ -101,9 +110,7 @@ export default {
     },
 
     mobileDetect() {
-      return navigator.userAgent.match(
-        /(Android|webOS|iPhone|iPad|iPod|BlackBerry|Windows Phone)/i
-      );
+      return navigator.userAgent.match(/(Android|webOS|iPhone|iPad|iPod|BlackBerry|Windows Phone)/i);
     },
   },
   mounted() {
@@ -170,6 +177,9 @@ nav {
     li {
       margin: 1rem;
       position: relative;
+      &:hover {
+        text-decoration: underline;
+      }
       a {
         color: #68563a88;
         text-decoration: none;
@@ -188,9 +198,6 @@ nav {
         }
       }
     }
-    li:hover {
-      text-decoration: underline;
-    }
   }
 }
 #main-container {
@@ -198,10 +205,11 @@ nav {
 }
 
 .section-name {
+  position: relative;
   display: flex;
   flex-direction: column;
-  border-left: 0.1rem solid #201d1d;
-  border-right: none;
+  // border-left: 0.1rem solid #201d1d;
+  // border-right: none;
   flex: 1.3rem 0 0;
   height: fit-content;
   align-items: center;
@@ -220,12 +228,19 @@ nav {
     font-size: 0.7rem;
     text-align: center;
   }
-  span:last-child {
+  span:nth-child(3) {
     width: 100%;
     height: 1.2rem;
     background: url(./assets/icons/side.svg) no-repeat;
     background-size: 100%;
     transform: scaleY(-1);
+  }
+  span:last-child {
+    position: absolute;
+    left: -0.1rem;
+    width: 0.1rem;
+    height: 100%;
+    background: #201d1d;
   }
 }
 </style>
