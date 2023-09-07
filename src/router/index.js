@@ -83,11 +83,13 @@ const routes = [
   // },
 ];
 
-const router = createRouter({
+export const router = createRouter({
   history: createWebHashHistory(),
   routes,
 });
 
+
+// 设置title
 router.beforeEach((to, from, next) => {
   if (to.meta.title) {
     document.title = to.meta.title;
@@ -95,4 +97,6 @@ router.beforeEach((to, from, next) => {
   next();
 });
 
-export default router;
+export function setupRouter(app) {
+  app.use(router);
+}

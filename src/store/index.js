@@ -1,6 +1,6 @@
 import { createStore } from "vuex";
 
-export default createStore({
+const store = createStore({
   state: {
     books: [],
     persons: [],
@@ -70,3 +70,9 @@ export default createStore({
   // actions: {},
   // modules: {},
 });
+
+export function setupStore(app) {
+  app.use(store);
+}
+
+export { store };
