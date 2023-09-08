@@ -88,16 +88,18 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: "About",
-  mounted() {
-    this.$emit("endLoading");
-  },
-  unmounted() {
-    this.$emit("startLoading");
-  },
-};
+<script lang="ts" setup>
+import { onMounted, onUnmounted } from "vue";
+
+const emit = defineEmits(["endLoading", "startLoading"]);
+
+onMounted(() => {
+  emit("endLoading");
+});
+
+onUnmounted(() => {
+  emit("startLoading");
+});
 </script>
 
 <style lang="less" scoped>

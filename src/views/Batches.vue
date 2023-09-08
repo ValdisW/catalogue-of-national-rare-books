@@ -36,8 +36,8 @@
                   title="文獻類型"
                   ref="document_type"
                   bar_color="#C4A1A1"
-                  :canvasWidth="15 * $store.state.rem"
-                  :canvasHeight="7 * $store.state.rem"
+                  :canvasWidth="15 * store.state.rem!"
+                  :canvasHeight="7 * store.state.rem!"
                   :margin_left="0.46"
                   :info="statistics[current_batch].document_type"
                 />
@@ -47,8 +47,8 @@
                   title="版本朝代"
                   ref="edition_dynasty"
                   bar_color="#76978F"
-                  :canvasWidth="15 * $store.state.rem"
-                  :canvasHeight="5.6 * $store.state.rem"
+                  :canvasWidth="15 * store.state.rem!"
+                  :canvasHeight="5.6 * store.state.rem!"
                   :margin_left="0.46"
                   :info="statistics[current_batch].edition_dynasty"
                 />
@@ -58,8 +58,8 @@
                   title="版本類型"
                   ref="edition_type"
                   bar_color="#B1B098"
-                  :canvasWidth="15 * $store.state.rem"
-                  :canvasHeight="9.6 * $store.state.rem"
+                  :canvasWidth="15 * store.state.rem!"
+                  :canvasHeight="9.6 * store.state.rem!"
                   :margin_left="0.46"
                   :info="statistics[current_batch].edition_type"
                 />
@@ -71,8 +71,8 @@
                   title="文種"
                   ref="language"
                   bar_color="#B0A1B8"
-                  :canvasWidth="14 * $store.state.rem"
-                  :canvasHeight="23.7 * $store.state.rem"
+                  :canvasWidth="14 * store.state.rem!"
+                  :canvasHeight="23.7 * store.state.rem!"
                   :margin_left="0.55"
                   :info="statistics[current_batch].language"
                 />
@@ -97,110 +97,110 @@
   </div>
 </template>
 
-<script>
+<script lang="ts" setup>
+import { ref, reactive, computed } from "vue";
+import { store } from "@/store";
+
+import type { RelatedBook } from "@/types";
+
 import { mapState } from "vuex";
 import TooltipBubble from "@/components/TooltipBubble.vue";
 import BarChart from "@/components/BarChart.vue";
 import BookItem from "@/components/BookItem.vue";
 import sta from "@/data/statistics.json";
-import AOS from "aos";
-import "aos/dist/aos.css";
+// import AOS from "aos";
+// import "aos/dist/aos.css";
 
-AOS.init();
+const emit = defineEmits(["openBookDetail"]);
 
-export default {
-  name: "Batches",
-  components: { BookItem, BarChart, TooltipBubble },
-  data() {
-    return {
-      batchInfo: [
-        {
-          name: "總",
-          description:
-            "《國家珍貴古籍名録》是由中華人民共和國國務院批准公布的我國現存珍貴古籍目録。建立《國家珍貴古籍名録》是確保珍貴古籍安全、推動古籍保護工作、促進優秀傳統文化傳承和弘揚的重要舉措。目前，國務院已批准公布六批《國家珍貴古籍名録》，全國485家機構/個人收藏的13026部古籍入選，囊括先秦兩漢至明清時期的漢文古籍、少數民族文字古籍和其他文字古籍，其中漢文文獻11855部（含甲骨4種，簡帛187種，敦煌遺書405件，碑帖拓本219件，古地圖149件，漢文古籍10891部），少數民族文字古籍1133部，其他文字古籍38部。",
-        },
-        {
-          name: "一",
-          description:
-            "第一批《國家珍貴古籍名録》于2008年3月1日公布，收録210家藏書機構/個人的2392部古籍文獻，其中，漢文文獻2282部，包括簡帛117種、敦煌遺書73件、碑帖拓本73件、古地圖10件、漢文古籍2009部；少數民族文字古籍110部，包括焉耆—龜兹文、于闐文、藏文、回鶻文、西夏文、白文、蒙古文、察合台文、彝文、滿文、東巴文、傣文、水文、古壯字等14種文字。",
-        },
-        {
-          name: "二",
-          description:
-            "第二批《國家珍貴古籍名録》于2009年6月9日公布，收録280家藏書機構/個人的4478部古籍文獻，其中，漢文文獻4211部，包括簡帛9種、敦煌遺書146件、碑帖拓本10件、古地圖13件、漢文古籍4033部；少數民族文字古籍266部，包括藏文、回鶻文、西夏文、蒙古文、察合台文、彝文、滿文、東巴文、傣文、水文、古壯字、布依文等12種文字；其他文字古籍1部。",
-        },
-        {
-          name: "三",
-          description:
-            "第三批《國家珍貴古籍名録》于2010年6月11日公布，收録239家藏書機構/個人的2989部古籍文獻，其中，漢文文獻2741部，包括敦煌遺書101件、碑帖拓本10件、古地圖52件、漢文古籍2578部；少數民族文字古籍246部，包括于闐文、粟特文、藏文、西夏文、蒙古文、察合台文、彝文、滿文、東巴文、傣文、水文、古壯字、布依文等13種文字；其他文字古籍2部。",
-        },
-        {
-          name: "四",
-          description:
-            "第四批《國家珍貴古籍名録》于2013年3月8日公布，收録189家藏書機構/個人的1516部古籍文獻，其中，漢文文獻1221部，包括甲骨3種、簡帛25種、敦煌遺書28件、碑帖拓本70件、古地圖42件、漢文古籍1053部；少數民族文字古籍286部，包括藏文、回鶻文、西夏文、蒙古文、察合台文、彝文、滿文、東巴文、傣文、水文、古壯字、布依文等12種文字；其他文字古籍9部。",
-        },
-        {
-          name: "五",
-          description:
-            "第五批《國家珍貴古籍名録》于2016年3月27日公布，共收録139家藏書機構/個人的899部古籍文獻，其中，漢文文獻754部，包括甲骨1種、簡帛13種、敦煌遺書28件、碑帖拓本22件、古地圖14件、漢文古籍676部；少數民族文字古籍131部，包括藏文、西夏文、蒙古文、察合台文、彝文、滿文、東巴文、水文、古壯字、布依文等10種文字；其他文字古籍14部。",
-        },
-        {
-          name: "六",
-          description:
-            "第六批《國家珍貴古籍名録》于2020年10月30日公布，共收録119家藏書機構/個人的752部古籍文獻，其中，漢文文獻646部，包括簡帛23種、敦煌遺書29件、碑帖拓本34件、古地圖18件、漢文古籍542部；少數民族文字古籍94部，包括于闐文、藏文、蒙古文、彝文、滿文、東巴文、傣文、水文、古壯字等9種文字；其他文字古籍12部。",
-        },
-      ],
-      current_batch: 0,
-      statistics: [],
-      showing_books: [],
-    };
+// AOS.init();
+
+const batchInfo = [
+  {
+    name: "總",
+    description:
+      "《國家珍貴古籍名録》是由中華人民共和國國務院批准公布的我國現存珍貴古籍目録。建立《國家珍貴古籍名録》是確保珍貴古籍安全、推動古籍保護工作、促進優秀傳統文化傳承和弘揚的重要舉措。目前，國務院已批准公布六批《國家珍貴古籍名録》，全國485家機構/個人收藏的13026部古籍入選，囊括先秦兩漢至明清時期的漢文古籍、少數民族文字古籍和其他文字古籍，其中漢文文獻11855部（含甲骨4種，簡帛187種，敦煌遺書405件，碑帖拓本219件，古地圖149件，漢文古籍10891部），少數民族文字古籍1133部，其他文字古籍38部。",
   },
-  computed: {
-    ...mapState(["rem"]),
+  {
+    name: "一",
+    description:
+      "第一批《國家珍貴古籍名録》于2008年3月1日公布，收録210家藏書機構/個人的2392部古籍文獻，其中，漢文文獻2282部，包括簡帛117種、敦煌遺書73件、碑帖拓本73件、古地圖10件、漢文古籍2009部；少數民族文字古籍110部，包括焉耆—龜兹文、于闐文、藏文、回鶻文、西夏文、白文、蒙古文、察合台文、彝文、滿文、東巴文、傣文、水文、古壯字等14種文字。",
   },
-  methods: {
-    /**
-     * 打开古籍详情页，逐级传递古籍id到App.vue
-     * @param {*} book_id 古籍id
-     */
-    openBookDetail(book_id) {
-      this.$emit("openBookDetail", book_id);
-    },
-    toWidth(p) {
-      return window.innerWidth * p;
-    },
-    toHeight(p) {
-      return window.innerHeight * p;
-    },
-
-    /**
-     * 从store中随机抽取6本古籍，显示在页面上
-     */
-    showMore() {
-      let arr =
-        this.current_batch == 0
-          ? this.$store.state.books
-          : this.$store.state.books.filter((el) => el.batch == this.current_batch);
-
-      this.showing_books = [];
-      setTimeout(() => {
-        for (let i = 0; i < 6; i++) this.showing_books.push(arr[Math.floor(Math.random() * arr.length)].id);
-      }, 50);
-    },
-
-    /**
-     * 切换批次
-     */
-    updateBatch(index) {
-      this.current_batch = index;
-      this.showMore();
-    },
+  {
+    name: "二",
+    description:
+      "第二批《國家珍貴古籍名録》于2009年6月9日公布，收録280家藏書機構/個人的4478部古籍文獻，其中，漢文文獻4211部，包括簡帛9種、敦煌遺書146件、碑帖拓本10件、古地圖13件、漢文古籍4033部；少數民族文字古籍266部，包括藏文、回鶻文、西夏文、蒙古文、察合台文、彝文、滿文、東巴文、傣文、水文、古壯字、布依文等12種文字；其他文字古籍1部。",
   },
-  created() {
-    this.showMore();
-    this.statistics = sta; // 要求统计数据写死，因此直接读取json文件
+  {
+    name: "三",
+    description:
+      "第三批《國家珍貴古籍名録》于2010年6月11日公布，收録239家藏書機構/個人的2989部古籍文獻，其中，漢文文獻2741部，包括敦煌遺書101件、碑帖拓本10件、古地圖52件、漢文古籍2578部；少數民族文字古籍246部，包括于闐文、粟特文、藏文、西夏文、蒙古文、察合台文、彝文、滿文、東巴文、傣文、水文、古壯字、布依文等13種文字；其他文字古籍2部。",
   },
-};
+  {
+    name: "四",
+    description:
+      "第四批《國家珍貴古籍名録》于2013年3月8日公布，收録189家藏書機構/個人的1516部古籍文獻，其中，漢文文獻1221部，包括甲骨3種、簡帛25種、敦煌遺書28件、碑帖拓本70件、古地圖42件、漢文古籍1053部；少數民族文字古籍286部，包括藏文、回鶻文、西夏文、蒙古文、察合台文、彝文、滿文、東巴文、傣文、水文、古壯字、布依文等12種文字；其他文字古籍9部。",
+  },
+  {
+    name: "五",
+    description:
+      "第五批《國家珍貴古籍名録》于2016年3月27日公布，共收録139家藏書機構/個人的899部古籍文獻，其中，漢文文獻754部，包括甲骨1種、簡帛13種、敦煌遺書28件、碑帖拓本22件、古地圖14件、漢文古籍676部；少數民族文字古籍131部，包括藏文、西夏文、蒙古文、察合台文、彝文、滿文、東巴文、水文、古壯字、布依文等10種文字；其他文字古籍14部。",
+  },
+  {
+    name: "六",
+    description:
+      "第六批《國家珍貴古籍名録》于2020年10月30日公布，共收録119家藏書機構/個人的752部古籍文獻，其中，漢文文獻646部，包括簡帛23種、敦煌遺書29件、碑帖拓本34件、古地圖18件、漢文古籍542部；少數民族文字古籍94部，包括于闐文、藏文、蒙古文、彝文、滿文、東巴文、傣文、水文、古壯字等9種文字；其他文字古籍12部。",
+  },
+];
+const current_batch = ref(0);
+const statistics = ref([]);
+const showing_books = <RelatedBook[]>reactive([]);
+
+const rem = computed(() => {
+  return mapState(["rem"]).rem;
+});
+
+/**
+ * 打开古籍详情页，逐级传递古籍id到App.vue
+ * @param {*} book_id 古籍id
+ */
+function openBookDetail(book_id: string) {
+  emit("openBookDetail", book_id);
+}
+
+function toWidth(p: number) {
+  return window.innerWidth * p;
+}
+
+function toHeight(p: number) {
+  return window.innerHeight * p;
+}
+
+/**
+ * 从store中随机抽取6本古籍，显示在页面上
+ */
+function showMore() {
+  let arr =
+    current_batch.value == 0
+      ? store.state.books
+      : store.state.books.filter((el: RelatedBook) => el.batch == current_batch.value);
+
+  showing_books.length = 0;
+  setTimeout(() => {
+    for (let i = 0; i < 6; i++) showing_books.push(arr[Math.floor(Math.random() * arr.length)].id);
+  }, 50);
+}
+
+/**
+ * 切换批次
+ */
+function updateBatch(index: number) {
+  current_batch.value = index;
+  showMore();
+}
+
+showMore();
+statistics.value = sta; // 要求统计数据写死，因此直接读取json文件
 
 // 先秦兩漢時期	入選古籍涉及：商、戰國、秦、西漢、東漢
 // 魏晋南北朝隋唐五代時期	入選古籍涉及：晋（西晋、東晋）、北凉、西凉、南北朝（南朝梁、南朝陳、北魏、西魏、北齊）、六朝、高昌、隋、唐（武周）、吐蕃統治敦煌時期、歸義軍時期、五代（後梁、後唐、後周）、吴越

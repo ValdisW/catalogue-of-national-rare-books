@@ -5,42 +5,31 @@
       <span></span>
     </div>
     <ul class="list" v-show="show_list">
-      <li
-        v-for="attr in attr_list"
-        :key="attr"
-        @click="select"
-        v-text="attr.name"
-        :name="attr.value"
-      ></li>
+      <li v-for="attr in attr_list" :key="attr" @click="select" v-text="attr.name" :name="attr.value"></li>
     </ul>
   </div>
 </template>
 
-<script>
-export default {
-  name: "Droplist",
-  props: {
-    attr_list: Array,
-  },
-  data() {
-    return {
-      options: [],
-      show_list: false,
-      default_text: this.attr_list[0].name,
-      curr_value: this.attr_list[0].value,
-    };
-  },
-  methods: {
-    toggleShowList() {
-      this.show_list = !this.show_list;
-    },
-    select(e) {
-      this.curr_value = e.target.getAttribute("name");
-      this.toggleShowList();
-      this.default_text = e.target.innerText;
-    },
-  },
-};
+<script lang="ts" setup>
+import { ref } from "vue";
+
+const props = defineProps({
+  attr_list: Array,
+});
+
+const show_list = ref(false);
+const default_text = ref(props.attr_list[0].name);
+const curr_value = ref(props.attr_list[0].value);
+
+function toggleShowList() {
+  show_list.value = !show_list.value;
+}
+
+function select(e: MouseEvent) {
+  curr_value.value = e.target.getAttribute("name");
+  toggleShowList();
+  default_text.value = e.target.innerText;
+}
 </script>
 
 <style lang="less" scoped>

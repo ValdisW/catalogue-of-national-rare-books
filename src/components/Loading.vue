@@ -15,13 +15,10 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: "Loading",
-  props: {
-    complete: Boolean,
-  },
-};
+<script lang="ts" setup>
+defineProps({
+  complete: Boolean,
+});
 </script>
 
 <style lang="less" scoped>

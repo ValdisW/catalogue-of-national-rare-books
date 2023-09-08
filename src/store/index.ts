@@ -1,9 +1,12 @@
+import { App } from "vue";
 import { createStore } from "vuex";
+
+import { RelatedBook, RelatedPerson } from "#/axios";
 
 const store = createStore({
   state: {
-    books: [],
-    persons: [],
+    books: Array<RelatedBook>,
+    persons: Array<RelatedPerson>,
     person_ralations: [],
     all_action: [],
     all_document_type: [],
@@ -71,7 +74,7 @@ const store = createStore({
   // modules: {},
 });
 
-export function setupStore(app) {
+export function setupStore(app: App) {
   app.use(store);
 }
 

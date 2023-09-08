@@ -7,35 +7,38 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: "BookItem",
-  props: {
-    id: String,
-  },
-  computed: {
-    /**
-     * 计算书影缩略图的url
-     */
-    cover_url() {
-      let img_res = this.$store.state.all_image.filter((el) => el.id == this.id); // 从vuex获取书影数据
-      return img_res[0].allowed ? `/data/images/thumbnails/${this.id}.jpg` : "/data/images/thumbnails/placeholder.jpg";
-    },
-  },
-  methods: {
-    openBookDetail() {
-      this.$emit("openBookDetail", this.id);
-    },
-    showDefaultImg(e) {
-      e.target.src = "/data/images/thumbnails/placeholder.jpg";
-    },
-  },
-  data() {
-    return {
-      title: this.$store.state.books.find((e) => e.id == this.id).name,
-    };
-  },
-};
+<script lang="ts" setup>
+import { computed } from "vue";
+
+import { store } from "@/store";
+
+const emit = defineEmits(["openBookDetail"]);
+
+const props = defineProps({
+  id: String,
+});
+
+/**
+ * 计算书影缩略图的url
+ */
+const cover_url = computed(() => {
+  let img_res = store.state.all_image.filter((el) => el.id == props.id); // 从vuex获取书影数据
+  return img_res[0].allowed ? `/data/images/thumbnails/${props.id}.jpg` : "/data/images/thumbnails/placeholder.jpg";
+});
+
+function openBookDetail() {
+  emit("openBookDetail", props.id);
+}
+
+function showDefaultImg(e) {
+  e.target.src = "/data/images/thumbnails/placeholder.jpg";
+}
+
+const title = store.state.books.find((e) => e.id == props.id).name;
+
+defineExpose({
+  showDefaultImg,
+});
 </script>
 
 <style lang="less" scoped>

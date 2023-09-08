@@ -8,15 +8,12 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: "BookInfoDialog",
-  props: {
-    id: String,
-    title: String,
-    detail: String,
-  },
-};
+<script lang="ts" setup>
+defineProps({
+  id: String,
+  title: String,
+  detail: String,
+});
 </script>
 
 <style lang="less" scoped>

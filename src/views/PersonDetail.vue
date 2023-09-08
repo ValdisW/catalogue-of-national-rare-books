@@ -35,10 +35,10 @@
           <h4>相關人物</h4>
           <div class="person-responsibility">
             <p
-              v-for="b in this.related_person"
+              v-for="b in related_person"
               :key="b"
               @click="openPersonDetail(b.person_id)"
-              v-text="$store.state.persons.find((ele) => ele.id == b.person_id).name + '（' + b.count + '）'"
+              v-text="store.state.persons.find((ele) => ele.id == b.person_id)!.name + '（' + b.count + '）'"
             ></p>
             <!-- <router-link
                 :to="/person-detail/ + b.person_id"
@@ -62,7 +62,7 @@
         </div>
         <div class="book-responsibility">
           <ul>
-            <li v-for="e in filtered_related_books" :key="e" @click="$emit('openBookDetail', e.book_id)">
+            <li v-for="e in filtered_related_books" :key="e" @click="emit('openBookDetail', e.book_id)">
               <span v-text="e.book_id + ' '"></span>
               <span v-text="e.title + ' '"></span>
               <span v-text="e.action + ' '"></span>
@@ -75,75 +75,91 @@
   </div>
 </template>
 
-<script>
+<script lang="ts" setup>
+import { ref, reactive } from "vue";
 import axios from "axios";
 import BookInfoDialog from "@/components/BookInfoDialog.vue";
+import { RelatedBook, RelatedPerson } from "#/axios";
 
-export default {
-  name: "PersonDetail",
-  components: { BookInfoDialog },
-  data() {
-    return {
-      show: false,
-      all_related_books: [],
-      filtered_related_books: [],
-      related_person: [],
-      hover_data: {
-        id: "",
-        title: "",
-        detail: "",
-      },
-      person_data: {},
-      action_types: [],
-    };
-  },
-  methods: {
-    init() {
-      this.action_types = [
-        { name: "創作", count: 0 },
-        { name: "出版", count: 0 },
-        { name: "批校題跋", count: 0 },
-        { name: "收藏", count: 0 },
-      ];
+import { store } from "@/store";
 
-      this.person_data = {
-        name: "加載中",
-        year_of_birth: "",
-        year_of_death: "",
-        courtesy_name: "-",
-        pseudonym_name: "-",
-        introduction: "-",
-      };
+const emit = defineEmits(["openPersonDetail", "openBookDetail"]);
 
-      this.related_person = [];
-      this.filtered_related_books = [];
-    },
-    close() {
-      this.show = false;
-    },
-    openPersonDetail(person_id) {
-      this.$emit("openPersonDetail", person_id);
-    },
-    open(person_id) {
-      this.init(); // 把四个类型的行为数归零
+const show = ref(false); // 控制本组件是否显示
 
-      this.show = true;
-      axios.get(`/data/person-detail/${person_id}`).then((d) => {
-        this.person_data = d.data[0][0];
-        this.filtered_related_books = this.all_related_books = d.data[1];
-        this.related_person = d.data[2];
-        this.related_person.sort((a, b) => b.count - a.count);
+const related_person = <RelatedPerson[]>reactive([]); // 相关的其他人物
+const all_related_books = <RelatedBook[]>reactive([]); // 该人物的所有相关书籍
+const filtered_related_books = <RelatedBook[]>reactive([]); // 创作/出版/批校题跋/收藏的相关书籍筛选结果
 
-        // for (let e of this.all_related_books)
-        //   e.type = this.$store.state.all_action.find((el) => el.id == e.action_id).type;
-        for (let e of this.action_types) for (let f of this.all_related_books) if (e.name == f.type) e.count++;
-      });
-    },
-    filterType(type) {
-      this.filtered_related_books = this.all_related_books.filter((el) => el.type == type);
-    },
-  },
-};
+// 实际没用上
+const hover_data = reactive({
+  id: "",
+  title: "",
+  detail: "",
+});
+
+// 用来呈现人物信息
+const person_data = ref({
+  name: "加載中",
+  year_of_birth: "",
+  year_of_death: "",
+  courtesy_name: "-",
+  pseudonym_name: "-",
+  introduction: "-",
+});
+
+// 该人物以各种形式参与的书籍统计
+const action_types = reactive([
+  { name: "創作", count: 0 },
+  { name: "出版", count: 0 },
+  { name: "批校題跋", count: 0 },
+  { name: "收藏", count: 0 },
+]);
+
+function init() {
+  // 动作分类归零
+  action_types.forEach((e) => (e.count = 0));
+
+  // 清空相关的人物、书籍
+  related_person.length = 0;
+  all_related_books.length = 0;
+  filtered_related_books.length = 0;
+}
+
+function close() {
+  show.value = false;
+}
+
+function openPersonDetail(person_id: string) {
+  emit("openPersonDetail", person_id);
+}
+
+function open(person_id: string) {
+  init();
+
+  show.value = true;
+
+  axios.get(`/data/person-detail/${person_id}`).then((d) => {
+    person_data.value = { ...d.data[0][0] };
+
+    filtered_related_books.push(...d.data[1]);
+    all_related_books.push(...d.data[1]);
+
+    related_person.push(...d.data[2]);
+    related_person.sort((a, b) => b.count - a.count);
+
+    // for (let e of this.all_related_books) e.type = this.$store.state.all_action.find((el) => el.id == e.action_id).type;
+    for (let e of action_types) for (let f of all_related_books) if (e.name == f.type) e.count++;
+  });
+}
+
+// 筛选
+function filterType(type: string) {
+  filtered_related_books.length = 0;
+  filtered_related_books.push(...all_related_books.filter((el) => el.type == type));
+}
+
+defineExpose({ open, close });
 </script>
 
 <style lang="less" scoped>

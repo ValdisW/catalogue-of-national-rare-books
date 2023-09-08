@@ -23,42 +23,44 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: "Filter",
-  props: {
-    attr_id: String,
-    attr_name: String, // 筛选器的标题
-    attrs: Array, // 筛选器展示的内容。键值对，各个属性id及其值 e.g. {name: "多文種", ids: ["1", "16", "23"], value: 345，selected: false}
-    db_column: String,
-  },
-  computed: {
-    max_value() {
-      let max = 0;
-      this.attrs.forEach((e) => {
-        if (max < e.value) max = e.value;
-      });
-      return max;
-    },
-  },
-  methods: {
-    /**
-     * 点击某个筛选项后，更新筛选条件
-     * @param {*} e 被点击的筛选条件的对应数据。内容格式与attrs对应
-     */
-    updateSelect(e) {
-      e.selected = !e.selected;
-      let selected_ids = [];
-      for (let e of this.attrs.filter((el) => el.selected).map((el) => (el = el.ids))) {
-        selected_ids = selected_ids.concat(e);
-      }
-      this.$emit("filter", {
-        attr: this.attr_id,
-        value: selected_ids,
-      });
-    },
-  },
-};
+<script lang="ts" setup>
+import { computed } from "vue";
+
+import { Filter } from "#/axios";
+
+const emit = defineEmits(["filter"]);
+
+const props = defineProps({
+  attr_id: String,
+  attr_name: String, // 筛选器的标题
+  attrs: Array<Filter>, // 筛选器展示的内容。键值对，各个属性id及其值 e.g. {name: "多文種", ids: ["1", "16", "23"], value: 345，selected: false}
+  db_column: String,
+});
+const max_value = computed(() => {
+  let max = 0;
+  props.attrs!.forEach((e) => {
+    if (max < e.value) max = e.value;
+  });
+  return max;
+});
+
+/**
+ * 点击某个筛选项后，更新筛选条件
+ * @param {*} e 被点击的筛选条件的对应数据。内容格式与attrs对应
+ */
+function updateSelect(e: Filter) {
+  e.selected = !e.selected;
+  let selected_ids: string[] = [];
+
+  // 获取筛选出来的古籍的id
+  for (let e of props.attrs!.filter((el) => el.selected).map((el) => el.ids)) {
+    selected_ids = selected_ids.concat(e);
+  }
+  emit("filter", {
+    attr: props.attr_id,
+    value: selected_ids,
+  });
+}
 </script>
 
 <style lang="less" scoped>

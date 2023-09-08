@@ -1,6 +1,6 @@
 <template>
   <!-- 不支持手机访问的提示 -->
-  <MobileWarning v-if="mobileDetect()" />
+  <MobileWarning v-if="onMobileDevice()" />
 
   <!-- 加载提示 -->
   <transition name="bg-fade"><Loading :complete="complete" /></transition>
@@ -35,88 +35,87 @@
     </router-view>
 
     <!-- 古籍详情页 -->
-    <BookDetail @openPersonDetail="openPersonDetail" ref="book-detail" />
+    <BookDetail @openPersonDetail="openPersonDetail" ref="BookDetailRef" />
 
     <!-- 人物详情页 -->
-    <PersonDetail @openBookDetail="openBookDetail" ref="person-detail" />
+    <PersonDetail @openBookDetail="openBookDetail" ref="PersonDetailRef" />
 
     <!-- 机构详情页（未使用） -->
-    <InstitutionDetail ref="institution-detail" institutionID="201"></InstitutionDetail>
+    <InstitutionDetail ref="InstitutionDetailRef" institutionID="201"></InstitutionDetail>
   </div>
 </template>
 
-<script>
+<script lang="ts" setup>
+import { ref } from "vue";
+
+import { store } from "@/store";
+
 import Loading from "@/components/Loading.vue";
 import MobileWarning from "@/components/MobileWarning.vue";
 import BookDetail from "@/views/BookDetail.vue";
 import PersonDetail from "@/views/PersonDetail.vue";
 import InstitutionDetail from "@/views/InstitutionDetail.vue";
 
-const baseSize = 20;  // 用于设置rem单位的基准值
+// DOM关联
+const BookDetailRef = ref(null);
+const PersonDetailRef = ref(null);
+const InstitutionDetailRef = ref(null);
 
-export default {
-  name: "App",
-  components: {
-    Loading,
-    MobileWarning,
-    BookDetail,
-    PersonDetail,
-    InstitutionDetail,
-  },
-  data() {
-    return {
-      complete: false,
-      nav_pages: [
-        { name: "名録介紹", router: "/" },
-        { name: "名録瀏覽", router: "/exploration" },
-        { name: "名録分析", router: "/relationship" },
-        { name: "研發團隊", router: "/about" },
-      ],
-    };
-  },
-  methods: {
-    openBookDetail(book_id) {
-      this.$refs["book-detail"].open(book_id);
-      this.$refs["person-detail"].close();
-    },
-    openPersonDetail(person_id) {
-      console.log('openPersonDetail');
-      this.$refs["book-detail"].close();
-      this.$refs["person-detail"].open(person_id);
-    },
-    openInstitutionDetail(institution_id) {
-      this.$refs["institution-detail"].open(institution_id);
-    },
-    PageSize() {
-      let width = window.innerWidth;
-      let height = Math.min(window.innerHeight, (width * 9) / 16);
-      width = (height * 16) / 9;
-      let size = { width, height };
-      return size;
-    },
-    setRem() {
-      // 用于根据页面大小设定rem，以自适应元素大小
-      const scale = this.PageSize().width / 1280;
-      let rem = baseSize * Math.min(scale, 50);
-      this.$store.commit("changeRem", rem);
-      document.documentElement.style.fontSize = rem + "px";
-    },
+const baseSize = 20; // 用于设置rem单位的基准值
 
-    init() {
-      this.setRem();
-      window.onresize = () => {
-        this.init();
-      };
-    },
+function openBookDetail(book_id: string) {
+  BookDetailRef.value.open(book_id);
+  PersonDetailRef.value.close();
+}
 
-    mobileDetect() {
-      return navigator.userAgent.match(/(Android|webOS|iPhone|iPad|iPod|BlackBerry|Windows Phone)/i);
-    },
-  },
-  mounted() {
-    this.init();
-  },
-};
+function openPersonDetail(person_id: string) {
+  console.log("openPersonDetail");
+  BookDetailRef.value.close();
+  PersonDetailRef.value.open(person_id);
+}
+
+function openInstitutionDetail(institution_id: string) {
+  InstitutionDetailRef.value.open(institution_id);
+}
+
+// 获取屏幕尺寸指标，用来计算字号
+function PageSize() {
+  let width = window.innerWidth;
+  let height = Math.min(window.innerHeight, (width * 9) / 16);
+  width = (height * 16) / 9;
+  let size = { width, height };
+  return size;
+}
+
+// 设置rem，以调节整体字号
+function setRem() {
+  // 用于根据页面大小设定rem，以自适应元素大小
+  const scale = PageSize().width / 1280;
+  let rem = baseSize * Math.min(scale, 50);
+  store.commit("changeRem", rem);
+  document.documentElement.style.fontSize = rem + "px";
+}
+
+function init() {
+  setRem();
+  window.onresize = () => {
+    init();
+  };
+}
+
+function onMobileDevice() {
+  return navigator.userAgent.match(/(Android|webOS|iPhone|iPad|iPod|BlackBerry|Windows Phone)/i);
+}
+
+init();
+
+const complete = ref<Boolean>(false);
+const nav_pages = [
+  { name: "名録介紹", router: "/" },
+  { name: "名録瀏覽", router: "/exploration" },
+  { name: "名録分析", router: "/relationship" },
+  { name: "研發團隊", router: "/about" },
+];
 </script>
 
 <style lang="less">

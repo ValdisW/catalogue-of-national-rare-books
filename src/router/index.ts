@@ -1,3 +1,4 @@
+import type { App } from "vue";
 import { createRouter, createWebHashHistory } from "vue-router";
 
 const routes = [
@@ -88,15 +89,14 @@ export const router = createRouter({
   routes,
 });
 
-
 // 设置title
 router.beforeEach((to, from, next) => {
   if (to.meta.title) {
-    document.title = to.meta.title;
+    document.title = to.meta.title as string;
   }
   next();
 });
 
-export function setupRouter(app) {
+export function setupRouter(app: App) {
   app.use(router);
 }
