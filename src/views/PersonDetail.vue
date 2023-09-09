@@ -1,350 +1,165 @@
 <template>
-  <div class="person-detail">
-    <BackButton />
+  <div class="person-detail" v-show="show">
     <div class="content">
-      <h1 v-text="$route.params.personID"></h1>
-      <div class="related-books">
-        <ul>
-          <li v-for="e in relatedBooks" :key="e">
-            <router-link
-              :to="'/book-detail/' + e.名录ID"
-              v-text="e.名录ID + ' ' + e.题名卷数 + ' ' + e.责任行为"
-            ></router-link>
-          </li>
-        </ul>
+      <div class="close-button" @click="close"></div>
+
+      <!-- 页面上半部分内容 -->
+      <div class="person-card">
+        <div class="person-info">
+          <div class="person-brief">
+            <div class="person-name">
+              <h1 v-text="person_data.name"></h1>
+            </div>
+            <div class="person-info-list">
+              <div class="person-birth">
+                <p>
+                  生卒：
+                  <span v-text="`${person_data.year_of_birth} - ${person_data.year_of_death}`"></span>
+                </p>
+              </div>
+              <div class="person-title">
+                <p>字:<span v-text="person_data.courtesy_name || '不詳'"></span></p>
+                <p>
+                  號:
+                  <span v-text="person_data.pseudonym_name || '不詳'"></span>
+                </p>
+              </div>
+              <p></p>
+              <span></span>
+            </div>
+          </div>
+          <div class="person-intro" v-text="person_data.introduction || ''"></div>
+        </div>
+
+        <div class="related-person">
+          <h4>相關人物</h4>
+          <div class="person-responsibility">
+            <p
+              v-for="b in related_person"
+              :key="b"
+              @click="openPersonDetail(b.person_id)"
+              v-text="store.state.persons.find((ele) => ele.id == b.person_id)!.name + '（' + b.count + '）'"
+            ></p>
+            <!-- <router-link
+                :to="/person-detail/ + b.person_id"
+                v-text="$store.state.persons.find((ele) => ele.id == b.person_id).name + '（' + b.count + '）'"
+              ></router-link> -->
+          </div>
+        </div>
       </div>
-      <div class="related-person">
-        <p v-for="b in this.related_person" :key="b">
-          <router-link
-            :to="/person-detail/ + b.责任人姓名"
-            v-text="b.责任人姓名 + ' ' + b.count"
-          ></router-link>
-        </p>
+
+      <div class="related-books">
+        <div class="responsibility-select">
+          <h4>責任目録</h4>
+          <button
+            v-for="n in action_types"
+            :key="n.name"
+            v-text="`${n.name}(${n.count})`"
+            class="responsibility-type"
+            :class="{ invalid: !n.count }"
+            @click="if (n.count) filterType(n.name);"
+          ></button>
+        </div>
+        <div class="book-responsibility">
+          <ul>
+            <li v-for="e in filtered_related_books" :key="e" @click="emit('openBookDetail', e.book_id)">
+              <span v-text="e.book_id + ' '"></span>
+              <span v-text="e.title + ' '"></span>
+              <span v-text="e.action + ' '"></span>
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
-    <BookInfoDialog
-      ref="book-info-dialog"
-      :id="hover_data.id"
-      :title="hover_data.title"
-      :detail="hover_data.detail"
-    />
+    <BookInfoDialog ref="book-info-dialog" :id="hover_data.id" :title="hover_data.title" :detail="hover_data.detail" />
   </div>
 </template>
 
-<script>
+<script lang="ts" setup>
+import { ref, reactive } from "vue";
 import axios from "axios";
-// import * as d3 from "d3";
-import BookInfoDialog from "@/components/BookInfoDialog";
-import BackButton from "@/components/BackButton";
+import BookInfoDialog from "@/components/BookInfoDialog.vue";
+import { Relation, RelatedPerson } from "#/axios";
 
-export default {
-  name: "PersonDetail",
-  components: { BookInfoDialog, BackButton },
-  data() {
-    return {
-      catalogue: {
-        创作: [
-          "撰",
-          "撰文",
-          "撰文並書",
-          "撰文序",
-          "撰文記",
-          "撰文並行書",
-          "撰序",
-          "撰記",
-          "集撰",
-          "撰集",
-          "撰並篆注",
-          "撰並注",
-          "撰並書",
-          "撰並編",
-          "撰記並書",
-          "撰後記",
-          "藏並撰",
-          "敕撰",
-          "藏幷撰",
-          "編撰",
-          "輯",
-          "釋文",
-          "書法",
-          "考證",
-          "考異",
-          "廣義",
-          "發明",
-          "集覽",
-          "正誤",
-          "質實",
-          "纂集",
-        ],
-        出版: [
-          "抄寫",
-          "抄",
-          "刻",
-          "重刻",
-          "修",
-          "重修",
-          "印",
-          "重印",
-          "刻版",
-          "拓",
-          "刻石",
-          "刻版 ",
-          "補",
-          "寫",
-          "修補",
-          "補刻",
-          "續刻",
-          "重刻石",
-          "印刷",
-          "題簽",
-          "題跋",
-          "題記",
-          "摹勒",
-          "增修",
-          "增刻",
-          "刻書牘紙",
-          "謙刻",
-          "繪",
-          "補修",
-          "刻石 ",
-          "原刻",
-          "重刻",
-          "刻詩",
-        ],
-        批校题跋: [
-          "題跋",
-          "跋",
-          "書",
-          "題款",
-          "題款並跋",
-          "題簽並跋",
-          "題字",
-          "題識",
-          "跋並題詩",
-          "題詩",
-          "題簽",
-          "摹勒並題額",
-          "題記",
-          "題端",
-          "題跋題詩題記",
-          "題詞",
-          "題詩並跋",
-          "題詩題詞並跋",
-          "批校題識",
-          "題簽題記",
-          "跋題簽",
-          "題跋並題端",
-          "題名",
-          "畫並題款",
-          "書函題簽",
-          "題跋及畫",
-          "篆書題端",
-          "題首",
-          "題辭",
-          "題簽並題跋",
-          "校並題識",
-          "題說",
-          "批校題跋",
-          "題簽並題款",
-          "題記並跋",
-          "題簽並題記",
-          "題識並跋",
-          "題簽題記並錄",
-          "藏並題簽",
-          "跋或題簽",
-          "點並題識",
-          "抄補並題識",
-          "校並跋又題簽",
-          "批點並題款",
-          "篆首並題識",
-          "題記考釋",
-          "題記並謄録",
-          "校正",
-          "校",
-          "校並跋",
-          "點校",
-          "校注",
-          "校定",
-          "編校",
-          "批校",
-          "校跋",
-          "墨批校",
-          "校補",
-          "批校並跋",
-          "校閱",
-          "校點並跋",
-          "校補並跋",
-          "校跋並錄",
-          "批校圈點",
-          "批校並錄",
-          "增校",
-          "校字",
-          "校訂",
-          "批校並跋又錄",
-          "校並跋又錄",
-          "重校",
-          "校語",
-          "校補並錄",
-          "校並補序",
-          "校記",
-          "校證",
-          "校釋",
-          "校並抄補序目",
-          "校並補錄遺詩",
-          "評校",
-          "簽並批校",
-          "校跋並録",
-          "批校並跋又録",
-          "圈點批校",
-          "簽校",
-          "校並錄",
-          "譯校",
-          "補臨並跋",
-          "抄補並跋",
-          "筆跋",
-          "釋文並跋",
-          "序並跋",
-          "批並跋",
-          "注並跋",
-          "點並跋",
-          "園跋",
-          "補志文並跋",
-          "跋並録",
-          "跋並錄",
-          "批點並跋",
-          "跋並臨",
-          "評並跋",
-          "批並錄",
-          "批評",
-          "批註",
-          "批注圈點",
-          "批注",
-          "批點",
-          "批語",
-          "批",
-          "批選",
-          "輯並批點",
-          "評注",
-          "附注",
-          "增注",
-          "增註",
-          "訓注",
-          "簽注",
-          "選注",
-          "圖注",
-          "錄疏注經",
-          "注頌",
-          "繪並注",
-          "輯並注",
-          "裁注",
-          "注解",
-          "輯並評",
-          "編注",
-          "箋注",
-          "補注",
-          "編年並注",
-          "輯注",
-          "書並繪",
-          "繪畫",
-          "绘图",
-          "繪圖",
-          "繪製",
-          "原繪",
-          "輯繪",
-          "編繪",
-          "註",
-          "音註",
-          "箋註",
-          "補註",
-          "註釋",
-          "訂註",
-          "辯註",
-          "纂註",
-          "注",
-          "注疏",
-          "言注",
-          "輯錄纂注",
-          "集注",
-          "標注",
-          "音注",
-        ],
-        收藏: [""],
-      },
-      relatedBooks: [],
-      related_person: [],
-      hover_data: {
-        id: "",
-        title: "",
-        detail: "",
-      },
-    };
-  },
-  mounted() {
-    axios
-      .get(`/data/person-detail/${this.$route.params.personID}`)
-      .then((d) => {
-        this.relatedBooks = d.data[0];
+import { store } from "@/store";
 
-        this.related_person = d.data[1];
-        this.related_person.sort((a, b) => b.count - a.count);
-        let max = 0,
-          min = Number.POSITIVE_INFINITY;
-        for (let p of this.related_person) {
-          if (max > p.count) max = p.count;
-          if (min < p.count) min = p.count;
-        }
-        // let rp = d3.select(".related-person");
-        // rp.selectAll("div")
-        //   .data(this.related_person)
-        //   .enter()
-        //   .append("div")
-        //   .style("width", "16px")
-        //   .style("height", "16px")
-        //   .style("border-radius", "50%")
-        //   .style("background", "#4a330066")
-        //   .style("display", "inline-block")
-        //   .style("cursor", "pointer")
-        //   .style("margin", "2px")
-        //   .style("position", "absolute")
-        //   .style(
-        //     "left",
-        //     (e, i, a) =>
-        //       `${
-        //         250 +
-        //         (200 - e.count * 10) * Math.cos(((Math.PI * 2) / a.length) * i)
-        //       }px`
-        //   )
-        //   .style(
-        //     "top",
-        //     (e, i, a) =>
-        //       `${
-        //         250 +
-        //         (200 - e.count * 10) * Math.sin(((Math.PI * 2) / a.length) * i)
-        //       }px`
-        //   )
-        //   .on("click", (e, d) => {
-        //     this.$router.push(`/person-detail/${d.责任人姓名}`);
-        //   })
-        //   .on("mousemove", (ev) => {
-        //     this.$refs["book-info-dialog"].$el.style.left =
-        //       ev.clientX + 10 + "px";
-        //     this.$refs["book-info-dialog"].$el.style.top =
-        //       ev.clientY + 30 + "px";
-        //   })
-        //   .on("mouseenter", (ev, data) => {
-        //     ev.target.style.background = "#da9f21";
-        //     this.$refs["book-info-dialog"].$el.style.display = "block";
-        //     this.hover_data = {
-        //       title: data.责任人姓名,
-        //     };
-        //   })
-        //   .on("mouseleave", (ev) => {
-        //     ev.target.style.background = "#4a330066";
-        //     this.$refs["book-info-dialog"].$el.style.display = "none";
-        //   });
-      });
-  },
-};
+const emit = defineEmits(["openPersonDetail", "openBookDetail"]);
+
+const show = ref(false); // 控制本组件是否显示
+
+const related_person = <RelatedPerson[]>reactive([]); // 相关的其他人物
+const all_related_books = <Relation[]>reactive([]); // 该人物的所有相关书籍
+const filtered_related_books = <Relation[]>reactive([]); // 创作/出版/批校题跋/收藏的相关书籍筛选结果
+
+// 实际没用上
+const hover_data = reactive({
+  id: "",
+  title: "",
+  detail: "",
+});
+
+// 用来呈现人物信息
+const person_data = ref({
+  name: "加載中",
+  year_of_birth: "",
+  year_of_death: "",
+  courtesy_name: "-",
+  pseudonym_name: "-",
+  introduction: "-",
+});
+
+// 该人物以各种形式参与的书籍统计
+const action_types = reactive([
+  { name: "創作", count: 0 },
+  { name: "出版", count: 0 },
+  { name: "批校題跋", count: 0 },
+  { name: "收藏", count: 0 },
+]);
+
+function init() {
+  // 动作分类归零
+  action_types.forEach((e) => (e.count = 0));
+
+  // 清空相关的人物、书籍
+  related_person.length = 0;
+  all_related_books.length = 0;
+  filtered_related_books.length = 0;
+}
+
+function close() {
+  show.value = false;
+}
+
+function openPersonDetail(person_id: string) {
+  emit("openPersonDetail", person_id);
+}
+
+function open(person_id: string) {
+  init();
+
+  show.value = true;
+
+  axios.get(`/data/person-detail/${person_id}`).then((d) => {
+    person_data.value = { ...d.data[0][0] };
+
+    filtered_related_books.push(...d.data[1]);
+    all_related_books.push(...d.data[1]);
+
+    related_person.push(...d.data[2]);
+    related_person.sort((a, b) => b.count - a.count);
+
+    // for (let e of this.all_related_books) e.type = this.$store.state.all_action.find((el) => el.id == e.action_id).type;
+    for (let e of action_types) for (let f of all_related_books) if (e.name == f.type) e.count++;
+  });
+}
+
+// 筛选
+function filterType(type: string) {
+  filtered_related_books.length = 0;
+  filtered_related_books.push(...all_related_books.filter((el) => el.type == type));
+}
+
+defineExpose({ open, close });
 </script>
 
 <style lang="less" scoped>
@@ -354,29 +169,158 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 20;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background: #f0e9dd;
+
   .content {
-    width: 80%;
-    display: flex;
+    width: 70%;
+    position: relative;
     align-items: center;
     justify-content: center;
-    .related-books {
-      overflow-y: scroll;
-      height: 400px;
-      font-size: 0.8rem;
-      a {
-        color: #000;
+    .close-button {
+      position: absolute;
+      left: -3rem;
+      top: 0.5rem;
+      width: 2rem;
+      height: 2rem;
+      background: url(../assets/icons/back.svg) center no-repeat;
+      background-size: 100%;
+      cursor: pointer;
+    }
+
+    .person-card {
+      margin-bottom: 1.5rem;
+      height: 11rem;
+      position: relative;
+      display: flex;
+      justify-content: space-between;
+      .person-info {
+        margin: 0 1rem 0 0;
+        .person-brief {
+          width: 25rem;
+          display: flex;
+          align-items: flex-start;
+          overflow: hidden;
+          .person-name {
+            min-width: 7.5rem;
+          }
+          .person-info-list {
+            white-space: nowrap;
+            margin: 0.4rem 0 0 1rem;
+            height: fit-content;
+            font-size: 0.8rem;
+            .person-birth {
+              display: flex;
+              p {
+                font-weight: bold;
+                span {
+                  font-weight: normal;
+                }
+              }
+            }
+            .person-title {
+              display: flex;
+              p {
+                font-weight: bold;
+                margin: 0 1rem 0 0;
+                span {
+                  font-weight: normal;
+                }
+              }
+            }
+          }
+        }
+        .person-intro {
+          margin-top: 1rem;
+          font-size: 0.7rem;
+          height: 7rem;
+          overflow-y: scroll;
+        }
+      }
+
+      .related-person {
+        padding: 0.5rem;
+        border-radius: 0.5rem;
+        background: #3331;
+        a {
+          color: #201d1d;
+        }
+        .person-responsibility {
+          position: relative;
+          font-size: 0.7rem;
+          width: 200px;
+          height: 170px;
+          overflow-y: scroll;
+          // p {
+          //   cursor: pointer;
+          //   &:hover {
+          //     background: #3331;
+          //   }
+          // }
+        }
       }
     }
-  }
-  .related-person {
-    a {
-      color: #000;
+    .related-books {
+      padding: 0.5rem;
+      border-radius: 0.5rem;
+      margin: 0 auto;
+      background: #3331;
+      align-items: center;
+      .responsibility-select {
+        display: flex;
+        .responsibility-type {
+          background: #5e524a;
+          border-radius: 0.3rem;
+          border: none;
+          padding: 0 0.5rem;
+          color: #ffffff;
+          height: 1.3rem;
+          font-size: 0.7rem;
+          margin: 0.1rem 0 0.5rem 20px;
+          cursor: pointer;
+          &:hover {
+            filter: brightness(80%);
+          }
+        }
+
+        .responsibility-type.invalid {
+          cursor: unset;
+          opacity: 0.5;
+          &:hover {
+            filter: none;
+          }
+        }
+      }
+      .book-responsibility {
+        overflow-y: scroll;
+        height: 15rem;
+        font-size: 0.8rem;
+        ul {
+          li {
+            cursor: pointer;
+            padding: 0.1rem 0;
+            span:first-child {
+              color: rgb(168, 124, 79);
+            }
+            span:last-child {
+              background: rgba(63, 40, 82, 0.413);
+              color: #eee;
+              padding: 0 0.1rem;
+              border-radius: 0.1rem;
+            }
+          }
+          li:hover {
+            background: #3331;
+          }
+        }
+      }
+      a {
+        color: #201d1d;
+      }
     }
-    position: relative;
-    font-size: 0.8rem;
-    width: 300px;
-    height: 500px;
-    overflow-y: scroll;
   }
 }
 </style>

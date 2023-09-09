@@ -8,15 +8,12 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: "BookInfoDialog",
-  props: {
-    id: String,
-    title: String,
-    detail: String,
-  },
-};
+<script lang="ts" setup>
+defineProps({
+  id: String,
+  title: String,
+  detail: String,
+});
 </script>
 
 <style lang="less" scoped>
@@ -25,7 +22,7 @@ export default {
   padding: 1.5rem;
   max-width: 15rem;
   position: absolute;
-  color: #fff;
+  color: #efefef;
   display: none;
   z-index: 1000;
   h4 {

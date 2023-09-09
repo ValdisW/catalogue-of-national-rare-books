@@ -1,218 +1,423 @@
 <template>
-  <div class="book-detail">
-    <BackButton />
+  <div class="book-detail" v-show="show">
     <div class="content">
-      <div class="img-wrapper">
-        <img src="@/assets/placeholder.jpg" alt="" />
-      </div>
+      <div class="close-button" @click="close"></div>
       <div class="info">
         <div class="title">
-          <span v-text="$route.params.bookID"></span>
-          <span v-text="normalized_title"></span>
+          <span v-text="book_data.name" :title="book_data.name"></span>
         </div>
-        <div class="detail">
-          <p class="edition-dynasty">
-            <span>版本年代：</span
-            ><span v-text="book_data.edition_dynasty"></span>
-          </p>
-          <p class="document-type">
-            <span>版本類型：</span
-            ><span v-text="book_data.document_type"></span>
-          </p>
-          <p><span>語種：</span><span v-text="book_data.language"></span></p>
-          <p><span>館藏：</span><span v-text="book_data.institution"></span></p>
-          <p>
-            <span>數量：</span
-            ><span v-text="book_data.quantity + book_data.measurement"></span>
-          </p>
+
+        <table class="detail">
+          <tr>
+            <td class="detail-title">名録號：</td>
+            <td class="detail-content document-type" v-text="book_data.id"></td>
+          </tr>
+          <tr>
+            <td class="detail-title">文獻類型：</td>
+            <td
+              class="detail-content document-type"
+              v-text="id2name(store.state.all_document_type, book_data.document_type_id, '-')"
+            ></td>
+          </tr>
+          <tr>
+            <td class="detail-title">文種：</td>
+            <td
+              class="detail-content language"
+              v-text="id2name(store.state.all_language, book_data.language_id, '-')"
+            ></td>
+          </tr>
+          <tr>
+            <td class="detail-title">分類：</td>
+            <td
+              class="detail-content name"
+              v-text="id2name(store.state.all_catalogue, book_data.catalogue_id, '-')"
+            ></td>
+          </tr>
+          <tr>
+            <td class="detail-title">題名：</td>
+            <td class="detail-content name" v-text="book_data.name || '-'"></td>
+          </tr>
+          <!-- <tr>
+            <td class="detail-title">版本類型：</td>
+            <td
+              class="detail-content edition-type"
+              v-text="id2name(store.state.all_document_type, book_data.edition_type_id, '-')"
+            ></td>
+          </tr> -->
+          <tr>
+            <td class="detail-title">版本：</td>
+            <td class="detail-content edition" v-text="book_data.edition || '-'"></td>
+          </tr>
+          <tr>
+            <td class="detail-title">數量：</td>
+            <td class="detail-content quantity" v-text="book_data.quantity || '-' + book_data.measurement || '-'"></td>
+          </tr>
+          <tr>
+            <td class="detail-title">裝幀形式：</td>
+            <td class="detail-content binding-form">-</td>
+          </tr>
+          <tr>
+            <td class="detail-title">開本尺寸：</td>
+            <td class="detail-content book-size" v-text="book_data.book_size || '-'"></td>
+          </tr>
+          <tr>
+            <td class="detail-title">板框尺寸：</td>
+            <td class="detail-content frame-size" v-text="book_data.frame_size || '-'"></td>
+          </tr>
+          <tr>
+            <td class="detail-title">版式：</td>
+            <td class="detail-content typeset" v-text="book_data.typeset || '-'"></td>
+          </tr>
+          <tr>
+            <td class="detail-title">牌記：</td>
+            <td class="detail-content note">-</td>
+          </tr>
+          <tr>
+            <td class="detail-title">收藏省份：</td>
+            <td
+              class="detail-content institute"
+              v-text="id2name(store.state.all_province, book_data.province_id, '-')"
+            ></td>
+          </tr>
+          <tr>
+            <td class="detail-title">收藏單位：</td>
+            <td
+              class="detail-content institute"
+              v-text="id2name(store.state.all_institution, book_data.institution_id, '-')"
+            ></td>
+          </tr>
+          <tr>
+            <td class="detail-title">索書號：</td>
+            <td class="detail-content" v-text="book_data.call_number || '-'"></td>
+          </tr>
+        </table>
+
+        <!-- 责任者 -->
+        <ul class="timeline">
+          <li v-for="person in related_person" :key="person" @click="clickPerson($event)">
+            <!-- 责任行为名称 -->
+            <div class="actions" v-text="person.action"></div>
+
+            <!-- 圆点 -->
+            <b></b>
+
+            <!-- 责任者名称 -->
+            <span class="person" v-if="person.person == '□□'" v-text="`[${person.dynasty_or_nation}]佚名`"></span>
+            <span
+              class="person"
+              v-else
+              @click="$emit('openPersonDetail', person.person_id)"
+              v-text="(person.dynasty_or_nation ? '[' + person.dynasty_or_nation + ']' : '') + person.person"
+            >
+            </span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- 书影 -->
+      <div class="book-image">
+        <!-- 书影图片 -->
+        <div class="img-wrapper" @click="openImageViewer">
+          <img
+            :src="image_filenames[image_showed_index]"
+            :alt="image_filenames[image_showed_index]"
+            @error="showDefaultImg"
+          />
         </div>
-        <div class="related-books">
-          <p
-            v-for="b in this.related_books"
-            :key="b.名录ID"
-            v-text="
-              $store.state.allData
-                .find((elem) => elem.id == b.名录ID)
-                .content.split('　')[0]
-            "
-          ></p>
+
+        <!-- 切换书影图片 -->
+        <div class="switch_pic" style="text-align: center">
+          <button
+            v-for="(u, i) in image_filenames"
+            :class="{ active: i == image_showed_index }"
+            :key="u"
+            @click="switchImage(i)"
+          ></button>
         </div>
-        <div class="person">
-          <table>
-            <tr v-for="e in person_data" :key="e">
-              <td>
-                <router-link
-                  v-if="e.责任人姓名"
-                  v-text="
-                    '[' + (e.dynasty_or_nation || '？') + ']' + e.责任人姓名
-                  "
-                  :to="'/person-detail/' + e.责任人姓名"
-                ></router-link>
-                <span
-                  v-else
-                  v-text="'[' + (e.dynasty_or_nation || '？') + ']佚名'"
-                ></span>
-              </td>
-              <td v-text="e.责任行为"></td>
-            </tr>
-          </table>
+
+        <!-- 名录内容 -->
+        <div class="display">
+          <div>
+            <p v-text="book_data.content_sc"></p>
+          </div>
         </div>
       </div>
     </div>
-    <BookInfoDialog
-      ref="book-info-dialog"
-      :id="hover_data.id"
-      :title="hover_data.title"
-      :detail="hover_data.detail"
-    />
+    <ImageViewer ref="ImageViewerRef" :imageUrl="image_filenames[image_showed_index]" />
   </div>
 </template>
 
-<script>
-import axios from "axios";
-// import * as d3 from "d3";
-import BookInfoDialog from "@/components/BookInfoDialog";
-import BackButton from "@/components/BackButton";
+<script lang="ts" setup>
+import { ref } from "vue";
+import { store } from "@/store";
+import axios, { AxiosResponse } from "axios";
+import type { Book, BookImage, Relation } from "#/axios";
 
-export default {
-  name: "BookDetail",
-  components: { BookInfoDialog, BackButton },
-  data() {
-    return {
-      book_data: { content: "" },
-      hover_data: {
-        id: "",
-        title: "",
-        detail: "",
-      },
-      person_data: [],
-      seal_data: [],
-      related_books: [],
-    };
-  },
-  computed: {
-    normalized_title() {
-      // 临时规范题名
-      return this.book_data.content.split("　")[0];
-    },
-  },
-  mounted() {
-    axios.get(`/data/book-detail/${this.$route.params.bookID}`).then((d) => {
-      this.book_data = d.data[0][0];
-      console.log(this.book_data);
+import ImageViewer from "@/components/ImageViewer.vue";
 
-      this.related_books = d.data[1];
-      this.person_data = d.data[2];
-      this.seal_data = d.data[3];
+import { id2name } from "@/utils/id2name.js";
 
-      // const related_books = d3.select(".related-books");
-      // related_books
-      //   .selectAll("div")
-      //   .data(d.data[1])
-      //   .enter()
-      //   .append("div")
-      //   .style("width", "16px")
-      //   .style("height", "16px")
-      //   .style("border-radius", "50%")
-      //   .style("background", "#4a330066")
-      //   .style("display", "inline-block")
-      //   .style("cursor", "pointer")
-      //   .style("margin", "2px")
-      //   .style("position", "absolute")
-      //   .style("left", (e, i, a) => `${250 + (200 - e.count * 10) * Math.cos(((Math.PI * 2) / a.length) * i)}px`)
-      //   .style("top", (e, i, a) => `${250 + (200 - e.count * 10) * Math.sin(((Math.PI * 2) / a.length) * i)}px`)
-      //   .on("click", (e, d) => {
-      //     this.$router.push(`/book-detail/${d.名录ID}`);
-      //   })
-      //   // .on("mouseenter", () => (this.$refs["book-info-dialog"].$el.style.display = "block"))
-      //   .on("mousemove", (ev) => {
-      //     this.$refs["book-info-dialog"].$el.style.left = ev.clientX + 10 + "px";
-      //     this.$refs["book-info-dialog"].$el.style.top = ev.clientY + 30 + "px";
-      //   })
-      //   .on("mouseenter", (ev, data) => {
-      //     ev.target.style.background = "#da9f21";
-      //     this.$refs["book-info-dialog"].$el.style.display = "block";
-      //     this.hover_data = {
-      //       id: data.名录ID,
-      //       title: this.$store.state.allData.find((elem) => elem.id == data.名录ID).content.split("　")[0],
-      //       detail: this.$store.state.allData.find((elem) => elem.id == data.名录ID).detail,
-      //     };
-      //   })
-      //   .on("mouseleave", (ev) => {
-      //     ev.target.style.background = "#4a330066";
-      //     this.$refs["book-info-dialog"].$el.style.display = "none";
-      //   });
-    });
-  },
-};
+const ImageViewerRef = ref<InstanceType<typeof ImageViewer> | null>(null);
+
+const show = ref(false);
+// const bookID = ref("");
+const image_filenames = ref<string[]>([]); // 书影图片
+const image_showed_index = ref(0);
+const book_data = ref<Book>({ content: "" });
+const related_person = ref<Relation[]>([]);
+const seals = ref([]);
+
+function clickPerson(e: MouseEvent) {
+  e.currentTarget?.lastElementChild.click();
+}
+function close() {
+  show.value = false;
+}
+function open(book_id: string) {
+  image_filenames.value = [];
+  show.value = true;
+
+  // 获取书影数据
+  axios.get(`/data/book-detail/${book_id}`).then((d: AxiosResponse) => {
+    book_data.value = d.data[0][0];
+    related_person.value = d.data[1];
+    seals.value = d.data[2];
+
+    let img_res = (store.state.all_image as unknown as Array<BookImage>).filter((el) => el.id == book_id); // 从vuex获取书影数据
+    if (img_res && img_res[0].filename && img_res[0].allowed)
+      for (let e of img_res) image_filenames.value.push(`/data/images/${e.folder}/${e.filename}`);
+    else image_filenames.value[0] = "none";
+  });
+}
+function showDefaultImg(e: Event) {
+  (e.target as HTMLImageElement).src = "/data/images/placeholder.jpg";
+}
+
+function openImageViewer() {
+  ImageViewerRef.value!.open();
+}
+function switchImage(index: number) {
+  image_showed_index.value = index;
+}
+// const normalized_title = computed(() => {
+//   // 临时规范题名
+//   return book_data.value.content.split("　")[0];
+// });
+
+defineExpose({
+  show,
+  open,
+  close,
+});
 </script>
 
 <style lang="less" scoped>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s;
+}
+
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+}
+
 .book-detail {
   width: 100vw;
   height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 20;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background: #f0e9dd;
 
   .content {
     width: 80%;
     display: flex;
-    align-items: center;
     justify-content: center;
 
-    .img-wrapper {
-      background: #dec4a4;
-      // background: #5e524a;
-      height: 80vh;
-      display: flex;
+    .close-button {
+      position: absolute;
+      left: 0;
+      top: 0.15rem;
+      width: 2rem;
+      height: 2rem;
+      background: url(../assets/icons/back.svg) center no-repeat;
+      background-size: 100%;
+      cursor: pointer;
+    }
+
+    .display {
+      font-size: 0.7rem;
+      margin-top: 5vh;
+      div {
+        ::-webkit-scrollbar {
+          width: 0.4rem;
+        }
+        p {
+          max-height: 4rem;
+          overflow-y: scroll;
+        }
+      }
+    }
+
+    .book-image {
+      width: 45%;
+      height: 75vh;
       align-items: center;
-      margin: 0 2rem 0 0;
-      img {
-        width: 300px;
+      justify-content: center;
+
+      .switch_pic {
+        display: block;
+        margin: 0 auto;
+
+        button {
+          margin: 0.4rem;
+          width: 0.75rem;
+          height: 0.75rem;
+          border-radius: 50%;
+          border: 0.07rem solid rgba(0, 0, 0, 0.632);
+          background: transparent;
+          box-sizing: border-box;
+          cursor: pointer;
+        }
+
+        button.active {
+          background: rgba(0, 0, 0, 0.632);
+        }
+      }
+
+      .img-wrapper {
+        background: #3331;
+        width: 100%;
+        height: 60vh;
+        margin: 0.5rem 0 0 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        img {
+          width: 100%;
+          height: 60vh;
+          object-fit: contain;
+          transition: all 1s ease-in-out;
+        }
       }
     }
     .info {
+      margin-right: 5vh;
+      width: 40%;
       height: 80vh;
+      // display: flex;
+      // flex-direction: column;
+      // justify-content: space-between;
+
       .title {
+        text-overflow: ellipsis;
+        width: 20rem;
+        overflow: hidden;
         font-family: "SourceHanSerif";
         font-weight: bold;
-        font-size: 2rem;
+        font-size: 1.6rem;
         margin: 0 0 1rem 0;
+
         span:first-child {
           color: #8f644d;
           margin: 0 1rem 0 0;
         }
+
         span:last-child {
           color: #4a3300;
+          white-space: nowrap;
         }
       }
+
       .detail {
-        font-size: 0.8rem;
-      }
-      .related-books {
-        font-size: 0.8rem;
-        position: relative;
-        width: 500px;
-        height: 300px;
-        overflow-y: scroll;
-      }
-      .person {
-        position: absolute;
-        right: 100px;
-        bottom: 100px;
-        table {
-          font-size: 0.8rem;
-          tr {
-            td {
-              a {
-                color: #000;
-              }
-            }
+        // display: flex;
+        font-size: 0.7rem;
+
+        tr {
+          line-height: 1.3rem;
+          td:first-child {
+            // width: 3.6rem;
           }
         }
+
+        .detail-title {
+          width: 3.6rem;
+          text-align: right;
+          font-weight: bold;
+          margin: 0 0.5rem 0 0;
+          flex: auto 0 0;
+        }
+
+        .detail-content {
+          line-height: 1rem;
+        }
+      }
+      ::-webkit-scrollbar {
+        height: 0.4rem;
+      }
+      .timeline {
+        list-style-type: none;
+        display: flex;
+        max-width: 70%;
+        overflow-x: scroll;
+        overflow-y: hidden;
+        height: 6rem;
+
+        li {
+          float: left;
+          min-width: 25%;
+          max-width: 20%;
+          position: relative;
+          text-align: center;
+          padding-top: 0.5rem;
+          cursor: pointer;
+          &:hover {
+            background: #00000012;
+          }
+        }
+
+        .actions {
+          text-align: center;
+          font-weight: bold;
+          font-size: 0.6rem;
+          height: 2rem;
+          margin-bottom: 0.7rem;
+          border-bottom: 0.15rem solid #4f4545;
+        }
+
+        .person {
+          text-align: center;
+          margin: 0.4rem 0 0;
+          font-size: 0.6rem;
+          color: #333;
+          display: block;
+          position: absolute;
+          width: 100%;
+        }
+      }
+
+      .timeline li b:before {
+        content: "";
+        position: absolute;
+        top: 2.1rem;
+        width: 0.8rem;
+        left: 0;
+        height: 0.8rem;
+        border: 0.1rem solid #9f6666;
+        border-radius: 50%;
+        background: #ffffff;
+        margin-left: 37%;
       }
     }
+
+    z-index: 1;
+    position: absolute;
   }
 }
 </style>

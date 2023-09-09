@@ -6,7 +6,7 @@
 
 <script>
 import { mapState } from "vuex";
-import Map from "@/components/Map-mapvgl.vue";
+import Map from "@/views/Map-mapvgl.vue";
 
 export default {
   name: "Exploration-BaiduMap",

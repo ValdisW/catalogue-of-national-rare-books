@@ -1,78 +1,144 @@
 <template>
-  <div class="bar-chart"></div>
+  <div class="bar-chart">
+    <div class="title" v-text="title"></div>
+    <div class="chart" ref="chart"></div>
+  </div>
 </template>
 
 <script>
 import * as d3 from "d3";
 
 export default {
-  name: "barChart",
+  name: "BarChart",
   props: {
+    canvasWidth: Number,
+    canvasHeight: Number,
     title: String,
-    data: Object,
+    info: Array,
+    bar_color: String,
+    margin_left: Number,
+  },
+  data() {
+    return {
+      margin: {
+        left: this.margin_left,
+        right: 0.15,
+        top: 0.1,
+        bottom: 0.1,
+      },
+    };
+  },
+  watch: {
+    canvasWidth(newVal) {
+      this.rescale(newVal, this.canvasWidth);
+    },
+    canvasHeight(newVal) {
+      this.rescale(this.canvasWidth, newVal);
+    },
+    info() {
+      this.initializeBarchart();
+    },
+  },
+  computed: {
+    displayed_data() {
+      return this.info.filter((el) => el.value > 0);
+    },
   },
   methods: {
-    render() {
-      let svg = d3.select(".bar-chart").append("svg");
-      /**
-       * 數據格式：
-       * {
-       *    "戰國": 1234,`
-       *    "秦": 333,
-       *    "漢": 666
-       * }
-       */
-      const xScale = d3.scaleLog([0, d3.max(this.data)], [30, 300]); // x轴的数值和渲染范围
-      const yScale = d3
-        .scaleBand(new d3.InternSet(d3.map(this.data, (d, i) => i)), [10, 100])
-        .padding(0.1);
-      const xAxis = d3.axisTop(xScale).ticks(5);
-      const yAxis = d3.axisLeft(yScale).tickSizeOuter(0);
+    rescale(width, height) {
+      this.initializeBarchart(width, height);
+    },
+    get_name() {
+      let lst = [];
+      this.displayed_data.forEach((e) => {
+        lst.push(e.name);
+      });
+      return lst;
+    },
+    initializeBarchart() {
+      if (this.displayed_data) {
+        let svgHeight = this.canvasHeight * (1 - this.margin.top - this.margin.bottom),
+          svgWidth = this.canvasWidth * (1 - this.margin.left - this.margin.right);
 
-      svg
-        .append("g")
-        .attr("transform", `translate(0,${20})`)
-        .call(xAxis)
-        .call((g) => g.select(".domain").remove())
-        .call((g) =>
-          g
-            .selectAll(".tick line")
-            .clone()
-            .attr("y2", 100)
-            .attr("stroke-opacity", 0.1)
-        )
-        .call((g) =>
-          g
-            .append("text")
-            .attr("x", 100)
-            .attr("y", -22)
-            .attr("fill", "currentColor")
-            .attr("text-anchor", "end")
-            .text("xLabel")
-        );
+        d3.select(this.$refs.chart).selectAll("svg").remove();
+        this.svg = d3.select(this.$refs.chart).append("svg").attr("width", this.canvasWidth).attr("height", svgHeight);
 
-      svg.append("g").attr("transform", `translate(${30},0)`).call(yAxis);
+        let x = d3
+          .scaleLinear()
+          .domain([0, Math.log(d3.max(this.displayed_data, (l) => l.value))])
+          .range([0, svgWidth]);
+        let y = d3.scaleBand().domain(this.get_name()).range([0, svgHeight]).padding(0.5);
 
-      svg
-        .append("g")
-        .attr("fill", "#333")
-        .selectAll("rect")
-        .data(this.data)
-        .join("rect")
-        .attr("x", xScale(0))
-        .attr("y", (d, i) => yScale(i))
-        .attr("width", (d) => xScale(d) - xScale(0))
-        .attr("height", yScale.bandwidth());
+        this.chart = this.svg
+          .selectAll("g")
+          .data(this.displayed_data)
+          .join("g")
+          .attr("class", (d) => {
+            "bar " + d.name;
+          })
+          .attr("transform", (d) => `translate(${this.canvasWidth * this.margin.left},${y(d.name)})`);
+
+        // add bar
+        this.chart
+          .append("g")
+          .append("rect")
+          .attr("x", 0)
+          .attr("y", 0)
+          .attr("width", (d) => x(Math.log(d.value + 1)))
+          .attr("height", y.bandwidth())
+          .attr("fill", this.bar_color)
+          .attr("fill-opacity", 0.8);
+
+        this.chart
+          .append("g")
+          .attr("transform", (d) => `translate(${x(Math.log(d.value + 1)) + 3},${y.bandwidth()})`)
+          .append("text")
+          .attr("font-size", "0.6rem")
+          .text((d) => d.value);
+
+        // y axis
+        let axis_y = d3
+          .axisLeft()
+          .scale(y)
+          .ticks(this.displayed_data.length)
+          .tickFormat((d) => d)
+          .tickSizeOuter(0);
+
+        this.svg
+          .append("g")
+          .attr("id", "axis")
+          .attr("transform", `translate(${this.canvasWidth * this.margin.left}, ${svgHeight * 0})`)
+          .call(axis_y) // 将g作为函数参数调用函数
+          .attr("font-size", "0.55rem")
+          .selectAll("text")
+          .text((d) => d);
+      }
     },
   },
   mounted() {
-    this.render();
+    this.initializeBarchart();
   },
 };
 </script>
 
-<style lang="less" scoped>
+<style scoped lang="less">
 .bar-chart {
-  background: #6666;
+  position: relative;
+
+  .title {
+    position: absolute;
+    left: 0;
+    top: 0;
+    font-weight: bold;
+    border: 0.05rem solid #201d1d;
+    font-size: 0.8rem;
+    width: 0.8rem;
+    line-height: 0.9rem;
+    padding: 0.2rem 0.15rem;
+  }
+
+  .chart {
+    margin: 0 0 0 1rem;
+  }
 }
 </style>

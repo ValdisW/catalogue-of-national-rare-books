@@ -1,43 +1,86 @@
 <template>
-  <div class="book-item">
-    <div>
-      <img src="@/assets/placeholder.jpg" alt="書影" />
+  <div class="book-item" @click="openBookDetail">
+    <div :style="`background-image: url(${cover_url})`">
+      <!-- <img :src="cover_url" :alt="id" @error="showDefaultImg" /> -->
     </div>
-    <p><router-link :to="'/book-detail/' + id" v-text="title"></router-link></p>
+    <p v-text="title"></p>
   </div>
 </template>
 
-<script>
-export default {
-  name: "BookItem",
-  props: {
-    id: String,
-  },
-  data() {
-    return {
-      title: this.$store.state.allData
-        .find((e) => e.id == this.id)
-        .content.split("　")[0],
-    };
-  },
-};
+<script lang="ts" setup>
+import { computed } from "vue";
+
+import { store } from "@/store";
+
+const emit = defineEmits(["openBookDetail"]);
+
+const props = defineProps({
+  id: String,
+});
+
+/**
+ * 计算书影缩略图的url
+ */
+const cover_url = computed(() => {
+  let img_res = store.state.all_image.filter((el) => el.id == props.id); // 从vuex获取书影数据
+  return img_res[0].allowed ? `/data/images/thumbnails/${props.id}.jpg` : "/data/images/thumbnails/placeholder.jpg";
+});
+
+function openBookDetail() {
+  emit("openBookDetail", props.id);
+}
+
+function showDefaultImg(e) {
+  e.target.src = "/data/images/thumbnails/placeholder.jpg";
+}
+
+const title = store.state.books.find((e) => e.id == props.id).name;
+
+defineExpose({
+  showDefaultImg,
+});
 </script>
 
 <style lang="less" scoped>
 .book-item {
-  width: 100px;
-  div {
-    background: #6666;
-    height: 100px;
-    display: flex;
-    justify-content: center;
-    img {
-      height: 100%;
+  flex: 7rem 1 1;
+  display: flex;
+  flex-direction: column;
+  margin: 0.5rem;
+  cursor: pointer;
+  transition: 0.1s;
+  &:hover {
+    filter: brightness(0.9);
+    div {
+      background-color: #00000020;
     }
   }
+  div {
+    background: #00000012;
+    // background-image: url(/data/images/thumbnails/placeholder.jpg);
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    flex: auto 1 1;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    // img {
+    //   object-fit: contain;
+    //   width: 100%;
+    //   height: 100%;
+    // }
+  }
+
   p {
-    font-size: 0.7rem;
+    flex: auto 0 0;
+    font-size: 0.6rem;
     text-align: center;
+    margin: 0.1rem 0 0;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+    overflow: hidden;
   }
 }
 </style>
