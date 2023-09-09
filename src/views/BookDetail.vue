@@ -4,7 +4,7 @@
       <div class="close-button" @click="close"></div>
       <div class="info">
         <div class="title">
-          <span v-text="this.book_data.name" :title="this.book_data.name"></span>
+          <span v-text="book_data.name" :title="book_data.name"></span>
         </div>
 
         <table class="detail">
@@ -16,21 +16,21 @@
             <td class="detail-title">文獻類型：</td>
             <td
               class="detail-content document-type"
-              v-text="id2name(this.$store.state.all_document_type, book_data.document_type_id, '-')"
+              v-text="id2name(store.state.all_document_type, book_data.document_type_id, '-')"
             ></td>
           </tr>
           <tr>
             <td class="detail-title">文種：</td>
             <td
               class="detail-content language"
-              v-text="id2name(this.$store.state.all_language, book_data.language_id, '-')"
+              v-text="id2name(store.state.all_language, book_data.language_id, '-')"
             ></td>
           </tr>
           <tr>
             <td class="detail-title">分類：</td>
             <td
               class="detail-content name"
-              v-text="id2name(this.$store.state.all_catalogue, book_data.catalogue_id, '-')"
+              v-text="id2name(store.state.all_catalogue, book_data.catalogue_id, '-')"
             ></td>
           </tr>
           <tr>
@@ -41,7 +41,7 @@
             <td class="detail-title">版本類型：</td>
             <td
               class="detail-content edition-type"
-              v-text="id2name(this.$store.state.all_document_type, book_data.edition_type_id, '-')"
+              v-text="id2name(store.state.all_document_type, book_data.edition_type_id, '-')"
             ></td>
           </tr> -->
           <tr>
@@ -50,7 +50,7 @@
           </tr>
           <tr>
             <td class="detail-title">數量：</td>
-            <td class="detail-content quantity" v-text="book_data.quantity + book_data.measurement || '-'"></td>
+            <td class="detail-content quantity" v-text="book_data.quantity || '-' + book_data.measurement || '-'"></td>
           </tr>
           <tr>
             <td class="detail-title">裝幀形式：</td>
@@ -76,14 +76,14 @@
             <td class="detail-title">收藏省份：</td>
             <td
               class="detail-content institute"
-              v-text="id2name(this.$store.state.all_province, book_data.province_id, '-')"
+              v-text="id2name(store.state.all_province, book_data.province_id, '-')"
             ></td>
           </tr>
           <tr>
             <td class="detail-title">收藏單位：</td>
             <td
               class="detail-content institute"
-              v-text="id2name(this.$store.state.all_institution, book_data.institution_id, '-')"
+              v-text="id2name(store.state.all_institution, book_data.institution_id, '-')"
             ></td>
           </tr>
           <tr>
@@ -96,18 +96,18 @@
         <ul class="timeline">
           <li v-for="person in related_person" :key="person" @click="clickPerson($event)">
             <!-- 责任行为名称 -->
-            <div class="actions" v-text="person.action_name"></div>
+            <div class="actions" v-text="person.action"></div>
 
             <!-- 圆点 -->
             <b></b>
 
             <!-- 责任者名称 -->
-            <span class="person" v-if="person.person_name == '□□'" v-text="`[${person.dynasty_or_nation}]佚名`"></span>
+            <span class="person" v-if="person.person == '□□'" v-text="`[${person.dynasty_or_nation}]佚名`"></span>
             <span
               class="person"
               v-else
               @click="$emit('openPersonDetail', person.person_id)"
-              v-text="(person.dynasty_or_nation ? '[' + person.dynasty_or_nation + ']' : '') + person.person_name"
+              v-text="(person.dynasty_or_nation ? '[' + person.dynasty_or_nation + ']' : '') + person.person"
             >
             </span>
           </li>
@@ -143,70 +143,72 @@
         </div>
       </div>
     </div>
-    <ImageViewer ref="image-viewer" :imageUrl="image_filenames[image_showed_index]" />
+    <ImageViewer ref="ImageViewerRef" :imageUrl="image_filenames[image_showed_index]" />
   </div>
 </template>
 
-<script>
-import axios from "axios";
+<script lang="ts" setup>
+import { ref } from "vue";
+import { store } from "@/store";
+import axios, { AxiosResponse } from "axios";
+import type { Book, BookImage, Relation } from "#/axios";
+
 import ImageViewer from "@/components/ImageViewer.vue";
+
 import { id2name } from "@/utils/id2name.js";
 
-export default {
-  name: "BookDetail",
-  components: { ImageViewer },
-  data() {
-    return {
-      show: false,
-      bookID: "",
-      image_filenames: [],
-      image_showed_index: 0,
-      book_data: { content: "" },
-      related_person: [],
-      seals: [],
-    };
-  },
-  methods: {
-    id2name,
-    clickPerson(e) {
-      e.currentTarget.lastElementChild.click();
-    },
-    close() {
-      this.show = false;
-    },
-    open(book_id) {
-      this.image_filenames = [];
-      this.show = true;
+const ImageViewerRef = ref<InstanceType<typeof ImageViewer> | null>(null);
 
-      // 获取书影数据
-      axios.get(`/data/book-detail/${book_id}`).then((d) => {
-        this.book_data = d.data[0][0];
-        this.related_person = d.data[1];
-        this.seals = d.data[2];
+const show = ref(false);
+// const bookID = ref("");
+const image_filenames = ref<string[]>([]); // 书影图片
+const image_showed_index = ref(0);
+const book_data = ref<Book>({ content: "" });
+const related_person = ref<Relation[]>([]);
+const seals = ref([]);
 
-        let img_res = this.$store.state.all_image.filter((el) => el.id == book_id); // 从vuex获取书影数据
-        if (img_res && img_res[0].filename && img_res[0].allowed)
-          for (let e of img_res) this.image_filenames.push(`/data/images/${e.folder}/${e.filename}`);
-        else this.image_filenames[0] = "none";
-      });
-    },
-    showDefaultImg(e) {
-      e.target.src = "/data/images/placeholder.jpg";
-    },
-    openImageViewer() {
-      this.$refs["image-viewer"].open();
-    },
-    switchImage(index) {
-      this.image_showed_index = index;
-    },
-  },
-  computed: {
-    normalized_title() {
-      // 临时规范题名
-      return this.book_data.content.split("　")[0];
-    },
-  },
-};
+function clickPerson(e: MouseEvent) {
+  e.currentTarget?.lastElementChild.click();
+}
+function close() {
+  show.value = false;
+}
+function open(book_id: string) {
+  image_filenames.value = [];
+  show.value = true;
+
+  // 获取书影数据
+  axios.get(`/data/book-detail/${book_id}`).then((d: AxiosResponse) => {
+    book_data.value = d.data[0][0];
+    related_person.value = d.data[1];
+    seals.value = d.data[2];
+
+    let img_res = (store.state.all_image as unknown as Array<BookImage>).filter((el) => el.id == book_id); // 从vuex获取书影数据
+    if (img_res && img_res[0].filename && img_res[0].allowed)
+      for (let e of img_res) image_filenames.value.push(`/data/images/${e.folder}/${e.filename}`);
+    else image_filenames.value[0] = "none";
+  });
+}
+function showDefaultImg(e: Event) {
+  (e.target as HTMLImageElement).src = "/data/images/placeholder.jpg";
+}
+
+function openImageViewer() {
+  ImageViewerRef.value!.open();
+}
+function switchImage(index: number) {
+  image_showed_index.value = index;
+}
+// const normalized_title = computed(() => {
+//   // 临时规范题名
+//   return book_data.value.content.split("　")[0];
+// });
+
+defineExpose({
+  show,
+  open,
+  close,
+});
 </script>
 
 <style lang="less" scoped>

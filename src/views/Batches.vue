@@ -101,7 +101,7 @@
 import { ref, reactive, computed } from "vue";
 import { store } from "@/store";
 
-import type { RelatedBook } from "@/types";
+import type { Relation } from "@/types";
 
 import { mapState } from "vuex";
 import TooltipBubble from "@/components/TooltipBubble.vue";
@@ -154,7 +154,7 @@ const batchInfo = [
 ];
 const current_batch = ref(0);
 const statistics = ref([]);
-const showing_books = <RelatedBook[]>reactive([]);
+const showing_books = <Relation[]>reactive([]);
 
 const rem = computed(() => {
   return mapState(["rem"]).rem;
@@ -183,7 +183,7 @@ function showMore() {
   let arr =
     current_batch.value == 0
       ? store.state.books
-      : store.state.books.filter((el: RelatedBook) => el.batch == current_batch.value);
+      : store.state.books.filter((el: Relation) => el.batch == current_batch.value);
 
   showing_books.length = 0;
   setTimeout(() => {

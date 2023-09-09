@@ -79,7 +79,7 @@
 import { ref, reactive } from "vue";
 import axios from "axios";
 import BookInfoDialog from "@/components/BookInfoDialog.vue";
-import { RelatedBook, RelatedPerson } from "#/axios";
+import { Relation, RelatedPerson } from "#/axios";
 
 import { store } from "@/store";
 
@@ -88,8 +88,8 @@ const emit = defineEmits(["openPersonDetail", "openBookDetail"]);
 const show = ref(false); // 控制本组件是否显示
 
 const related_person = <RelatedPerson[]>reactive([]); // 相关的其他人物
-const all_related_books = <RelatedBook[]>reactive([]); // 该人物的所有相关书籍
-const filtered_related_books = <RelatedBook[]>reactive([]); // 创作/出版/批校题跋/收藏的相关书籍筛选结果
+const all_related_books = <Relation[]>reactive([]); // 该人物的所有相关书籍
+const filtered_related_books = <Relation[]>reactive([]); // 创作/出版/批校题跋/收藏的相关书籍筛选结果
 
 // 实际没用上
 const hover_data = reactive({

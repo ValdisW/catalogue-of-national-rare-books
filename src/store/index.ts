@@ -1,11 +1,11 @@
 import { App } from "vue";
 import { createStore } from "vuex";
 
-import { RelatedBook, RelatedPerson } from "#/axios";
+import { BookImage, Relation, RelatedPerson } from "#/axios";
 
 const store = createStore({
   state: {
-    books: Array<RelatedBook>,
+    books: Array<Relation>,
     persons: Array<RelatedPerson>,
     person_ralations: [],
     all_action: [],
@@ -16,7 +16,7 @@ const store = createStore({
     all_institution: [],
     all_province: [],
     all_catalogue: [],
-    all_image: [],
+    all_image: Array<BookImage>,
     rem: null,
   },
   getters: {
