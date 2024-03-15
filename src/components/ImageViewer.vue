@@ -9,7 +9,16 @@
     </div>
 
     <div class="img-wrapper">
-      <img ref="ImageRef" class="image" :src="imageUrl" :alt="imageText" v-drag @mousewheel.prevent="scaleFun" />
+      <img
+        ref="ImageRef"
+        class="image"
+        :src="imageUrl"
+        :alt="imageText"
+        @mousedown.prevent="dragStart"
+        @mousemove.prevent="dragMove"
+        @mouseup.prevent="dragEnd"
+        @mousewheel.prevent="scaleFun"
+      />
     </div>
   </div>
 </template>
@@ -22,12 +31,12 @@ defineProps({ imageUrl: String, imageText: String });
 const imgScale = ref(1);
 const show = ref(false);
 
-const ImageRef = ref<HTMLImageElement>(null);
+const ImageRef = ref<HTMLImageElement | null>(null);
 
 function scaleFun(e: WheelEvent) {
   let direction = e.deltaY > 0 ? -0.1 : 0.1;
-  let left = ImageRef.value.offsetLeft;
-  let top = ImageRef.value.offsetTop;
+  let left = ImageRef.value?.offsetLeft;
+  let top = ImageRef.value?.offsetTop;
 
   imgScale.value = Math.max(imgScale.value + direction, 0.1);
   ImageRef.value.style.transform = `translate(-50%,-50%) scale(${imgScale.value})`;
@@ -49,28 +58,28 @@ function close() {
   // scaleToOrigin();
 }
 
-let directives = {
-  drag: function (dragItem, _, vnode) {
-    vnode.el.parentElement.parentElement.onmousedown = (e) => {
-      e.preventDefault();
-      let disX = e.pageX - dragItem.offsetLeft;
-      let disY = e.pageY - dragItem.offsetTop;
-      document.onmousemove = (e) => {
-        e.preventDefault();
-        let left = e.pageX - disX;
-        let top = e.pageY - disY;
-        // console.log('move', e.pageX, e.pageY, left, top)
-        dragItem.style.left = left + "px";
-        dragItem.style.top = top + "px";
-      };
-      document.onmouseup = (e) => {
-        e.preventDefault();
-        document.onmousemove = null;
-        document.onmouseup = null;
-      };
-    };
-  },
-};
+let disX = 0,
+  disY = 0,
+  isDragging = false;
+function dragStart(event: MouseEvent) {
+  isDragging = true;
+  disX = event.pageX - event.currentTarget.offsetLeft;
+  disY = event.pageY - event.currentTarget.offsetTop;
+}
+
+function dragMove(event: MouseEvent) {
+  if (isDragging) {
+    let left = event.pageX - disX;
+    let top = event.pageY - disY;
+    // console.log('move', e.pageX, e.pageY, left, top)
+    event.currentTarget.style.left = left + "px";
+    event.currentTarget.style.top = top + "px";
+  }
+}
+
+function dragEnd() {
+  isDragging = false;
+}
 
 defineExpose({ open, close });
 </script>
