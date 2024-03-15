@@ -1,46 +1,3 @@
-<template>
-  <!-- 不支持手机访问的提示 -->
-  <MobileWarning v-if="onMobileDevice()" />
-
-  <!-- 加载提示 -->
-  <transition name="bg-fade"><Loading :complete="complete" /></transition>
-
-  <div id="main-container">
-    <!-- 顶部导航 -->
-    <nav>
-      <ul>
-        <li v-for="page in nav_pages" :key="page.name">
-          <router-link
-            :class="{ active: $router.currentRoute.value.path == page.router }"
-            :to="page.router"
-            v-text="page.name"
-          ></router-link>
-        </li>
-      </ul>
-    </nav>
-
-    <!-- 用来显示四个主页面 -->
-    <router-view
-      v-slot="{ Component }"
-      :key="$route.fullPath"
-      @startLoading="complete = false"
-      @endLoading="complete = true"
-      @openBookDetail="openBookDetail"
-      @openPersonDetail="openPersonDetail"
-    >
-      <keep-alive>
-        <component :is="Component" />
-      </keep-alive>
-    </router-view>
-
-    <!-- 古籍详情页 -->
-    <BookDetail @openPersonDetail="openPersonDetail" ref="BookDetailRef" />
-
-    <!-- 人物详情页 -->
-    <PersonDetail @openBookDetail="openBookDetail" ref="PersonDetailRef" />
-  </div>
-</template>
-
 <script lang="ts" setup>
 import { ref } from "vue";
 
@@ -106,6 +63,49 @@ const nav_pages = [
   { name: "研發團隊", router: "/about" },
 ];
 </script>
+
+<template>
+  <!-- 不支持手机访问的提示 -->
+  <MobileWarning v-if="onMobileDevice()" />
+
+  <!-- 加载提示 -->
+  <transition name="bg-fade"><Loading :complete="complete" /></transition>
+
+  <div id="main-container">
+    <!-- 顶部导航 -->
+    <nav>
+      <ul>
+        <li v-for="page in nav_pages" :key="page.name">
+          <router-link
+            :class="{ active: $router.currentRoute.value.path == page.router }"
+            :to="page.router"
+            v-text="page.name"
+          ></router-link>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- 用来显示四个主页面 -->
+    <router-view
+      v-slot="{ Component }"
+      :key="$route.fullPath"
+      @startLoading="complete = false"
+      @endLoading="complete = true"
+      @openBookDetail="openBookDetail"
+      @openPersonDetail="openPersonDetail"
+    >
+      <keep-alive>
+        <component :is="Component" />
+      </keep-alive>
+    </router-view>
+
+    <!-- 古籍详情页 -->
+    <BookDetail @openPersonDetail="openPersonDetail" ref="BookDetailRef" />
+
+    <!-- 人物详情页 -->
+    <PersonDetail @openBookDetail="openBookDetail" ref="PersonDetailRef" />
+  </div>
+</template>
 
 <style lang="less">
 * {

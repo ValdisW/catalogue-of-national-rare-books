@@ -1,12 +1,3 @@
-<template>
-  <div class="book-item" @click="openBookDetail">
-    <div :style="`background-image: url(${cover_url})`">
-      <!-- <img :src="cover_url" :alt="id" @error="showDefaultImg" /> -->
-    </div>
-    <p v-text="title"></p>
-  </div>
-</template>
-
 <script lang="ts" setup>
 import { computed } from "vue";
 
@@ -43,6 +34,15 @@ defineExpose({
   showDefaultImg,
 });
 </script>
+
+<template>
+  <div class="book-item" @click="openBookDetail">
+    <div :style="`background-image: url(${cover_url})`">
+      <!-- <img :src="cover_url" :alt="id" @error="showDefaultImg" /> -->
+    </div>
+    <p v-text="title"></p>
+  </div>
+</template>
 
 <style lang="less" scoped>
 .book-item {

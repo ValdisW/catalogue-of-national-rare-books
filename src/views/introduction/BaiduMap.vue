@@ -1,58 +1,3 @@
-<template>
-  <div class="exploration-map">
-    <!-- <Map class="baidumap"></Map> -->
-    <div class="spatial-sampling">
-      <div class="section-name">
-        <span></span>
-        <span>入選名録古籍藏地分布</span>
-        <span></span>
-        <span></span>
-      </div>
-
-      <!-- 左侧地图 -->
-      <div id="map-container" @wheel.stop=""></div>
-
-      <!-- 右侧列表 -->
-      <div id="map-list">
-        <!-- 省份列表 -->
-        <ul class="provinces">
-          <li
-            v-for="(city, index) in province_info"
-            :key="index"
-            @click.self="expandProvince(city)"
-            :id="`list-${index}`"
-            :show="false"
-          >
-            <span v-text="`${city.name} - ${city.count}`" @click.self="expandProvince(city)"></span>
-            <!-- 机构列表 -->
-            <ul class="institutions" v-show="city.selected">
-              <li
-                v-for="e in city.child"
-                :key="e"
-                @click="flyToInstitution(store.state.all_institution.find((el) => el.id == e))"
-                v-text="
-                  store.state.all_institution.find((el) => el.id == e).name +
-                  ' - ' +
-                  store.state.all_institution.find((el) => el.id == e).books
-                "
-              ></li>
-            </ul>
-          </li>
-        </ul>
-      </div>
-
-      <!-- 悬浮框 -->
-      <div id="tooltip">
-        <div ref="ToolTipBoxRef" id="tooltip-box">
-          <h2 v-text="current_institution_name"></h2>
-          <div class="intro" v-text="current_institution_intro"></div>
-          <div class="books" v-text="current_institution_books"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</template>
-
 <script lang="ts" setup>
 import { computed, onMounted, ref, watch } from "vue";
 import { store } from "@/store";
@@ -354,6 +299,61 @@ onMounted(() => {
   initInstitutionLayer();
 });
 </script>
+
+<template>
+  <div class="exploration-map">
+    <!-- <Map class="baidumap"></Map> -->
+    <div class="spatial-sampling">
+      <div class="section-name">
+        <span></span>
+        <span>入選名録古籍藏地分布</span>
+        <span></span>
+        <span></span>
+      </div>
+
+      <!-- 左侧地图 -->
+      <div id="map-container" @wheel.stop=""></div>
+
+      <!-- 右侧列表 -->
+      <div id="map-list">
+        <!-- 省份列表 -->
+        <ul class="provinces">
+          <li
+            v-for="(city, index) in province_info"
+            :key="index"
+            @click.self="expandProvince(city)"
+            :id="`list-${index}`"
+            :show="false"
+          >
+            <span v-text="`${city.name} - ${city.count}`" @click.self="expandProvince(city)"></span>
+            <!-- 机构列表 -->
+            <ul class="institutions" v-show="city.selected">
+              <li
+                v-for="e in city.child"
+                :key="e"
+                @click="flyToInstitution(store.state.all_institution.find((el) => el.id == e))"
+                v-text="
+                  store.state.all_institution.find((el) => el.id == e).name +
+                  ' - ' +
+                  store.state.all_institution.find((el) => el.id == e).books
+                "
+              ></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+
+      <!-- 悬浮框 -->
+      <div id="tooltip">
+        <div ref="ToolTipBoxRef" id="tooltip-box">
+          <h2 v-text="current_institution_name"></h2>
+          <div class="intro" v-text="current_institution_intro"></div>
+          <div class="books" v-text="current_institution_books"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
 
 <style lang="less" scoped>
 .exploration-map {

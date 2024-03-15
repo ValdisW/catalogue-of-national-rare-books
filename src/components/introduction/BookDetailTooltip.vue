@@ -1,40 +1,3 @@
-<!-- 粒子的悬浮框 -->
-<template>
-  <div class="book-detail-tooltip" v-show="show">
-    <div class="container">
-      <div class="content">
-        <h4>
-          <span v-text="id"></span>
-          <span v-text="detail_data.name"></span>
-        </h4>
-        <div class="detail">
-          <p>
-            <span>批次：</span>
-            <span v-text="'第' + detail_data.batch + '批'"></span>
-          </p>
-          <p>
-            <span>文獻類型：</span>
-            <span v-text="getDocumentTypeNameById(detail_data.document_type_id)"></span>
-          </p>
-          <p>
-            <span>文種：</span>
-            <span v-text="getLanguageNameById(detail_data.language_id)"></span>
-          </p>
-          <p>
-            <span>版本朝代：</span>
-            <span v-text="getEditionDynastyNameById(detail_data.edition_dynasty_id)"></span>
-          </p>
-          <p>
-            <span>收藏單位：</span>
-            <span v-text="getInstitutionNameById(detail_data.institution_id)"></span>
-          </p>
-        </div>
-        <span class="to-detail" @click="openBookDetail">查看詳情</span>
-      </div>
-    </div>
-  </div>
-</template>
-
 <script lang="ts" setup>
 import { computed, ref } from "vue";
 import { store } from "@/store";
@@ -105,6 +68,42 @@ defineExpose({
   open,
 });
 </script>
+
+<template>
+  <div class="book-detail-tooltip" v-show="show">
+    <div class="container">
+      <div class="content">
+        <h4>
+          <span v-text="id"></span>
+          <span v-text="detail_data.name"></span>
+        </h4>
+        <div class="detail">
+          <p>
+            <span>批次：</span>
+            <span v-text="'第' + detail_data.batch + '批'"></span>
+          </p>
+          <p>
+            <span>文獻類型：</span>
+            <span v-text="getDocumentTypeNameById(detail_data.document_type_id)"></span>
+          </p>
+          <p>
+            <span>文種：</span>
+            <span v-text="getLanguageNameById(detail_data.language_id)"></span>
+          </p>
+          <p>
+            <span>版本朝代：</span>
+            <span v-text="getEditionDynastyNameById(detail_data.edition_dynasty_id)"></span>
+          </p>
+          <p>
+            <span>收藏單位：</span>
+            <span v-text="getInstitutionNameById(detail_data.institution_id)"></span>
+          </p>
+        </div>
+        <span class="to-detail" @click="openBookDetail">查看詳情</span>
+      </div>
+    </div>
+  </div>
+</template>
 
 <style lang="less" scoped>
 .book-detail-tooltip {

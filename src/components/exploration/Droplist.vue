@@ -1,16 +1,3 @@
-<template>
-  <!-- 检索时用到的下拉列表，用来指定具体的检索字段 -->
-  <div class="droplist">
-    <div class="box" @click="toggleShowList">
-      <span ref="box-text" class="selected" v-text="default_text"></span>
-      <span></span>
-    </div>
-    <ul class="list" v-show="show_list">
-      <li v-for="attr in attr_list" :key="attr" @click="select" v-text="attr.name" :name="attr.value"></li>
-    </ul>
-  </div>
-</template>
-
 <script lang="ts" setup>
 import { ref } from "vue";
 
@@ -36,6 +23,19 @@ defineExpose({
   curr_value,
 });
 </script>
+
+<template>
+  <!-- 检索时用到的下拉列表，用来指定具体的检索字段 -->
+  <div class="droplist">
+    <div class="box" @click="toggleShowList">
+      <span ref="box-text" class="selected" v-text="default_text"></span>
+      <span></span>
+    </div>
+    <ul class="list" v-show="show_list">
+      <li v-for="attr in attr_list" :key="attr" @click="select" v-text="attr.name" :name="attr.value"></li>
+    </ul>
+  </div>
+</template>
 
 <style lang="less" scoped>
 @offset: 0.5rem;

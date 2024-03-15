@@ -1,28 +1,3 @@
-<template>
-  <div class="image-viewer" v-show="show">
-    <div class="button">
-      <!-- <div class="scale-to-origin" @click="scaleToOrigin">還原</div> -->
-    </div>
-    <div class="close" @click="close">
-      <div></div>
-      <div></div>
-    </div>
-
-    <div class="img-wrapper">
-      <img
-        ref="ImageRef"
-        class="image"
-        :src="imageUrl"
-        :alt="imageText"
-        @mousedown.prevent="dragStart"
-        @mousemove.prevent="dragMove"
-        @mouseup.prevent="dragEnd"
-        @mousewheel.prevent="scaleFun"
-      />
-    </div>
-  </div>
-</template>
-
 <script lang="ts" setup>
 import { ref } from "vue";
 
@@ -83,6 +58,31 @@ function dragEnd() {
 
 defineExpose({ open, close });
 </script>
+
+<template>
+  <div class="image-viewer" v-show="show">
+    <div class="button">
+      <!-- <div class="scale-to-origin" @click="scaleToOrigin">還原</div> -->
+    </div>
+    <div class="close" @click="close">
+      <div></div>
+      <div></div>
+    </div>
+
+    <div class="img-wrapper">
+      <img
+        ref="ImageRef"
+        class="image"
+        :src="imageUrl"
+        :alt="imageText"
+        @mousedown.prevent="dragStart"
+        @mousemove.prevent="dragMove"
+        @mouseup.prevent="dragEnd"
+        @mousewheel.prevent="scaleFun"
+      />
+    </div>
+  </div>
+</template>
 
 <style scoped lang="less">
 .image-viewer {

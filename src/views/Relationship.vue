@@ -1,81 +1,3 @@
-<template>
-  <div class="relationship" v-if="complete">
-    <div class="left">
-      <!-- 檢索工具 -->
-      <div class="search">
-        <input
-          type="text"
-          value="資治通鑒"
-          ref="text"
-          @keyup="
-            (e) => {
-              if (e.key == 'Enter') search();
-            }
-          "
-        />
-        <!-- <Droplist ref="drop-list" :attr_list="display_attrs" /> -->
-        <button id="search-button" :class="{ invalid: wait }" @click="search"></button>
-        <button id="tip-button">
-          <div id="tip-content">
-            通過檢索古籍題名，挖掘古籍書目和人物之間的關聯。節點代表人物，節點之間的連線是指兩個人物共同創作、出版或收藏過同一本書。
-            <br />
-            <br />
-            在檢索“資治通鑒”的情況下：點擊一個節點（人物），與之相關的節點將在“相關人物”中列出，並標記了其所參與過的與“資治通鑒”相關的古籍數量；點擊一條連線，則在“相關古籍”中顯示所連接的兩個節點（人物）共同參與的古籍。
-          </div>
-          <div class="arrow"></div>
-        </button>
-      </div>
-
-      <!-- 關係圖 -->
-      <div class="results results-relation">
-        <div class="graph" ref="svg-wrapper"></div>
-      </div>
-    </div>
-
-    <div class="right">
-      <div class="list nodes-list">
-        <h4>相關人物</h4>
-        <ul ref="nodes-list">
-          <li
-            v-for="n in node_list"
-            :name="n.id"
-            :key="n.id"
-            v-text="`${n.name}(${n.curr_books})`"
-            :class="[`n${n.id}`, { active: n.active }]"
-            @mouseover="nodeHighlight(n.id, false)"
-          ></li>
-        </ul>
-      </div>
-    </div>
-
-    <div ref="tooltip" class="tooltip" v-show="show_tooltip">
-      <h5 v-text="selected_info.name"></h5>
-      <span @click="openPersonDetail(selected_info.id)">查看人物詳情</span>
-    </div>
-
-    <div class="list relationship-detail" ref="relationship-detail" v-show="show_relationship_detail">
-      <h4>相關古籍</h4>
-      <ul>
-        <li v-for="r in relation_list" :key="r" @click="openBookDetail(convertBookId(r.book_id))">
-          <!-- 古籍信息 -->
-          <div class="book">
-            <span v-text="convertBookId(r.book_id)"></span>
-            <span v-text="getBookNameById(convertBookId(r.book_id))"></span>
-          </div>
-
-          <!-- 人物信息 -->
-          <div class="person">
-            <span class="name" v-text="getPersonNameById(r.person1_id)"></span
-            ><span class="action" v-text="getActionNameById(r.action1_id)"></span>&nbsp;&nbsp;&nbsp;&nbsp;
-            <span class="name" v-text="getPersonNameById(r.person2_id)"></span
-            ><span class="action" v-text="getActionNameById(r.action2_id)"></span>
-          </div>
-        </li>
-      </ul>
-    </div>
-  </div>
-</template>
-
 <script>
 import * as d3 from "d3";
 import { getRelByBookName, loadRelationshipData } from "@/api";
@@ -465,6 +387,84 @@ export default {
   },
 };
 </script>
+
+<template>
+  <div class="relationship" v-if="complete">
+    <div class="left">
+      <!-- 檢索工具 -->
+      <div class="search">
+        <input
+          type="text"
+          value="資治通鑒"
+          ref="text"
+          @keyup="
+            (e) => {
+              if (e.key == 'Enter') search();
+            }
+          "
+        />
+        <!-- <Droplist ref="drop-list" :attr_list="display_attrs" /> -->
+        <button id="search-button" :class="{ invalid: wait }" @click="search"></button>
+        <button id="tip-button">
+          <div id="tip-content">
+            通過檢索古籍題名，挖掘古籍書目和人物之間的關聯。節點代表人物，節點之間的連線是指兩個人物共同創作、出版或收藏過同一本書。
+            <br />
+            <br />
+            在檢索“資治通鑒”的情況下：點擊一個節點（人物），與之相關的節點將在“相關人物”中列出，並標記了其所參與過的與“資治通鑒”相關的古籍數量；點擊一條連線，則在“相關古籍”中顯示所連接的兩個節點（人物）共同參與的古籍。
+          </div>
+          <div class="arrow"></div>
+        </button>
+      </div>
+
+      <!-- 關係圖 -->
+      <div class="results results-relation">
+        <div class="graph" ref="svg-wrapper"></div>
+      </div>
+    </div>
+
+    <div class="right">
+      <div class="list nodes-list">
+        <h4>相關人物</h4>
+        <ul ref="nodes-list">
+          <li
+            v-for="n in node_list"
+            :name="n.id"
+            :key="n.id"
+            v-text="`${n.name}(${n.curr_books})`"
+            :class="[`n${n.id}`, { active: n.active }]"
+            @mouseover="nodeHighlight(n.id, false)"
+          ></li>
+        </ul>
+      </div>
+    </div>
+
+    <div ref="tooltip" class="tooltip" v-show="show_tooltip">
+      <h5 v-text="selected_info.name"></h5>
+      <span @click="openPersonDetail(selected_info.id)">查看人物詳情</span>
+    </div>
+
+    <div class="list relationship-detail" ref="relationship-detail" v-show="show_relationship_detail">
+      <h4>相關古籍</h4>
+      <ul>
+        <li v-for="r in relation_list" :key="r" @click="openBookDetail(convertBookId(r.book_id))">
+          <!-- 古籍信息 -->
+          <div class="book">
+            <span v-text="convertBookId(r.book_id)"></span>
+            <span v-text="getBookNameById(convertBookId(r.book_id))"></span>
+          </div>
+
+          <!-- 人物信息 -->
+          <div class="person">
+            <span class="name" v-text="getPersonNameById(r.person1_id)"></span
+            ><span class="action" v-text="getActionNameById(r.action1_id)"></span>&nbsp;&nbsp;&nbsp;&nbsp;
+            <span class="name" v-text="getPersonNameById(r.person2_id)"></span
+            ><span class="action" v-text="getActionNameById(r.action2_id)"></span>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</template>
 
 <style lang="less" scoped>
 .relationship {

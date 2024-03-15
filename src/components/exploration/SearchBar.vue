@@ -1,3 +1,72 @@
+<script lang="ts" setup>
+import { ref } from "vue";
+import Droplist from "@/components/exploration/Droplist.vue";
+
+defineProps({
+  attr_list: {
+    type: Array,
+    required: true,
+  },
+  wait: {
+    type: Boolean,
+    required: true,
+  },
+});
+
+const emit = defineEmits(["allAttrSearch", "search"]);
+
+const TextRef = ref(null); // 全字段检索的<input>
+const TextSingleRef = ref(null); // 指定字段检索的第一个<input>
+const TextMultipleRef = ref(null); // 指定字段检索的后续<input>
+const DroplistSingleRef = ref(null);
+const DroplistMultipleRef = ref(null);
+
+const n = ref(1);
+const all_attr_mode = ref(true);
+const show_more_bars = ref(true);
+const input_tip = ref(false);
+
+// 全字段检索
+function allAttrSearch() {
+  // 输入框中有内容才开始检索，否则提示
+  if (TextRef.value.value) emit("allAttrSearch", TextRef.value.value);
+  else input_tip.value = true;
+}
+
+// 指定字段检索
+function search() {
+  if (TextSingleRef.value) {
+    let arr = []; // 用于构建多字段检索的内容
+    if (n.value == 1) {
+      // 只有一个字段
+      arr.push({
+        value: TextSingleRef.value.value,
+        attr: DroplistSingleRef.value.curr_value,
+      });
+    } else {
+      // 多个字段
+      arr.push({
+        value: TextSingleRef.value.value,
+        attr: DroplistSingleRef.value.curr_value,
+      });
+      for (let i = 0; i < TextMultipleRef.value.length; i++) {
+        arr.push({
+          value: TextMultipleRef.value[i].value,
+          attr: DroplistMultipleRef.value[i].curr_value,
+        });
+      }
+    }
+    console.log(arr);
+    emit("search", arr);
+  } else input_tip.value = true;
+}
+
+// 添加字段
+function add() {
+  if (n.value < 4) n.value++;
+}
+</script>
+
 <template>
   <div class="search-bar">
     <div class="toggle-mode">
@@ -70,75 +139,6 @@
   </div>
 </template>
 
-<script lang="ts" setup>
-import { ref } from "vue";
-import Droplist from "@/components/Droplist.vue";
-
-defineProps({
-  attr_list: {
-    type: Array,
-    required: true,
-  },
-  wait: {
-    type: Boolean,
-    required: true,
-  },
-});
-
-const emit = defineEmits(["allAttrSearch", "search"]);
-
-const TextRef = ref(null); // 全字段检索的<input>
-const TextSingleRef = ref(null); // 指定字段检索的第一个<input>
-const TextMultipleRef = ref(null); // 指定字段检索的后续<input>
-const DroplistSingleRef = ref(null);
-const DroplistMultipleRef = ref(null);
-
-const n = ref(1);
-const all_attr_mode = ref(true);
-const show_more_bars = ref(true);
-const input_tip = ref(false);
-
-// 全字段检索
-function allAttrSearch() {
-  // 输入框中有内容才开始检索，否则提示
-  if (TextRef.value.value) emit("allAttrSearch", TextRef.value.value);
-  else input_tip.value = true;
-}
-
-// 指定字段检索
-function search() {
-  if (TextSingleRef.value) {
-    let arr = []; // 用于构建多字段检索的内容
-    if (n.value == 1) {
-      // 只有一个字段
-      arr.push({
-        value: TextSingleRef.value.value,
-        attr: DroplistSingleRef.value.curr_value,
-      });
-    } else {
-      // 多个字段
-      arr.push({
-        value: TextSingleRef.value.value,
-        attr: DroplistSingleRef.value.curr_value,
-      });
-      for (let i = 0; i < TextMultipleRef.value.length; i++) {
-        arr.push({
-          value: TextMultipleRef.value[i].value,
-          attr: DroplistMultipleRef.value[i].curr_value,
-        });
-      }
-    }
-    console.log(arr);
-    emit("search", arr);
-  } else input_tip.value = true;
-}
-
-// 添加字段
-function add() {
-  if (n.value < 4) n.value++;
-}
-</script>
-
 <style lang="less" scoped>
 .fade1-enter-active {
   transition: all 0.5s;
@@ -193,7 +193,7 @@ function add() {
         width: 1.3rem;
         height: 1.3rem;
         border-radius: 50%;
-        background: #f0f0f0 url(../assets/icons/up.svg) center no-repeat;
+        background: #f0f0f0 url(../../assets/icons/up.svg) center no-repeat;
         background-size: 40%;
         cursor: pointer;
         position: absolute;
@@ -209,7 +209,7 @@ function add() {
       }
 
       button.search-button {
-        background: #fbb03b url(../assets/icons/search.svg) center no-repeat;
+        background: #fbb03b url(../../assets/icons/search.svg) center no-repeat;
         background-size: 66%;
         width: 2rem;
         height: 2rem;
@@ -218,7 +218,7 @@ function add() {
         cursor: pointer;
       }
       button.search-button.invalid {
-        background: #ccc url(../assets/icons/search.svg) center no-repeat;
+        background: #ccc url(../../assets/icons/search.svg) center no-repeat;
         background-size: 66%;
         cursor: unset;
         &:hover {

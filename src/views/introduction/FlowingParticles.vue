@@ -1,40 +1,7 @@
-<template>
-  <div id="flow">
-    <div class="content">
-      <div class="section-name">
-        <span></span>
-        <span>入選名録古籍版本朝代分布</span>
-        <span></span>
-        <span></span>
-      </div>
-      <div class="main">
-        <!-- 年代选择组件 -->
-        <DynastySelector @changeDynastyIDs="changeDynasty" />
-
-        <!-- 暂停/继续 -->
-        <div class="togglePause" :class="{ continue: !playing }" @click="togglePause"></div>
-
-        <!-- 画布 -->
-        <svg id="particles-svg" ref="particles-svg" @click="togglePause"></svg>
-
-        <!-- 右下角文字 -->
-        <div class="comment" v-text="curr_comment"></div>
-
-        <!-- 悬浮窗 -->
-        <BookDetailTooltip
-          @openBookDetail="$emit('openBookDetail', tooltip_id)"
-          ref="BookDetailTooltipRef"
-          :id="tooltip_id"
-        />
-      </div>
-    </div>
-  </div>
-</template>
-
 <script lang="ts" setup>
 import * as d3 from "d3";
-import DynastySelector from "@/components/DynastySelector.vue";
-import BookDetailTooltip from "@/components/BookDetailTooltip.vue";
+import DynastySelector from "@/components/introduction/DynastySelector.vue";
+import BookDetailTooltip from "@/components/introduction/BookDetailTooltip.vue";
 import { onMounted, onUnmounted, ref, watch } from "vue";
 import { store } from "@/store";
 import { Book } from "#/axios";
@@ -266,6 +233,39 @@ defineExpose({
   pause,
 });
 </script>
+
+<template>
+  <div id="flow">
+    <div class="content">
+      <div class="section-name">
+        <span></span>
+        <span>入選名録古籍版本朝代分布</span>
+        <span></span>
+        <span></span>
+      </div>
+      <div class="main">
+        <!-- 年代选择组件 -->
+        <DynastySelector @changeDynastyIDs="changeDynasty" />
+
+        <!-- 暂停/继续 -->
+        <div class="togglePause" :class="{ continue: !playing }" @click="togglePause"></div>
+
+        <!-- 画布 -->
+        <svg id="particles-svg" ref="particles-svg" @click="togglePause"></svg>
+
+        <!-- 右下角文字 -->
+        <div class="comment" v-text="curr_comment"></div>
+
+        <!-- 悬浮窗 -->
+        <BookDetailTooltip
+          @openBookDetail="$emit('openBookDetail', tooltip_id)"
+          ref="BookDetailTooltipRef"
+          :id="tooltip_id"
+        />
+      </div>
+    </div>
+  </div>
+</template>
 
 <style lang="less" scoped>
 #flow {

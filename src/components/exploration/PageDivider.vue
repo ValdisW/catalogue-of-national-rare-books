@@ -1,3 +1,42 @@
+<script lang="ts" setup>
+import { computed, ref, watch } from "vue";
+
+const emit = defineEmits(["turnTo"]);
+
+const current_page = ref(1);
+
+const props = defineProps({
+  items_sum: Number,
+  each_page_items: Number,
+});
+
+const pages_sum = computed(() => {
+  return props.items_sum ? Math.ceil(props.items_sum / props.each_page_items!) : 1; // 暂时这样处理，如果没有任何内容，就有1页而不是0页
+});
+
+watch(current_page, (n) => {
+  if (n > pages_sum.value) current_page.value = pages_sum.value;
+  if (n < 1) current_page.value = 1;
+  emit("turnTo", n);
+});
+
+watch(pages_sum, (n) => {
+  if (current_page.value > n) current_page.value = n;
+});
+
+function toPrevPage() {
+  if (current_page.value > 1) current_page.value--;
+}
+
+function toNextPage() {
+  if (current_page.value < pages_sum.value) current_page.value++;
+}
+
+function turnTo(page_index: number) {
+  if (page_index >= 1 && page_index <= pages_sum.value) current_page.value = page_index;
+}
+</script>
+
 <template>
   <div class="page-divider" v-show="pages_sum > 0">
     <!-- 总页码数超过12时 -->
@@ -73,45 +112,6 @@
     </div>
   </div>
 </template>
-
-<script lang="ts" setup>
-import { computed, ref, watch } from "vue";
-
-const emit = defineEmits(["turnTo"]);
-
-const current_page = ref(1);
-
-const props = defineProps({
-  items_sum: Number,
-  each_page_items: Number,
-});
-
-const pages_sum = computed(() => {
-  return props.items_sum ? Math.ceil(props.items_sum / props.each_page_items!) : 1; // 暂时这样处理，如果没有任何内容，就有1页而不是0页
-});
-
-watch(current_page, (n) => {
-  if (n > pages_sum.value) current_page.value = pages_sum.value;
-  if (n < 1) current_page.value = 1;
-  emit("turnTo", n);
-});
-
-watch(pages_sum, (n) => {
-  if (current_page.value > n) current_page.value = n;
-});
-
-function toPrevPage() {
-  if (current_page.value > 1) current_page.value--;
-}
-
-function toNextPage() {
-  if (current_page.value < pages_sum.value) current_page.value++;
-}
-
-function turnTo(page_index: number) {
-  if (page_index >= 1 && page_index <= pages_sum.value) current_page.value = page_index;
-}
-</script>
 
 <style lang="less" scoped>
 .prev-page,

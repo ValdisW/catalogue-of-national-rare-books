@@ -1,3 +1,9 @@
+<script lang="ts" setup>
+defineProps({
+  complete: { type: Boolean },
+});
+</script>
+
 <template>
   <div class="loading" v-show="!complete">
     <div class="content">
@@ -14,12 +20,6 @@
     </div>
   </div>
 </template>
-
-<script lang="ts" setup>
-defineProps({
-  complete: { type: Boolean },
-});
-</script>
 
 <style lang="less" scoped>
 @circle-color: #efefef;

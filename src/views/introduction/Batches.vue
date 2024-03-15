@@ -1,102 +1,3 @@
-<template>
-  <div class="batches">
-    <div class="section-name">
-      <span></span>
-      <span>批次選擇</span>
-      <span></span>
-      <span></span>
-    </div>
-    <div class="container">
-      <div class="batch-buttons">
-        <button
-          v-for="(batch, index) in batchInfo"
-          :key="index"
-          v-text="batch.name"
-          :class="{ selected: current_batch == index }"
-          @click="updateBatch(index)"
-        ></button>
-      </div>
-
-      <div class="content">
-        <div class="info">
-          <!-- 基本文字介绍 -->
-          <div class="col-1">
-            <h3 v-if="current_batch == 0">國家珍貴古籍名録</h3>
-            <h3 v-else v-text="`國家珍貴古籍名録 第${batchInfo[current_batch].name}批`"></h3>
-
-            <!-- 批次描述 -->
-            <p class="batch-description" v-text="batchInfo[current_batch].description"></p>
-          </div>
-
-          <!-- 条形图表 -->
-          <div class="col-2">
-            <div class="left">
-              <div class="chart-wrapper document-types">
-                <BarChart
-                  title="文獻類型"
-                  ref="document_type"
-                  bar_color="#C4A1A1"
-                  :canvasWidth="15 * store.state.rem!"
-                  :canvasHeight="7 * store.state.rem!"
-                  :margin_left="0.46"
-                  :info="statistics[current_batch].document_type"
-                />
-              </div>
-              <div class="chart-wrapper edition-dynasties">
-                <BarChart
-                  title="版本朝代"
-                  ref="edition_dynasty"
-                  bar_color="#76978F"
-                  :canvasWidth="15 * store.state.rem!"
-                  :canvasHeight="5.6 * store.state.rem!"
-                  :margin_left="0.46"
-                  :info="statistics[current_batch].edition_dynasty"
-                />
-              </div>
-              <div class="chart-wrapper edition-types">
-                <BarChart
-                  title="版本類型"
-                  ref="edition_type"
-                  bar_color="#B1B098"
-                  :canvasWidth="15 * store.state.rem!"
-                  :canvasHeight="9.6 * store.state.rem!"
-                  :margin_left="0.46"
-                  :info="statistics[current_batch].edition_type"
-                />
-              </div>
-            </div>
-            <div class="right">
-              <div class="chart-wrapper languagess">
-                <BarChart
-                  title="文種"
-                  ref="language"
-                  bar_color="#B0A1B8"
-                  :canvasWidth="14 * store.state.rem!"
-                  :canvasHeight="23.7 * store.state.rem!"
-                  :margin_left="0.55"
-                  :info="statistics[current_batch].language"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- 特色古籍 -->
-        <div class="featured-books">
-          <div class="show-more">
-            <span class="icon"></span>
-            <span @click="showMore">换一組</span>
-          </div>
-          <TransitionGroup name="fade1" class="books" tag="div">
-            <BookItem @openBookDetail="openBookDetail" v-for="b in showing_books" :key="b" :id="b" />
-          </TransitionGroup>
-        </div>
-      </div>
-    </div>
-    <TooltipBubble ref="tooltip-bubble" :text="123" />
-  </div>
-</template>
-
 <script lang="ts" setup>
 import { ref, reactive, computed } from "vue";
 import { store } from "@/store";
@@ -104,9 +5,8 @@ import { store } from "@/store";
 import type { Relation } from "@/types";
 
 import { mapState } from "vuex";
-import TooltipBubble from "@/components/TooltipBubble.vue";
-import BarChart from "@/components/BarChart.vue";
-import BookItem from "@/components/BookItem.vue";
+import BarChart from "@/components/introduction/BarChart.vue";
+import BookItem from "@/components/introduction/BookItem.vue";
 import sta from "@/data/statistics.json";
 // import AOS from "aos";
 // import "aos/dist/aos.css";
@@ -208,6 +108,104 @@ statistics.value = sta; // 要求统计数据写死，因此直接读取json文�
 // 明	入選古籍涉及：明、南明、北元
 // 清	入選古籍涉及：清、太平天國
 </script>
+
+<template>
+  <div class="batches">
+    <div class="section-name">
+      <span></span>
+      <span>批次選擇</span>
+      <span></span>
+      <span></span>
+    </div>
+    <div class="container">
+      <div class="batch-buttons">
+        <button
+          v-for="(batch, index) in batchInfo"
+          :key="index"
+          v-text="batch.name"
+          :class="{ selected: current_batch == index }"
+          @click="updateBatch(index)"
+        ></button>
+      </div>
+
+      <div class="content">
+        <div class="info">
+          <!-- 基本文字介绍 -->
+          <div class="col-1">
+            <h3 v-if="current_batch == 0">國家珍貴古籍名録</h3>
+            <h3 v-else v-text="`國家珍貴古籍名録 第${batchInfo[current_batch].name}批`"></h3>
+
+            <!-- 批次描述 -->
+            <p class="batch-description" v-text="batchInfo[current_batch].description"></p>
+          </div>
+
+          <!-- 条形图表 -->
+          <div class="col-2">
+            <div class="left">
+              <div class="chart-wrapper document-types">
+                <BarChart
+                  title="文獻類型"
+                  ref="document_type"
+                  bar_color="#C4A1A1"
+                  :canvasWidth="15 * store.state.rem!"
+                  :canvasHeight="7 * store.state.rem!"
+                  :margin_left="0.46"
+                  :info="statistics[current_batch].document_type"
+                />
+              </div>
+              <div class="chart-wrapper edition-dynasties">
+                <BarChart
+                  title="版本朝代"
+                  ref="edition_dynasty"
+                  bar_color="#76978F"
+                  :canvasWidth="15 * store.state.rem!"
+                  :canvasHeight="5.6 * store.state.rem!"
+                  :margin_left="0.46"
+                  :info="statistics[current_batch].edition_dynasty"
+                />
+              </div>
+              <div class="chart-wrapper edition-types">
+                <BarChart
+                  title="版本類型"
+                  ref="edition_type"
+                  bar_color="#B1B098"
+                  :canvasWidth="15 * store.state.rem!"
+                  :canvasHeight="9.6 * store.state.rem!"
+                  :margin_left="0.46"
+                  :info="statistics[current_batch].edition_type"
+                />
+              </div>
+            </div>
+            <div class="right">
+              <div class="chart-wrapper languagess">
+                <BarChart
+                  title="文種"
+                  ref="language"
+                  bar_color="#B0A1B8"
+                  :canvasWidth="14 * store.state.rem!"
+                  :canvasHeight="23.7 * store.state.rem!"
+                  :margin_left="0.55"
+                  :info="statistics[current_batch].language"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 特色古籍 -->
+        <div class="featured-books">
+          <div class="show-more">
+            <span class="icon"></span>
+            <span @click="showMore">换一組</span>
+          </div>
+          <TransitionGroup name="fade1" class="books" tag="div">
+            <BookItem @openBookDetail="openBookDetail" v-for="b in showing_books" :key="b" :id="b" />
+          </TransitionGroup>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
 
 <style lang="less" scoped>
 .fade1-enter-active {

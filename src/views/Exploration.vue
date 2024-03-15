@@ -1,79 +1,11 @@
-<template>
-  <div class="exploration" :class="{ new: !show_results }" v-if="complete">
-    <div class="container">
-      <div class="search" :class="{ new: !show_results }">
-        <SearchBar :wait="wait" :attr_list="search_attrs" @search="search" @allAttrSearch="allAttrSearch" />
-      </div>
-
-      <div class="main-content" v-show="show_results">
-        <!-- 左側篩選欄 -->
-        <div class="filters">
-          <Filter
-            v-for="e in filter_data"
-            :key="e.id"
-            :attr_name="e.name"
-            :attr_id="e.id"
-            :attrs="e.value"
-            :db_column="e.db_column"
-            @filter="filterResult"
-          />
-        </div>
-
-        <!-- 右側檢索結果 -->
-        <div class="search-result">
-          <p class="total">
-            共計
-            {{ has_filtered ? filtered_result.length : search_result.length }}
-            條結果
-          </p>
-          <div class="results results-plain">
-            <table class="results-list">
-              <thead>
-                <tr>
-                  <th v-for="e in display_attrs" :key="e.name" @click="toggleRank(e.value, e.order)">
-                    <span class="attr-title" v-text="e.name"></span>
-                    <span class="rank">
-                      <span :class="{ active: e.order == false }"></span>
-                      <span :class="{ active: e.order }"></span>
-                    </span>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="item in curr_d" :key="item.id" class="item-block" @click="$emit('openBookDetail', item.id)">
-                  <td v-text="'第' + item.batch + '批'"></td>
-                  <td v-text="item.id || '-'"></td>
-                  <td v-text="item.name || '-'"></td>
-                  <td v-text="item.edition || '-'"></td>
-                  <td v-text="item.edition_dynasty"></td>
-                  <td v-text="item.document_type"></td>
-                  <td v-text="item.language"></td>
-                  <td v-text="item.province"></td>
-                  <td v-text="item.institution"></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <PageDivider
-            @turnTo="alterPage"
-            :items_sum="has_filtered ? filtered_result.length : search_result.length"
-            :each_page_items="each_page_items"
-            ref="PageDividerRef"
-          />
-        </div>
-      </div>
-    </div>
-  </div>
-</template>
-
 <script lang="ts" setup>
 import { onMounted, onUnmounted, reactive, ref } from "vue";
 import { loadExplorationData, searchForBooks, serachAll } from "@/api";
 import { store } from "@/store";
 
-import SearchBar from "@/components/SearchBar.vue";
-import PageDivider from "@/components/PageDivider.vue";
-import Filter from "@/components/Filter.vue";
+import SearchBar from "@/components/exploration/SearchBar.vue";
+import PageDivider from "@/components/exploration/PageDivider.vue";
+import Filter from "@/components/exploration/Filter.vue";
 
 const emit = defineEmits(["startLoading", "endLoading"]);
 
@@ -357,6 +289,74 @@ onUnmounted(() => {
   emit("startLoading");
 });
 </script>
+
+<template>
+  <div class="exploration" :class="{ new: !show_results }" v-if="complete">
+    <div class="container">
+      <div class="search" :class="{ new: !show_results }">
+        <SearchBar :wait="wait" :attr_list="search_attrs" @search="search" @allAttrSearch="allAttrSearch" />
+      </div>
+
+      <div class="main-content" v-show="show_results">
+        <!-- 左側篩選欄 -->
+        <div class="filters">
+          <Filter
+            v-for="e in filter_data"
+            :key="e.id"
+            :attr_name="e.name"
+            :attr_id="e.id"
+            :attrs="e.value"
+            :db_column="e.db_column"
+            @filter="filterResult"
+          />
+        </div>
+
+        <!-- 右側檢索結果 -->
+        <div class="search-result">
+          <p class="total">
+            共計
+            {{ has_filtered ? filtered_result.length : search_result.length }}
+            條結果
+          </p>
+          <div class="results results-plain">
+            <table class="results-list">
+              <thead>
+                <tr>
+                  <th v-for="e in display_attrs" :key="e.name" @click="toggleRank(e.value, e.order)">
+                    <span class="attr-title" v-text="e.name"></span>
+                    <span class="rank">
+                      <span :class="{ active: e.order == false }"></span>
+                      <span :class="{ active: e.order }"></span>
+                    </span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="item in curr_d" :key="item.id" class="item-block" @click="$emit('openBookDetail', item.id)">
+                  <td v-text="'第' + item.batch + '批'"></td>
+                  <td v-text="item.id || '-'"></td>
+                  <td v-text="item.name || '-'"></td>
+                  <td v-text="item.edition || '-'"></td>
+                  <td v-text="item.edition_dynasty"></td>
+                  <td v-text="item.document_type"></td>
+                  <td v-text="item.language"></td>
+                  <td v-text="item.province"></td>
+                  <td v-text="item.institution"></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <PageDivider
+            @turnTo="alterPage"
+            :items_sum="has_filtered ? filtered_result.length : search_result.length"
+            :each_page_items="each_page_items"
+            ref="PageDividerRef"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
 
 <style lang="less" scoped>
 .exploration {

@@ -1,66 +1,3 @@
-<template>
-  <div class="introduction" @wheel.prevent="rowScroll" ref="introduction" v-if="complete">
-    <section class="section-1">
-      <!-- 左侧今日古籍 -->
-      <div class="everyday-book">
-        <div>
-          <p>今日古籍</p>
-          <p v-text="now.getDate()"></p>
-          <p v-text="now.getFullYear() + '.' + (now.getMonth() + 1)"></p>
-        </div>
-
-        <div @click="$emit('openBookDetail', recommendBook.id)">
-          <p v-text="recommendBook.id"></p>
-          <p v-text="recommendBook.name"></p>
-        </div>
-
-        <!-- 书影 -->
-        <div class="image-wrapper" @click="$emit('openBookDetail', recommendBook.id)">
-          <img
-            @click="$emit('openBookDetail', d.data[0])"
-            :src="getImageURL(recommendBook.id, store.state.all_image)"
-            alt="书影"
-          />
-        </div>
-      </div>
-
-      <!-- 中间封面 -->
-      <div class="cover">
-        <div>
-          <div>
-            <h1>國<br />家<br />珍<br />貴<br />古<br />籍<br />名<br />録</h1>
-          </div>
-        </div>
-      </div>
-
-      <!-- 右侧按钮，点击进入下一页 -->
-      <div class="slider" @click="toNextPage()">
-        <img class="s1" src="../assets/yb1.svg" />
-        <img class="s2" src="../assets/yb2.svg" />
-        <div class="mouse-tip"></div>
-      </div>
-    </section>
-    <section class="section-2">
-      <Batches @openBookDetail="openBookDetail" />
-    </section>
-    <!-- <section class="section-3">
-      <BaiduMap />
-    </section> -->
-    <section class="section-4">
-      <FlowingParticles ref="FlowingParticlesRef" @openBookDetail="openBookDetail" />
-    </section>
-
-    <div class="badges">
-      <span
-        v-for="e in sectionSum"
-        :key="e"
-        :class="{ active: e - 1 == current_page }"
-        @click="scrollToSection(e - 1, true)"
-      ></span>
-    </div>
-  </div>
-</template>
-
 <script lang="ts" setup>
 import { computed, onMounted, onUnmounted, ref } from "vue";
 import { store } from "@/store";
@@ -194,6 +131,69 @@ onUnmounted(() => {
   // window.removeEventListener("touchmove", this.touchMove); // mobile devices
 });
 </script>
+
+<template>
+  <div class="introduction" @wheel.prevent="rowScroll" ref="introduction" v-if="complete">
+    <section class="section-1">
+      <!-- 左侧今日古籍 -->
+      <div class="everyday-book">
+        <div>
+          <p>今日古籍</p>
+          <p v-text="now.getDate()"></p>
+          <p v-text="now.getFullYear() + '.' + (now.getMonth() + 1)"></p>
+        </div>
+
+        <div @click="$emit('openBookDetail', recommendBook.id)">
+          <p v-text="recommendBook.id"></p>
+          <p v-text="recommendBook.name"></p>
+        </div>
+
+        <!-- 书影 -->
+        <div class="image-wrapper" @click="$emit('openBookDetail', recommendBook.id)">
+          <img
+            @click="$emit('openBookDetail', d.data[0])"
+            :src="getImageURL(recommendBook.id, store.state.all_image)"
+            alt="书影"
+          />
+        </div>
+      </div>
+
+      <!-- 中间封面 -->
+      <div class="cover">
+        <div>
+          <div>
+            <h1>國<br />家<br />珍<br />貴<br />古<br />籍<br />名<br />録</h1>
+          </div>
+        </div>
+      </div>
+
+      <!-- 右侧按钮，点击进入下一页 -->
+      <div class="slider" @click="toNextPage()">
+        <img class="s1" src="../assets/yb1.svg" />
+        <img class="s2" src="../assets/yb2.svg" />
+        <div class="mouse-tip"></div>
+      </div>
+    </section>
+    <section class="section-2">
+      <Batches @openBookDetail="openBookDetail" />
+    </section>
+    <!-- <section class="section-3">
+      <BaiduMap />
+    </section> -->
+    <section class="section-4">
+      <FlowingParticles ref="FlowingParticlesRef" @openBookDetail="openBookDetail" />
+    </section>
+
+    <div class="badges">
+      <span
+        v-for="e in sectionSum"
+        :key="e"
+        :class="{ active: e - 1 == current_page }"
+        @click="scrollToSection(e - 1, true)"
+      ></span>
+    </div>
+  </div>
+</template>
 
 <style lang="less" scoped>
 .introduction {
