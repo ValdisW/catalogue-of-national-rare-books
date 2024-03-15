@@ -36,7 +36,7 @@
           <div class="person-responsibility">
             <p
               v-for="b in related_person"
-              :key="b"
+              :key="b.person_id"
               @click="openPersonDetail(b.person_id)"
               v-text="store.state.persons.find((ele) => ele.id == b.person_id)!.name + '（' + b.count + '）'"
             ></p>
@@ -77,11 +77,11 @@
 
 <script lang="ts" setup>
 import { ref, reactive } from "vue";
-import axios from "axios";
 import BookInfoDialog from "@/components/BookInfoDialog.vue";
 import { Relation, RelatedPerson } from "#/axios";
 
 import { store } from "@/store";
+import { getPersonDetailData } from "@/api";
 
 const emit = defineEmits(["openPersonDetail", "openBookDetail"]);
 
@@ -131,7 +131,8 @@ function close() {
 }
 
 function openPersonDetail(person_id: string) {
-  emit("openPersonDetail", person_id);
+  // emit("openPersonDetail", person_id);
+  open(person_id);
 }
 
 function open(person_id: string) {
@@ -139,7 +140,7 @@ function open(person_id: string) {
 
   show.value = true;
 
-  axios.get(`/data/person-detail/${person_id}`).then((d) => {
+  getPersonDetailData(person_id).then((d) => {
     person_data.value = { ...d.data[0][0] };
 
     filtered_related_books.push(...d.data[1]);
@@ -186,7 +187,7 @@ defineExpose({ open, close });
       top: 0.5rem;
       width: 2rem;
       height: 2rem;
-      background: url(../assets/icons/back.svg) center no-repeat;
+      background: url(../../assets/icons/back.svg) center no-repeat;
       background-size: 100%;
       cursor: pointer;
     }
@@ -245,21 +246,22 @@ defineExpose({ open, close });
         padding: 0.5rem;
         border-radius: 0.5rem;
         background: #3331;
+        display: flex;
+        flex-direction: column;
         a {
           color: #201d1d;
         }
         .person-responsibility {
           position: relative;
           font-size: 0.7rem;
-          width: 200px;
-          height: 170px;
+          width: 10rem;
           overflow-y: scroll;
-          // p {
-          //   cursor: pointer;
-          //   &:hover {
-          //     background: #3331;
-          //   }
-          // }
+          p {
+            cursor: pointer;
+            &:hover {
+              background: #3331;
+            }
+          }
         }
       }
     }

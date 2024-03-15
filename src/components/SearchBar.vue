@@ -12,7 +12,7 @@
           <input
             placeholder="請輸入關鍵詞"
             type="text"
-            ref="text"
+            ref="TextRef"
             @keyup="
               (e) => {
                 if (e.key == 'Enter') allAttrSearch();
@@ -20,6 +20,7 @@
             "
           />
         </div>
+        <!-- 全字段检索的检索按钮 -->
         <button class="search-button" :class="{ invalid: wait }" @click="if (!wait) allAttrSearch();"></button>
       </div>
 
@@ -32,14 +33,14 @@
           <input
             placeholder="請輸入關鍵詞"
             type="text"
-            ref="text-single"
+            ref="TextSingleRef"
             @keyup="
               (e) => {
                 if (e.key == 'Enter') search();
               }
             "
           />
-          <Droplist ref="drop-list-single" :attr_list="attr_list" />
+          <Droplist ref="DroplistSingleRef" :attr_list="attr_list" />
         </div>
 
         <!-- 后续的字段 -->
@@ -49,84 +50,93 @@
               <input
                 placeholder="請輸入關鍵詞"
                 type="text"
-                ref="text-multiple"
+                ref="TextMultipleRef"
                 @keyup="
                   (e) => {
                     if (e.key == 'Enter') search();
                   }
                 "
               />
-              <Droplist ref="drop-list-multiple" :attr_list="attr_list" />
+              <Droplist ref="DroplistMultipleRef" :attr_list="attr_list" />
             </div>
           </TransitionGroup>
         </Transition>
         <div class="hide" v-show="n > 1" @click="show_more_bars = !show_more_bars"></div>
 
+        <!-- 指定字段检索的检索按钮 -->
         <button class="search-button" :class="{ invalid: wait }" @click="if (!wait) search();"></button>
       </div>
     </div>
   </div>
 </template>
 
-<script>
+<script lang="ts" setup>
+import { ref } from "vue";
 import Droplist from "@/components/Droplist.vue";
 
-export default {
-  name: "SearchBar",
-  components: { Droplist },
-  props: {
-    attr_list: Array,
-    wait: Boolean,
+defineProps({
+  attr_list: {
+    type: Array,
+    required: true,
   },
-  data() {
-    return {
-      n: 1,
-      all_attr_mode: true,
-      show_more_bars: true,
-      input_tip: false,
-    };
+  wait: {
+    type: Boolean,
+    required: true,
   },
-  methods: {
-    // 全字段检索
-    allAttrSearch() {
-      // 输入框中有内容才开始检索，否则提示
-      if (this.$refs["text"].value) this.$emit("allAttrSearch", this.$refs["text"].value);
-      else this.input_tip = true;
-    },
+});
 
-    // 指定字段检索
-    search() {
-      if (this.$refs["text-single"].value) {
-        let arr = []; // 用于构建多字段检索的内容
-        if (this.n == 1) {
-          // 只有一个字段
-          arr.push({
-            value: this.$refs["text-single"].value,
-            attr: this.$refs["drop-list-single"].curr_value,
-          });
-        } else {
-          // 多个字段
-          arr.push({
-            value: this.$refs["text-single"].value,
-            attr: this.$refs["drop-list-single"].curr_value,
-          });
-          for (let i = 0; i < this.$refs["text-multiple"].length; i++) {
-            arr.push({
-              value: this.$refs["text-multiple"][i].value,
-              attr: this.$refs["drop-list-multiple"][i].curr_value,
-            });
-          }
-        }
-        this.$emit("search", arr);
-      } else this.input_tip = true;
-    },
+const emit = defineEmits(["allAttrSearch", "search"]);
 
-    // 添加字段
-    add() {
-      if (this.n < 4) this.n++;
-    },
-  },
-};
+const TextRef = ref(null); // 全字段检索的<input>
+const TextSingleRef = ref(null); // 指定字段检索的第一个<input>
+const TextMultipleRef = ref(null); // 指定字段检索的后续<input>
+const DroplistSingleRef = ref(null);
+const DroplistMultipleRef = ref(null);
+
+const n = ref(1);
+const all_attr_mode = ref(true);
+const show_more_bars = ref(true);
+const input_tip = ref(false);
+
+// 全字段检索
+function allAttrSearch() {
+  // 输入框中有内容才开始检索，否则提示
+  if (TextRef.value.value) emit("allAttrSearch", TextRef.value.value);
+  else input_tip.value = true;
+}
+
+// 指定字段检索
+function search() {
+  if (TextSingleRef.value) {
+    let arr = []; // 用于构建多字段检索的内容
+    if (n.value == 1) {
+      // 只有一个字段
+      arr.push({
+        value: TextSingleRef.value.value,
+        attr: DroplistSingleRef.value.curr_value,
+      });
+    } else {
+      // 多个字段
+      arr.push({
+        value: TextSingleRef.value.value,
+        attr: DroplistSingleRef.value.curr_value,
+      });
+      for (let i = 0; i < TextMultipleRef.value.length; i++) {
+        arr.push({
+          value: TextMultipleRef.value[i].value,
+          attr: DroplistMultipleRef.value[i].curr_value,
+        });
+      }
+    }
+    console.log(arr);
+    emit("search", arr);
+  } else input_tip.value = true;
+}
+
+// 添加字段
+function add() {
+  if (n.value < 4) n.value++;
+}
 </script>
 
 <style lang="less" scoped>

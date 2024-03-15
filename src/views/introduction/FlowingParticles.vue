@@ -302,7 +302,7 @@ export default {
 
       .togglePause {
         user-select: none;
-        background: url(../assets/icons/pause.svg) center no-repeat;
+        background: url(../../assets/icons/pause.svg) center no-repeat;
         background-size: 30%;
         border: 0.13rem solid #201d1d;
         cursor: pointer;
@@ -315,7 +315,7 @@ export default {
         opacity: 0.6;
       }
       .togglePause.continue {
-        background: url(../assets/icons/continue.svg) center no-repeat;
+        background: url(../../assets/icons/continue.svg) center no-repeat;
         background-size: 30%;
       }
     }

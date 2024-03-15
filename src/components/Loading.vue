@@ -17,7 +17,7 @@
 
 <script lang="ts" setup>
 defineProps({
-  complete: Boolean,
+  complete: { type: Boolean },
 });
 </script>
 

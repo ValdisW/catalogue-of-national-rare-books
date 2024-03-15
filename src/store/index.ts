@@ -1,11 +1,11 @@
 import { App } from "vue";
 import { createStore } from "vuex";
 
-import { BookImage, Relation, RelatedPerson } from "#/axios";
+import { BookImage, RelatedPerson, Book } from "#/axios";
 
 const store = createStore({
   state: {
-    books: Array<Relation>,
+    books: Array<Book>,
     persons: Array<RelatedPerson>,
     person_ralations: [],
     all_action: [],
@@ -38,6 +38,7 @@ const store = createStore({
         state.all_institution,
         state.all_image,
       ] = _data;
+      console.log(state.all_institution);
     },
     loadExplorationData(state, _data) {
       [

@@ -2,7 +2,7 @@
   <div class="exploration" :class="{ new: !show_results }" v-if="complete">
     <div class="container">
       <div class="search" :class="{ new: !show_results }">
-        <SearchBar :wait="wait" :attr_list="display_attrs" @search="search" @allAttrSearch="allAttrSearch" />
+        <SearchBar :wait="wait" :attr_list="search_attrs" @search="search" @allAttrSearch="allAttrSearch" />
       </div>
 
       <div class="main-content" v-show="show_results">
@@ -10,7 +10,7 @@
         <div class="filters">
           <Filter
             v-for="e in filter_data"
-            :key="e"
+            :key="e.id"
             :attr_name="e.name"
             :attr_id="e.id"
             :attrs="e.value"
@@ -58,7 +58,7 @@
             @turnTo="alterPage"
             :items_sum="has_filtered ? filtered_result.length : search_result.length"
             :each_page_items="each_page_items"
-            ref="page-divider"
+            ref="PageDividerRef"
           />
         </div>
       </div>
@@ -66,273 +66,296 @@
   </div>
 </template>
 
-<script>
-import axios from "axios";
+<script lang="ts" setup>
+import { onMounted, onUnmounted, reactive, ref } from "vue";
+import { loadExplorationData, searchForBooks, serachAll } from "@/api";
+import { store } from "@/store";
+
 import SearchBar from "@/components/SearchBar.vue";
 import PageDivider from "@/components/PageDivider.vue";
 import Filter from "@/components/Filter.vue";
 
-export default {
-  name: "Exploration",
-  components: { SearchBar, PageDivider, Filter },
-  data() {
-    return {
-      complete: false,
-      show_results: false,
-      search_result: [], // 所有检索结果
-      curr_d: [], // 当前页的检索结果
-      each_page_items: 50, // 每页的检索结果数量
+const emit = defineEmits(["startLoading", "endLoading"]);
 
-      wait: false, // 点击搜索按钮的等待，防止重复点击
+const PageDividerRef = ref(null);
 
-      curr_filter: {}, // 当前的筛选条件
+const complete = ref(false);
+const show_results = ref(false);
+const search_result = ref([]); // 所有检索结果
+const curr_d = ref([]); // 当前页的检索结果
+const each_page_items = ref(50); // 每页的检索结果数量
 
-      has_filtered: false, // 标记是否已经进行过筛选（用于正确显示检索结果数量以及页码数）
+const wait = ref(false); // 点击搜索按钮的等待，防止重复点击
 
-      // 筛选器数据
-      filter_data: [
-        { id: "document_type", name: "文獻類型", db_column: "name", value: [] },
-        { id: "language", name: "文種", db_column: "type", value: [] },
-        {
-          id: "edition_dynasty",
-          name: "版本朝代",
-          db_column: "name",
-          value: [],
-        },
-        {
-          id: "edition_type",
-          name: "版本類型",
-          db_column: "level_1",
-          value: [],
-        },
-      ],
+const curr_filter = ref({}); // 当前的筛选条件
 
-      filtered_result: [], // 筛选后的结果
+const has_filtered = ref(false); // 标记是否已经进行过筛选（用于正确显示检索结果数量以及页码数）
 
-      // 展示字段与检索字段
-      display_attrs: [
-        { name: "名録批次", value: "batch", order: true, byID: false },
-        { name: "名録號", value: "id", order: true, byID: false },
-        { name: "題名", value: "name", order: null, byID: false },
-        { name: "版本", value: "edition", order: null, byID: false },
-        { name: "版本朝代", value: "edition_dynasty", order: null, byID: true },
-        { name: "文獻類型", value: "document_type", order: null, byID: true },
-        { name: "文種", value: "language", order: null, byID: true },
-        { name: "收藏省份", value: "province", order: null, byID: true },
-        { name: "收藏單位", value: "institution", order: null, byID: true },
-      ],
-    };
+// 筛选器数据
+const filter_data: {
+  id: string;
+  name: string;
+  db_column: string;
+  value: { name: string; value: any; selected: boolean }[];
+}[] = reactive([
+  { id: "document_type", name: "文獻類型", db_column: "name", value: [] },
+  { id: "language", name: "文種", db_column: "type", value: [] },
+  {
+    id: "edition_dynasty",
+    name: "版本朝代",
+    db_column: "name",
+    value: [],
   },
-  methods: {
-    /**
-     * 多个指定字段的检索
-     * @param {*} values 检索词及筛选条件
-     */
-    search(values) {
-      if (!this.wait) {
-        this.wait = true;
-        axios
-          .post("/data/search-for-books", { values })
-          .then((res) => {
-            this.search_result = res.data;
-            this.curr_d = this.search_result.slice(0, this.each_page_items); // 当前页数据
-            this.convertResult();
-            this.updateFilter();
-            this.show_results = true;
-            this.wait = false;
-          })
-          .then((err) => {
-            if (err) console.error(err);
-          });
-        this.has_filtered = false;
-      }
-    },
+  {
+    id: "edition_type",
+    name: "版本類型",
+    db_column: "level_1",
+    value: [],
+  },
+]);
 
-    /**
-     * 全字段检索
-     * @param {*} query 输入框中的内容
-     */
-    allAttrSearch(query) {
-      if (!this.wait) {
-        this.wait = true;
-        axios
-          .post("/data/search-all", { query })
-          .then((res) => {
-            this.search_result = res.data;
-            this.curr_d = this.search_result.slice(0, this.each_page_items); // 当前页数据
-            this.convertResult();
-            this.updateFilter();
-            this.show_results = true;
-            this.wait = false;
-          })
-          .then((err) => {
-            if (err) console.error(err);
-          });
-        this.has_filtered = false;
-      }
-    },
+const filtered_result = ref([]); // 筛选后的结果
 
-    // 更新统计数据
-    updateFilter() {
-      for (let i in this.filter_data) {
-        this.filter_data[i].value = this.getSum(this.search_result, this.filter_data[i].id + "_id");
+// 展示字段与检索字段
+const search_attrs = [
+  { name: "名録批次", value: "batch" },
+  { name: "名録號", value: "id" },
+  { name: "題名", value: "name" },
+  { name: "版本", value: "edition" },
+  { name: "版本朝代", value: "edition_dynasty" },
+  { name: "文獻類型", value: "document_type" },
+  { name: "文種", value: "language" },
+  { name: "收藏省份", value: "province" },
+  { name: "收藏單位", value: "institution" },
+  { name: "責任行爲", value: "action" },
+  { name: "責任者名稱", value: "person_name" },
+  { name: "責任者朝代", value: "person_dynasty" },
+  { name: "責任者身份", value: "person_status" },
+];
 
-        // 根据大类，作进一步统计
-        let temp = [],
-          result = [];
-        for (let e of this.filter_data[i].value)
-          temp.push({
-            id: e.name,
-            value: e.value,
-            type: this.$store.state["all_" + this.filter_data[i].id].find((el) => el.id == e.name)[
-              this.filter_data[i].db_column
-            ],
-          });
-        for (let i in temp) {
-          if (!result.find((el) => el.name == temp[i].type))
-            result.push({
-              name: temp[i].type,
-              ids: [temp[i].id],
-              value: temp[i].value,
-              selected: false,
-            });
-          else {
-            result.find((el) => el.name == temp[i].type).ids.push(temp[i].id);
-            result.find((el) => el.name == temp[i].type).value += temp[i].value;
-          }
-        }
-        this.filter_data[i].value = result;
-      }
-    },
+const display_attrs = reactive([
+  { name: "名録批次", value: "batch", order: true, byID: false },
+  { name: "名録號", value: "id", order: true, byID: false },
+  { name: "題名", value: "name", order: false, byID: false },
+  { name: "版本", value: "edition", order: false, byID: false },
+  { name: "版本朝代", value: "edition_dynasty", order: false, byID: true },
+  { name: "文獻類型", value: "document_type", order: false, byID: true },
+  { name: "文種", value: "language", order: false, byID: true },
+  { name: "收藏省份", value: "province", order: false, byID: true },
+  { name: "收藏單位", value: "institution", order: false, byID: true },
+]);
 
-    convertResult() {
-      this.curr_d.forEach((e) => {
-        ["edition_dynasty", "document_type", "language", "province", "institution"].map((attr) => {
-          e[attr] = this.$store.state[`all_${attr}`].find((ele) => ele.id == e[`${attr}_id`])
-            ? this.$store.state[`all_${attr}`].find((ele) => ele.id == e[`${attr}_id`]).name
-            : "-";
-        });
+/**
+ * 多个指定字段的检索
+ * @param {*} values 检索词及筛选条件
+ */
+function search(values: Array<{ value: string; attr: string }>) {
+  if (!wait.value) {
+    wait.value = true;
+    searchForBooks(values)
+      .then((res) => {
+        search_result.value = res.data;
+        curr_d.value = search_result.value.slice(0, each_page_items.value); // 当前页数据
+        convertResult();
+        updateFilter();
+        show_results.value = true;
+        wait.value = false;
+      })
+      .then((err) => {
+        if (err) console.error(err);
       });
-    },
+    has_filtered.value = false;
+  }
+}
 
-    // Filter发生变化
-    filterResult(e) {
-      this.curr_filter[e.attr] = e.value;
-      this.filtered_result = this.search_result.filter((el) => {
-        let flag = true;
-        for (let i in this.curr_filter) {
-          if (!this.curr_filter[i].length) continue;
-          let _flag = false;
-          for (let v of this.curr_filter[i]) _flag = _flag || "" + el[i + "_id"] == v;
-          flag = flag && _flag;
-        }
-        return flag;
+/**
+ * 全字段检索
+ * @param {*} query 输入框中的内容
+ */
+function allAttrSearch(query: string) {
+  if (!wait.value) {
+    wait.value = true;
+    serachAll(query)
+      .then((res) => {
+        search_result.value = res.data;
+        curr_d.value = search_result.value.slice(0, each_page_items.value); // 当前页数据
+        convertResult();
+        updateFilter();
+        show_results.value = true;
+        wait.value = false;
+      })
+      .then((err) => {
+        if (err) console.error(err);
       });
+    has_filtered.value = false;
+  }
+}
 
-      this.curr_d = this.filtered_result.slice(0, this.each_page_items); // 当前页数据
-      this.convertResult();
+// 更新统计数据
+function updateFilter() {
+  for (let i in filter_data) {
+    filter_data[i].value = getSum(search_result.value, filter_data[i].id + "_id");
 
-      this.has_filtered = true;
-      this.$refs["page-divider"].turnTo(1);
-    },
-
-    /**
-     * 根据检索结果与属性名，统计不同属性值对应的检索结果条数
-     * @param {array} r 检索结果
-     * @param {string} attr 属性名，应该是r中的某个键名
-     * @returns 返回{属性名（id）, 属性值（数量）, 选中状态（给筛选器用）}
-     */
-    getSum(r, attr) {
-      let a = {};
-      r.forEach((e) => {
-        a[e[attr]] = a[e[attr]] || 0;
-        a[e[attr]]++;
+    // 根据大类，作进一步统计
+    let temp: { id: string; value: string; type: string }[] = [],
+      result: { name: string; ids: string[]; value: string; selected: boolean }[] = [];
+    for (let e of filter_data[i].value)
+      temp.push({
+        id: e.name,
+        value: e.value,
+        type: store.state["all_" + filter_data[i].id].find((el) => el.id == e.name)[filter_data[i].db_column],
       });
-      let arr = [];
-      for (let i in a) {
-        arr.push({
-          name: i,
-          value: a[i],
+    for (let i in temp) {
+      if (!result.find((el) => el.name == temp[i].type))
+        result.push({
+          name: temp[i].type,
+          ids: [temp[i].id],
+          value: temp[i].value,
           selected: false,
         });
+      else {
+        result.find((el) => el.name == temp[i].type).ids.push(temp[i].id);
+        result.find((el) => el.name == temp[i].type).value += temp[i].value;
       }
-      return arr;
-    },
+    }
+    filter_data[i].value = result;
+  }
+}
 
-    toggleRank(attr, order) {
-      if (order) {
-        this.search_result.sort((a, b) => {
-          let flag;
-          if (typeof a[attr] == "string") flag = b[attr].localeCompare(a[attr]);
-          else if (typeof a[attr] == "number") flag = b[attr] - a[attr];
-          else flag = 1;
-          return flag;
-        });
-      } else {
-        this.search_result.sort((a, b) => {
-          let flag;
-          if (typeof a[attr] == "string") flag = a[attr].localeCompare(b[attr]);
-          else if (typeof a[attr] == "number") flag = a[attr] - b[attr];
-          else flag = 1;
-          return flag;
-        });
-      }
-
-      let t = this.display_attrs.find((e) => e.value == attr).order;
-      this.display_attrs.forEach((el) => {
-        el.order = null;
-      });
-      this.display_attrs.find((e) => e.value == attr).order = !t;
-
-      this.curr_d = this.search_result.slice(0, this.each_page_items);
-      this.convertResult();
-
-      this.$refs["page-divider"].turnTo(1);
-    },
-    alterPage(page_index) {
-      if (this.has_filtered)
-        this.curr_d = this.filtered_result.slice(
-          this.each_page_items * (page_index - 1),
-          this.each_page_items * page_index
-        );
-      else
-        this.curr_d = this.search_result.slice(
-          this.each_page_items * (page_index - 1),
-          this.each_page_items * page_index
-        );
-      this.convertResult();
-    },
-    showFilterOptions(e) {
-      let b = e.currentTarget.querySelector(".options").style.display == "block";
-      document.querySelectorAll(".options").forEach((e) => (e.style.display = "none"));
-      e.currentTarget.querySelector(".options").style.display = b ? "none" : "block";
-    },
-    choose(e) {
-      document.querySelectorAll(".options").forEach((e) => (e.style.display = "none"));
-      let parent_filter_value = e.path[3].querySelector(".value");
-      parent_filter_value.setAttribute("val", e.currentTarget.getAttribute("val"));
-      parent_filter_value.innerText = e.currentTarget.innerText;
-    },
-  },
-  mounted() {
-    axios.get("/data/exploration-load").then((res) => {
-      this.$store.commit("loadExplorationData", res.data);
-
-      this.complete = true;
-      this.$emit("endLoading");
-
-      this.filtered_result = this.search_result = this.$store.state.books;
-
-      this.curr_d = this.search_result.slice(0, this.each_page_items); // 当前页数据
-      this.convertResult();
-
-      this.updateFilter();
+function convertResult() {
+  curr_d.value.forEach((e) => {
+    ["edition_dynasty", "document_type", "language", "province", "institution"].map((attr) => {
+      e[attr] = store.state[`all_${attr}`].find((ele) => ele.id == e[`${attr}_id`])
+        ? store.state[`all_${attr}`].find((ele) => ele.id == e[`${attr}_id`]).name
+        : "-";
     });
-  },
-  unmounted() {
-    this.$emit("startLoading");
-  },
-};
+  });
+}
+
+// Filter发生变化
+function filterResult(e) {
+  curr_filter.value[e.attr] = e.value;
+  filtered_result.value = search_result.value.filter((el) => {
+    let flag = true;
+    for (let i in curr_filter.value) {
+      if (!curr_filter.value[i].length) continue;
+      let _flag = false;
+      for (let v of curr_filter.value[i]) _flag = _flag || "" + el[i + "_id"] == v;
+      flag = flag && _flag;
+    }
+    return flag;
+  });
+
+  curr_d.value = filtered_result.value.slice(0, each_page_items.value); // 当前页数据
+  convertResult();
+
+  has_filtered.value = true;
+  PageDividerRef.value.turnTo(1);
+}
+
+/**
+ * 根据检索结果与属性名，统计不同属性值对应的检索结果条数
+ * @param {array} r 检索结果
+ * @param {string} attr 属性名，应该是r中的某个键名
+ * @returns 返回{属性名（id）, 属性值（数量）, 选中状态（给筛选器用）}
+ */
+function getSum(r, attr) {
+  let a = {};
+  r.forEach((e) => {
+    a[e[attr]] = a[e[attr]] || 0;
+    a[e[attr]]++;
+  });
+  let arr = [];
+  for (let i in a) {
+    arr.push({
+      name: i,
+      value: a[i],
+      selected: false,
+    });
+  }
+  return arr;
+}
+
+// 检索结果按指定字段正序/倒序排序
+function toggleRank(attr, order) {
+  // 更新检索结果
+  if (order) {
+    search_result.value.sort((a, b) => {
+      let flag;
+      if (typeof a[attr] == "string") flag = b[attr].localeCompare(a[attr]);
+      else if (typeof a[attr] == "number") flag = b[attr] - a[attr];
+      else flag = 1;
+      return flag;
+    });
+  } else {
+    search_result.value.sort((a, b) => {
+      let flag;
+      if (typeof a[attr] == "string") flag = a[attr].localeCompare(b[attr]);
+      else if (typeof a[attr] == "number") flag = a[attr] - b[attr];
+      else flag = 1;
+      return flag;
+    });
+  }
+
+  // 修改排序标记
+  let t = display_attrs.find((e) => e.value == attr).order;
+  display_attrs.forEach((el) => {
+    el.order = false;
+  });
+  display_attrs.find((e) => e.value == attr).order = !t;
+
+  curr_d.value = search_result.value.slice(0, each_page_items.value);
+  convertResult();
+
+  PageDividerRef.value.turnTo(1); // 返回第一页
+}
+
+function alterPage(page_index) {
+  if (has_filtered.value)
+    curr_d.value = filtered_result.value.slice(
+      each_page_items.value * (page_index - 1),
+      each_page_items.value * page_index
+    );
+  else
+    curr_d.value = search_result.value.slice(
+      each_page_items.value * (page_index - 1),
+      each_page_items.value * page_index
+    );
+  convertResult();
+}
+
+function showFilterOptions(e) {
+  let b = e.currentTarget.querySelector(".options").style.display == "block";
+  document.querySelectorAll(".options").forEach((e) => (e.style.display = "none"));
+  e.currentTarget.querySelector(".options").style.display = b ? "none" : "block";
+}
+
+function choose(e) {
+  document.querySelectorAll(".options").forEach((e) => (e.style.display = "none"));
+  let parent_filter_value = e.path[3].querySelector(".value");
+  parent_filter_value.setAttribute("val", e.currentTarget.getAttribute("val"));
+  parent_filter_value.innerText = e.currentTarget.innerText;
+}
+
+onMounted(() => {
+  loadExplorationData().then((res) => {
+    store.commit("loadExplorationData", res.data);
+
+    complete.value = true;
+    emit("endLoading");
+
+    filtered_result.value = search_result.value = store.state.books;
+
+    curr_d.value = search_result.value.slice(0, each_page_items.value); // 当前页数据
+    convertResult();
+
+    updateFilter();
+  });
+});
+
+onUnmounted(() => {
+  emit("startLoading");
+});
 </script>
 
 <style lang="less" scoped>

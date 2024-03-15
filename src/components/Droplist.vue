@@ -1,4 +1,5 @@
 <template>
+  <!-- 检索时用到的下拉列表，用来指定具体的检索字段 -->
   <div class="droplist">
     <div class="box" @click="toggleShowList">
       <span ref="box-text" class="selected" v-text="default_text"></span>
@@ -30,23 +31,29 @@ function select(e: MouseEvent) {
   toggleShowList();
   default_text.value = e.target.innerText;
 }
+
+defineExpose({
+  curr_value,
+});
 </script>
 
 <style lang="less" scoped>
+@offset: 0.5rem;
 .droplist {
-  cursor: pointer;
   font-size: 0.7rem;
   display: inline-block;
-  width: 4rem;
+  width: calc(4rem + 12px);
   height: 2.1rem;
   user-select: none;
-  margin-left: -4rem;
+  margin: 0 @offset 0 calc(-4rem - @offset - 12px);
   vertical-align: top; // 防错位
 
   .box {
     height: 100%;
     display: flex;
     align-items: center;
+    justify-content: right;
+    cursor: pointer;
     span:nth-child(2) {
       display: inline-block;
       width: 0;
@@ -66,9 +73,13 @@ function select(e: MouseEvent) {
     border-radius: 0.3rem;
     text-align: center;
     z-index: 200;
-    width: 4rem;
+    width: calc(4rem + 12px);
     overflow: hidden;
+    max-height: 10rem;
+    overflow-y: scroll;
+    margin: 0 0 0 @offset;
     li {
+      cursor: pointer;
       height: 1.5rem;
       line-height: 1.5rem;
     }

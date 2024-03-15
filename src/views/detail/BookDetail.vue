@@ -94,20 +94,19 @@
 
         <!-- 责任者 -->
         <ul class="timeline">
-          <li v-for="person in related_person" :key="person" @click="clickPerson($event)">
+          <li v-for="person in related_person" :key="person.person_id" @click="clickPerson(person.person_id)">
             <!-- 责任行为名称 -->
-            <div class="actions" v-text="person.action"></div>
+            <div class="actions" v-text="person.action_name"></div>
 
             <!-- 圆点 -->
             <b></b>
 
             <!-- 责任者名称 -->
-            <span class="person" v-if="person.person == '□□'" v-text="`[${person.dynasty_or_nation}]佚名`"></span>
+            <span class="person" v-if="person.person_name == '□□'" v-text="`[${person.dynasty_or_nation}]佚名`"></span>
             <span
               class="person"
               v-else
-              @click="$emit('openPersonDetail', person.person_id)"
-              v-text="(person.dynasty_or_nation ? '[' + person.dynasty_or_nation + ']' : '') + person.person"
+              v-text="(person.dynasty_or_nation ? '[' + person.dynasty_or_nation + ']' : '') + person.person_name"
             >
             </span>
           </li>
@@ -150,12 +149,12 @@
 <script lang="ts" setup>
 import { ref } from "vue";
 import { store } from "@/store";
-import axios, { AxiosResponse } from "axios";
 import type { Book, BookImage, Relation } from "#/axios";
 
 import ImageViewer from "@/components/ImageViewer.vue";
 
-import { id2name } from "@/utils/id2name.js";
+import { id2name } from "@/utils/id2name.ts";
+import { getBookDetailData } from "@/api";
 
 const ImageViewerRef = ref<InstanceType<typeof ImageViewer> | null>(null);
 
@@ -167,18 +166,23 @@ const book_data = ref<Book>({ content: "" });
 const related_person = ref<Relation[]>([]);
 const seals = ref([]);
 
-function clickPerson(e: MouseEvent) {
-  e.currentTarget?.lastElementChild.click();
+const emit = defineEmits(["startLoading", "endLoading", "openPersonDetail"]);
+
+function clickPerson(id: string) {
+  if (id != "P000000") emit("openPersonDetail", id);
 }
+
 function close() {
   show.value = false;
 }
+
+// 控制古籍详情的显示和更新
 function open(book_id: string) {
   image_filenames.value = [];
   show.value = true;
 
   // 获取书影数据
-  axios.get(`/data/book-detail/${book_id}`).then((d: AxiosResponse) => {
+  getBookDetailData(book_id).then((d) => {
     book_data.value = d.data[0][0];
     related_person.value = d.data[1];
     seals.value = d.data[2];
@@ -202,6 +206,15 @@ function switchImage(index: number) {
 // const normalized_title = computed(() => {
 //   // 临时规范题名
 //   return book_data.value.content.split("　")[0];
+// });
+
+// onMounted(() => {
+//   show.value = true;
+//   emit("endLoading");
+// });
+
+// onUnmounted(() => {
+//   emit("startLoading");
 // });
 
 defineExpose({
@@ -245,7 +258,7 @@ defineExpose({
       top: 0.15rem;
       width: 2rem;
       height: 2rem;
-      background: url(../assets/icons/back.svg) center no-repeat;
+      background: url(../../assets/icons/back.svg) center no-repeat;
       background-size: 100%;
       cursor: pointer;
     }
