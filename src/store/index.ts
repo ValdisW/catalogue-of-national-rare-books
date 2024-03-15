@@ -38,7 +38,6 @@ const store = createStore({
         state.all_institution,
         state.all_image,
       ] = _data;
-      console.log(state.all_institution);
     },
     loadExplorationData(state, _data) {
       [
