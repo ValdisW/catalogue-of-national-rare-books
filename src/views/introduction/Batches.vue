@@ -328,7 +328,7 @@ statistics.value = sta; // 要求统计数据写死，因此直接读取json文�
             display: inline-block;
             width: 0.7rem;
             height: 0.7rem;
-            background: url(../assets/icons/show-more.svg) center no-repeat;
+            background: url(../../assets/icons/show-more.svg) center no-repeat;
             background-size: 100%;
           }
 
