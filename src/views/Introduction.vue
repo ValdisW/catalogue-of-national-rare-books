@@ -110,7 +110,7 @@ function openBookDetail(book_id: string) {
 function rowScroll(e: WheelEvent) {
   if (e.deltaY > 0 && !scrolling.value) toNextPage();
   else if (e.deltaY < 0 && !scrolling.value) toPrevPage();
-  if (current_page.value == sectionSum - 1) FlowingParticlesRef.value?.continue();
+  if (current_page.value == sectionSum - 1) FlowingParticlesRef.value?.continuePlay();
   else FlowingParticlesRef.value?.pause();
 }
 
