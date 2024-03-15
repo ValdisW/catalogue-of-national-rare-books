@@ -41,22 +41,22 @@ import { Book } from "#/axios";
 
 const MAX_PARTICLES = 250;
 const NUM_PARTICLES = 100;
-const PARTICLE_SIZE = 0.5; // View heights
-const SPEED = 20000; // 毫秒数
+const PARTICLE_SIZE = 0.5;
+const SPEED = 20000;
 
 const svg = ref<d3.Selection<SVGSVGElement, unknown, HTMLElement, any> | null>(null);
 const particles = ref<Particle[]>([]);
 const animation_handler = ref(0);
 const playing = ref(true);
 const curr_time = ref(0);
-const particles_original_data = ref([]);
+const particles_original_data = ref<Book[]>([]);
 const tooltip_id = ref("");
 const curr_comment = ref("");
 
 interface Particle {
-  info: Book;
   x: number;
   y: number;
+  info: Book;
   diameter: number;
   duration: number;
   amplitude: number;
@@ -95,9 +95,12 @@ function changeDynasty(o: { text: string; ids: string[] }) {
 
   // 如果粒子数量太多，只显示其中一部分
   if (particles_original_data.value.length > MAX_PARTICLES) {
-    let temp_arr = JSON.parse(JSON.stringify(particles_original_data.value));
+    let temp_arr: Book[] = JSON.parse(JSON.stringify(particles_original_data.value));
     particles_original_data.value = [];
-    for (let i = 0; i < MAX_PARTICLES; i++) particles_original_data.value.push(temp_arr.pop());
+    for (let i = 0; i < MAX_PARTICLES; i++) {
+      let temp = temp_arr.pop();
+      if (temp) particles_original_data.value.push(temp);
+    }
   }
 
   // 生成某数量的粒子
@@ -131,18 +134,7 @@ function togglePause() {
   else continuePlay();
 }
 
-function normalPool(o) {
-  let r = 0;
-  do {
-    let a = Math.round(this.normal({ mean: o.mean, dev: o.dev }));
-    if (a < o.pool.length && a >= 0) return o.pool[a];
-    r++;
-  } while (r < 100);
-}
-
 function randomNormal(o: { mean: number; dev: number }) {
-  if (((o = Object.assign({ mean: 0, dev: 1, pool: [] }, o)), Array.isArray(o.pool) && o.pool.length > 0))
-    return normalPool(o);
   let r,
     a,
     n,
@@ -212,20 +204,20 @@ function draw() {
   });
 
   // 根据数据更新粒子位置
-  const vh = svg.value.attr("height") / 100;
-  svg.value
-    ?.selectAll("circle")
+  const vh = parseInt(svg.value!.attr("height")) / 100;
+  svg
+    .value!.selectAll("circle")
     .data(particles.value)
     .attr("fill", (e) => e.colour)
-    .attr("cx", (e) => e.x * svg.value.attr("width"))
-    .attr("cy", (e) => e.y * vh + svg.value.attr("height") / 2)
+    .attr("cx", (e) => e.x * parseInt(svg.value!.attr("width")))
+    .attr("cy", (e) => e.y * vh + parseInt(svg.value!.attr("height")) / 2)
     .attr("r", (e) => e.diameter * vh)
     .attr("cursor", "pointer");
 
   // 交互
   svg.value?.selectAll("circle").on("click", (e: MouseEvent, d) => {
     pause();
-    event.stopPropagation();
+    e.stopPropagation();
     BookDetailTooltipRef.value.$el.style.left = e.clientX + 30 + "px";
     BookDetailTooltipRef.value.$el.style.top = e.clientY - 140 + "px";
     BookDetailTooltipRef.value.$el.style.display = "block";
