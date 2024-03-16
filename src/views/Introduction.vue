@@ -8,6 +8,8 @@ import { getImageURL } from "@/utils/thumbnail";
 import { Book, Province } from "#/axios";
 import { loadIntroductionData, preloadIntroductionData } from "@/api";
 
+import MyWorker from "@/utils/worker.js?worker";
+
 const sectionSum = 3;
 const emit = defineEmits(["openBookDetail", "startLoading", "endLoading"]);
 
@@ -34,15 +36,6 @@ const complete = ref(false);
 function openBookDetail(book_id: string) {
   emit("openBookDetail", book_id);
 }
-
-// function calculateSectionOffsets() {
-//   let sections = document.querySelectorAll("section");
-//   let length = sections.length;
-//   for (let i = 0; i < length; i++) {
-//     let sectionOffset = sections[i].offsetRight;
-//     this.offsets.push(sectionOffset);
-//   }
-// }
 
 function rowScroll(e: WheelEvent) {
   if (e.deltaY > 0 && !scrolling.value) toNextPage();
@@ -90,9 +83,10 @@ function scrollToSection(id: number, force = false) {
 }
 
 onMounted(() => {
-  preloadIntroductionData().then((res) => {
+  const worker = new MyWorker();
+  worker.onmessage = function (event: MessageEvent) {
     // 加载数据
-    store.commit("preloadIntroductionData", res.data);
+    store.commit("preloadIntroductionData", event.data);
     for (let e of store.state.all_institution) {
       let r = store.state.all_province.find((el: Province) => el.id == e.province_id);
       if (!r.child) r.child = [];
@@ -101,34 +95,31 @@ onMounted(() => {
     complete.value = true;
     emit("endLoading");
 
-    // calculateSectionOffsets();
-
-    // window.addEventListener("DOMMouseScroll", this.handleMouseWheelDOM); // Mozilla Firefox
-    // window.addEventListener("mousewheel", this.handleMouseWheel, {
-    //   passive: false,
-    // });
-    // // Other browsers
-    // window.addEventListener("touchstart", this.touchStart, {
-    //   passive: false,
-    // });
-    // window.addEventListener("touchmove", this.touchMove, { passive: false }); // mobile devices
-
     // 浏览过程中加载
     loadIntroductionData().then((res) => {
       store.commit("loadIntroductionData", res.data);
     });
-  });
+  };
+  // preloadIntroductionData().then((res) => {
+  //   // 加载数据
+  //   store.commit("preloadIntroductionData", res.data);
+  //   for (let e of store.state.all_institution) {
+  //     let r = store.state.all_province.find((el: Province) => el.id == e.province_id);
+  //     if (!r.child) r.child = [];
+  //     if (e.id != "0000") r.child.push(e.id);
+  //   }
+  //   complete.value = true;
+  //   emit("endLoading");
+
+  //   // 浏览过程中加载
+  //   loadIntroductionData().then((res) => {
+  //     store.commit("loadIntroductionData", res.data);
+  //   });
+  // });
 });
+
 onUnmounted(() => {
   emit("startLoading");
-  // window.removeEventListener("mousewheel", this.handleMouseWheel, {
-  //   passive: false,
-  // });
-  // // Other browsers
-  // window.removeEventListener("DOMMouseScroll", this.handleMouseWheelDOM); // Mozilla Firefox
-
-  // window.removeEventListener("touchstart", this.touchStart); // mobile devices
-  // window.removeEventListener("touchmove", this.touchMove); // mobile devices
 });
 </script>
 
