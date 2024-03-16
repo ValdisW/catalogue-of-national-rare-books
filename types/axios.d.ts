@@ -45,10 +45,10 @@ export interface Relation {
   record: string;
   dynasty_or_nation: string; // 朝代国别
   person_id: string; // 人物id
-  person: string; // 人物名称
+  person_name: string; // 人物名称
   institution_name: string; // 机构名称
   action_id: string; // 动作id
-  action: string; // 动作名称
+  action_name: string; // 动作名称
   type: string; // 动作类型
   person_status: string;
   level: string;
@@ -86,4 +86,23 @@ export interface Filter {
   ids: Array<string>;
   value: number;
   selected: boolean;
+}
+
+export interface Province {
+  id?: string;
+  name?: string;
+  books?: number;
+  lat?: number;
+  lng?: number;
+  child?: Array<string>;
+}
+
+export interface Institution {
+  id?: string;
+  province_id?: string;
+  name?: string;
+  books?: number;
+  lat?: number;
+  lng?: number;
+  intro?: string;
 }

@@ -1,26 +1,4 @@
-<template>
-  <div class="dynasty-selector" ref="dynasty-selector">
-    <ul>
-      <li
-        class="has-data"
-        v-for="(e, i) in list"
-        :key="e.name"
-        @click="changeEra($event, e, i)"
-        :class="{ active: i == current_dynasty }"
-      >
-        <span class="icon"></span>
-        <span v-text="e.name"></span>
-      </li>
-      <li class="no-data">
-        <span class="icon"></span>
-        <span>一九四九年後</span>
-      </li>
-    </ul>
-  </div>
-</template>
-
 <script>
-
 export default {
   name: "DynastySelector",
   data() {
@@ -92,6 +70,27 @@ export default {
   },
 };
 </script>
+
+<template>
+  <div class="dynasty-selector" ref="dynasty-selector">
+    <ul>
+      <li
+        class="has-data"
+        v-for="(e, i) in list"
+        :key="e.name"
+        @click="changeEra($event, e, i)"
+        :class="{ active: i == current_dynasty }"
+      >
+        <span class="icon"></span>
+        <span v-text="e.name"></span>
+      </li>
+      <li class="no-data">
+        <span class="icon"></span>
+        <span>一九四九年後</span>
+      </li>
+    </ul>
+  </div>
+</template>
 
 <style lang="less" scoped>
 .dynasty-selector {

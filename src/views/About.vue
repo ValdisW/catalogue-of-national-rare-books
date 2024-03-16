@@ -1,3 +1,17 @@
+<script lang="ts" setup>
+import { onMounted, onUnmounted } from "vue";
+
+const emit = defineEmits(["endLoading", "startLoading"]);
+
+onMounted(() => {
+  emit("endLoading");
+});
+
+onUnmounted(() => {
+  emit("startLoading");
+});
+</script>
+
 <template>
   <div class="about">
     <div class="bg"></div>
@@ -87,20 +101,6 @@
     </div>
   </div>
 </template>
-
-<script lang="ts" setup>
-import { onMounted, onUnmounted } from "vue";
-
-const emit = defineEmits(["endLoading", "startLoading"]);
-
-onMounted(() => {
-  emit("endLoading");
-});
-
-onUnmounted(() => {
-  emit("startLoading");
-});
-</script>
 
 <style lang="less" scoped>
 .about {

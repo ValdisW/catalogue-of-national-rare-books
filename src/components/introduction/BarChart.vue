@@ -1,10 +1,3 @@
-<template>
-  <div class="bar-chart">
-    <div class="title" v-text="title"></div>
-    <div class="chart" ref="chart"></div>
-  </div>
-</template>
-
 <script>
 import * as d3 from "d3";
 
@@ -120,6 +113,13 @@ export default {
   },
 };
 </script>
+
+<template>
+  <div class="bar-chart">
+    <div class="title" v-text="title"></div>
+    <div class="chart" ref="chart"></div>
+  </div>
+</template>
 
 <style scoped lang="less">
 .bar-chart {

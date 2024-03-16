@@ -1,12 +1,3 @@
-<template>
-  <div class="book-item" @click="openBookDetail">
-    <div :style="`background-image: url(${cover_url})`">
-      <!-- <img :src="cover_url" :alt="id" @error="showDefaultImg" /> -->
-    </div>
-    <p v-text="title"></p>
-  </div>
-</template>
-
 <script lang="ts" setup>
 import { computed } from "vue";
 
@@ -20,10 +11,13 @@ const props = defineProps({
 
 /**
  * 计算书影缩略图的url
+ * （使用缺省封面的逻辑：allowed为0表示不公开，或filename为空表示无图片）
  */
 const cover_url = computed(() => {
-  let img_res = store.state.all_image.filter((el) => el.id == props.id); // 从vuex获取书影数据
-  return img_res[0].allowed ? `/data/images/thumbnails/${props.id}.jpg` : "/data/images/thumbnails/placeholder.jpg";
+  let img_res = store.state.all_image.filter((el) => el.id == props.id)[0]; // 从vuex获取书影数据
+  return img_res.allowed && img_res.filename
+    ? `/data/images/thumbnails/${props.id}.jpg`
+    : "/data/images/thumbnails/placeholder.jpg";
 });
 
 function openBookDetail() {
@@ -40,6 +34,15 @@ defineExpose({
   showDefaultImg,
 });
 </script>
+
+<template>
+  <div class="book-item" @click="openBookDetail">
+    <div :style="`background-image: url(${cover_url})`">
+      <!-- <img :src="cover_url" :alt="id" @error="showDefaultImg" /> -->
+    </div>
+    <p v-text="title"></p>
+  </div>
+</template>
 
 <style lang="less" scoped>
 .book-item {

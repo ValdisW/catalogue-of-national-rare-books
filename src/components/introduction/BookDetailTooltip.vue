@@ -1,4 +1,74 @@
-<!-- 粒子的悬浮框 -->
+<script lang="ts" setup>
+import { computed, ref } from "vue";
+import { store } from "@/store";
+import { Book } from "#/axios";
+
+const show = ref(true);
+
+const emit = defineEmits(["openBookDetail"]);
+
+const detail_data = computed(() => {
+  if (!props.id) return { content: "　" };
+  else return store.state.books.find((el: Book) => el.id == props.id);
+});
+
+const props = defineProps({
+  id: String,
+});
+
+function open() {
+  show.value = true;
+}
+function close() {
+  show.value = false;
+}
+function openBookDetail() {
+  close();
+  emit("openBookDetail", props.id);
+}
+
+// function getPersonNameById(id: string) {
+//   let r = store.state.persons.find((e) => e.id == id);
+//   if (r) return r.name;
+//   else return "未知人名";
+// }
+// function getBookNameById(id: string) {
+//   let r = store.state.books.find((e) => e.id == id);
+//   if (r) return r.name;
+//   else return "未知书名";
+// }
+// function getActionNameById(id: string) {
+//   let r = store.state.all_action.find((e) => e.id == id);
+//   if (r) return r.name;
+//   else return "未知行为";
+// }
+function getDocumentTypeNameById(id: string) {
+  let r = store.state.all_document_type.find((e) => e.id == id);
+  if (r) return r.name;
+  else return "未知行为";
+}
+function getEditionDynastyNameById(id: string) {
+  let r = store.state.all_edition_dynasty.find((e) => e.id == id);
+  if (r) return r.name;
+  else return "未知行为";
+}
+function getInstitutionNameById(id: string) {
+  let r = store.state.all_institution.find((e) => e.id == id);
+  if (r) return r.name;
+  else return "未知行为";
+}
+function getLanguageNameById(id: string) {
+  let r = store.state.all_language.find((e) => e.id == id);
+  if (r) return r.name;
+  else return "未知语言";
+}
+
+defineExpose({
+  close,
+  open,
+});
+</script>
+
 <template>
   <div class="book-detail-tooltip" v-show="show">
     <div class="container">
@@ -34,41 +104,6 @@
     </div>
   </div>
 </template>
-
-<script>
-import Utils from "@/Utils.vue";
-
-export default {
-  name: "bookDetailTooltip",
-  props: {
-    id: String,
-  },
-  data() {
-    return {
-      show: true,
-    };
-  },
-  methods: {
-    ...Utils.methods,
-    open() {
-      this.show = true;
-    },
-    close() {
-      this.show = false;
-    },
-    openBookDetail() {
-      this.close();
-      this.$emit("openBookDetail", this.id);
-    },
-  },
-  computed: {
-    detail_data() {
-      if (!this.id) return { content: "　" };
-      else return this.$store.state.books.find((el) => el.id == this.id);
-    },
-  },
-};
-</script>
 
 <style lang="less" scoped>
 .book-detail-tooltip {

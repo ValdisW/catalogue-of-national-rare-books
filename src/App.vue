@@ -1,50 +1,3 @@
-<template>
-  <!-- 不支持手机访问的提示 -->
-  <MobileWarning v-if="onMobileDevice()" />
-
-  <!-- 加载提示 -->
-  <transition name="bg-fade"><Loading :complete="complete" /></transition>
-
-  <div id="main-container">
-    <!-- 顶部导航 -->
-    <nav>
-      <ul>
-        <li v-for="page in nav_pages" :key="page.name">
-          <router-link
-            :class="{ active: $router.currentRoute.value.path == page.router }"
-            :to="page.router"
-            v-text="page.name"
-          ></router-link>
-        </li>
-      </ul>
-    </nav>
-
-    <!-- 用来显示四个主页面 -->
-    <router-view
-      v-slot="{ Component }"
-      :key="$route.fullPath"
-      @startLoading="complete = false"
-      @endLoading="complete = true"
-      @openBookDetail="openBookDetail"
-      @openPersonDetail="openPersonDetail"
-      @openInstitutionDetail="openInstitutionDetail"
-    >
-      <keep-alive>
-        <component :is="Component" />
-      </keep-alive>
-    </router-view>
-
-    <!-- 古籍详情页 -->
-    <BookDetail @openPersonDetail="openPersonDetail" ref="BookDetailRef" />
-
-    <!-- 人物详情页 -->
-    <PersonDetail @openBookDetail="openBookDetail" ref="PersonDetailRef" />
-
-    <!-- 机构详情页（未使用） -->
-    <InstitutionDetail ref="InstitutionDetailRef" institutionID="201"></InstitutionDetail>
-  </div>
-</template>
-
 <script lang="ts" setup>
 import { ref } from "vue";
 
@@ -52,30 +5,23 @@ import { store } from "@/store";
 
 import Loading from "@/components/Loading.vue";
 import MobileWarning from "@/components/MobileWarning.vue";
-import BookDetail from "@/views/BookDetail.vue";
-import PersonDetail from "@/views/PersonDetail.vue";
-import InstitutionDetail from "@/views/InstitutionDetail.vue";
+import BookDetail from "@/views/detail/BookDetail.vue";
+import PersonDetail from "@/views/detail/PersonDetail.vue";
 
 // DOM关联
-const BookDetailRef = ref(null);
-const PersonDetailRef = ref(null);
-const InstitutionDetailRef = ref(null);
+const BookDetailRef = ref<InstanceType<typeof BookDetail> | null>(null);
+const PersonDetailRef = ref<InstanceType<typeof PersonDetail> | null>(null);
 
 const baseSize = 20; // 用于设置rem单位的基准值
 
 function openBookDetail(book_id: string) {
-  BookDetailRef.value.open(book_id);
-  PersonDetailRef.value.close();
+  BookDetailRef.value?.open(book_id);
+  PersonDetailRef.value?.close();
 }
 
 function openPersonDetail(person_id: string) {
-  console.log("openPersonDetail");
-  BookDetailRef.value.close();
-  PersonDetailRef.value.open(person_id);
-}
-
-function openInstitutionDetail(institution_id: string) {
-  InstitutionDetailRef.value.open(institution_id);
+  BookDetailRef.value?.close();
+  PersonDetailRef.value?.open(person_id);
 }
 
 // 获取屏幕尺寸指标，用来计算字号
@@ -109,7 +55,7 @@ function onMobileDevice() {
 
 init();
 
-const complete = ref<Boolean>(false);
+const complete = ref(false);
 const nav_pages = [
   { name: "名録介紹", router: "/" },
   { name: "名録瀏覽", router: "/exploration" },
@@ -117,6 +63,49 @@ const nav_pages = [
   { name: "研發團隊", router: "/about" },
 ];
 </script>
+
+<template>
+  <!-- 不支持手机访问的提示 -->
+  <MobileWarning v-if="onMobileDevice()" />
+
+  <!-- 加载提示 -->
+  <transition name="bg-fade"><Loading :complete="complete" /></transition>
+
+  <div id="main-container">
+    <!-- 顶部导航 -->
+    <nav>
+      <ul>
+        <li v-for="page in nav_pages" :key="page.name">
+          <router-link
+            :class="{ active: $router.currentRoute.value.path == page.router }"
+            :to="page.router"
+            v-text="page.name"
+          ></router-link>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- 用来显示四个主页面 -->
+    <router-view
+      v-slot="{ Component }"
+      :key="$route.fullPath"
+      @startLoading="complete = false"
+      @endLoading="complete = true"
+      @openBookDetail="openBookDetail"
+      @openPersonDetail="openPersonDetail"
+    >
+      <keep-alive>
+        <component :is="Component" />
+      </keep-alive>
+    </router-view>
+
+    <!-- 古籍详情页 -->
+    <BookDetail @openPersonDetail="openPersonDetail" ref="BookDetailRef" />
+
+    <!-- 人物详情页 -->
+    <PersonDetail @openBookDetail="openBookDetail" ref="PersonDetailRef" />
+  </div>
+</template>
 
 <style lang="less">
 * {

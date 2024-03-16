@@ -1,28 +1,3 @@
-<template>
-  <div class="filter">
-    <p class="title" v-text="attr_name"></p>
-    <div class="content">
-      <ul>
-        <li v-for="e in attrs" :class="{ selected: e.selected }" :key="e" :val="e.value" @click="updateSelect(e)">
-          <!-- 条形-->
-          <div
-            class="bar"
-            :style="{
-              width: (Math.log(e.value + 1) / Math.log(max_value + 1)) * 100 + '%',
-            }"
-          ></div>
-
-          <!-- 各属性值及其对应的数量 -->
-          <div class="info">
-            <span v-text="e.name"></span>
-            <span v-text="e.value"></span>
-          </div>
-        </li>
-      </ul>
-    </div>
-  </div>
-</template>
-
 <script lang="ts" setup>
 import { computed } from "vue";
 
@@ -62,6 +37,31 @@ function updateSelect(e: Filter) {
   });
 }
 </script>
+
+<template>
+  <div class="filter">
+    <p class="title" v-text="attr_name"></p>
+    <div class="content">
+      <ul>
+        <li v-for="e in attrs" :class="{ selected: e.selected }" :key="e" :val="e.value" @click="updateSelect(e)">
+          <!-- 条形-->
+          <div
+            class="bar"
+            :style="{
+              width: (Math.log(e.value + 1) / Math.log(max_value + 1)) * 100 + '%',
+            }"
+          ></div>
+
+          <!-- 各属性值及其对应的数量 -->
+          <div class="info">
+            <span v-text="e.name"></span>
+            <span v-text="e.value"></span>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</template>
 
 <style lang="less" scoped>
 .filter {

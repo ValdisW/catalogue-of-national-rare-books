@@ -1,3 +1,128 @@
+<script lang="ts" setup>
+import { computed, onMounted, onUnmounted, ref } from "vue";
+import { store } from "@/store";
+import FlowingParticles from "@/views/introduction/FlowingParticles.vue";
+// import BaiduMap from "@/views/introduction/BaiduMap.vue";
+import Batches from "@/views/introduction/Batches.vue";
+import { getImageURL } from "@/utils/thumbnail";
+import { Book, Province } from "#/axios";
+import { loadIntroductionData, preloadIntroductionData } from "@/api";
+
+import MyWorker from "@/utils/worker.js?worker";
+
+const sectionSum = 3;
+const emit = defineEmits(["openBookDetail", "startLoading", "endLoading"]);
+
+const recommendBook = computed(() => {
+  let t = store.state.books.filter(
+    (el: Book) => el.name.length > 3 && el.name.length < 8 && !el.name.match(/(·|\?|（|\[)/i)
+  );
+  let d_books: Array<Book> = [];
+  for (let e of t) if (!d_books.find((el) => el.name == e.name)) d_books.push(e);
+
+  return d_books[Math.floor(new Date().getTime() / 8.64e7) % d_books.length];
+});
+
+const FlowingParticlesRef = ref<InstanceType<typeof FlowingParticles> | null>(null);
+
+const now = new Date();
+const scrolling = ref(false);
+const current_page = ref(0);
+// const page_width = Number;
+// const offsets = [];
+const complete = ref(false);
+
+// getImageURL,
+function openBookDetail(book_id: string) {
+  emit("openBookDetail", book_id);
+}
+
+function rowScroll(e: WheelEvent) {
+  if (e.deltaY > 0 && !scrolling.value) toNextPage();
+  else if (e.deltaY < 0 && !scrolling.value) toPrevPage();
+  if (current_page.value == sectionSum - 1) FlowingParticlesRef.value?.continuePlay();
+  else FlowingParticlesRef.value?.pause();
+}
+
+function toNextPage() {
+  scrolling.value = true;
+  current_page.value++;
+
+  if (current_page.value > sectionSum - 1) current_page.value = sectionSum - 1;
+
+  scrollToSection(current_page.value, true);
+}
+
+function toPrevPage() {
+  scrolling.value = true;
+  current_page.value--;
+
+  if (current_page.value < 0) current_page.value = 0;
+
+  scrollToSection(current_page.value, true);
+}
+
+/**
+ * 横向滚动到指定的section，不触发滚动事件
+ * @param {*} id section的id，四个section对应0~3
+ * @param {*} force
+ */
+function scrollToSection(id: number, force = false) {
+  let timeout;
+  if (scrolling.value && !force) return false;
+
+  current_page.value = id;
+  scrolling.value = true;
+
+  document.getElementsByTagName("section")[id].scrollIntoView({ behavior: "smooth", inline: "nearest" }); // 执行滚动
+
+  clearTimeout(timeout);
+  timeout = setTimeout(() => {
+    scrolling.value = false;
+  }, 400);
+}
+
+onMounted(() => {
+  const worker = new MyWorker();
+  worker.onmessage = function (event: MessageEvent) {
+    // 加载数据
+    store.commit("preloadIntroductionData", event.data);
+    for (let e of store.state.all_institution) {
+      let r = store.state.all_province.find((el: Province) => el.id == e.province_id);
+      if (!r.child) r.child = [];
+      if (e.id != "0000") r.child.push(e.id);
+    }
+    complete.value = true;
+    emit("endLoading");
+
+    // 浏览过程中加载
+    loadIntroductionData().then((res) => {
+      store.commit("loadIntroductionData", res.data);
+    });
+  };
+  // preloadIntroductionData().then((res) => {
+  //   // 加载数据
+  //   store.commit("preloadIntroductionData", res.data);
+  //   for (let e of store.state.all_institution) {
+  //     let r = store.state.all_province.find((el: Province) => el.id == e.province_id);
+  //     if (!r.child) r.child = [];
+  //     if (e.id != "0000") r.child.push(e.id);
+  //   }
+  //   complete.value = true;
+  //   emit("endLoading");
+
+  //   // 浏览过程中加载
+  //   loadIntroductionData().then((res) => {
+  //     store.commit("loadIntroductionData", res.data);
+  //   });
+  // });
+});
+
+onUnmounted(() => {
+  emit("startLoading");
+});
+</script>
+
 <template>
   <div class="introduction" @wheel.prevent="rowScroll" ref="introduction" v-if="complete">
     <section class="section-1">
@@ -18,7 +143,7 @@
         <div class="image-wrapper" @click="$emit('openBookDetail', recommendBook.id)">
           <img
             @click="$emit('openBookDetail', d.data[0])"
-            :src="getImageURL(recommendBook.id, $store.state.all_image)"
+            :src="getImageURL(recommendBook.id, store.state.all_image)"
             alt="书影"
           />
         </div>
@@ -43,16 +168,16 @@
     <section class="section-2">
       <Batches @openBookDetail="openBookDetail" />
     </section>
-    <section class="section-3">
+    <!-- <section class="section-3">
       <BaiduMap />
-    </section>
+    </section> -->
     <section class="section-4">
-      <FlowingParticles ref="flowing-particles" @openBookDetail="openBookDetail" />
+      <FlowingParticles ref="FlowingParticlesRef" @openBookDetail="openBookDetail" />
     </section>
 
     <div class="badges">
       <span
-        v-for="e in 4"
+        v-for="e in sectionSum"
         :key="e"
         :class="{ active: e - 1 == current_page }"
         @click="scrollToSection(e - 1, true)"
@@ -60,146 +185,6 @@
     </div>
   </div>
 </template>
-
-<script>
-import FlowingParticles from "@/components/FlowingParticles.vue";
-import BaiduMap from "@/views/Exploration-BaiduMap.vue";
-import Batches from "@/views/Batches.vue";
-import { getImageURL } from "@/utils/thumbnail";
-import axios from "axios";
-
-export default {
-  name: "Introduction",
-  components: {
-    FlowingParticles,
-    BaiduMap,
-    Batches,
-  },
-  computed: {
-    // 计算今日古籍
-    recommendBook() {
-      let t = this.$store.state.books.filter(
-        (el) => el.name.length > 3 && el.name.length < 8 && !el.name.match(/(·|\?|（|\[)/i)
-      );
-      let d_books = [];
-      for (let e of t) if (!d_books.find((el) => el.name == e.name)) d_books.push(e);
-
-      return d_books[Math.floor(new Date().getTime() / 8.64e7) % d_books.length];
-    },
-  },
-  data() {
-    return {
-      now: new Date(),
-      scrolling: false,
-      current_page: 0,
-      page_width: Number,
-      offsets: [],
-      complete: false,
-    };
-  },
-  methods: {
-    getImageURL,
-    openBookDetail(book_id) {
-      this.$emit("openBookDetail", book_id);
-    },
-    calculateSectionOffsets() {
-      let sections = document.querySelectorAll("section");
-      let length = sections.length;
-      for (let i = 0; i < length; i++) {
-        let sectionOffset = sections[i].offsetRight;
-        this.offsets.push(sectionOffset);
-      }
-    },
-
-    rowScroll(e) {
-      if (e.deltaY > 0 && !this.scrolling) this.toNextPage();
-      else if (e.deltaY < 0 && !this.scrolling) this.toPrevPage();
-      if (this.current_page == 3) this.$refs["flowing-particles"].continue();
-      else this.$refs["flowing-particles"].pause();
-    },
-
-    toNextPage() {
-      this.scrolling = true;
-      this.current_page++;
-
-      if (this.current_page > 3) this.current_page = 3;
-
-      this.scrollToSection(this.current_page, true);
-    },
-    toPrevPage() {
-      this.scrolling = true;
-      this.current_page--;
-
-      if (this.current_page < 0) this.current_page = 0;
-
-      this.scrollToSection(this.current_page, true);
-    },
-
-    /**
-     * 横向滚动到指定的section，不触发滚动事件
-     * @param {*} id section的id，四个section对应0~3
-     * @param {*} force
-     */
-    scrollToSection(id, force = false) {
-      let timeout;
-      if (this.scrolling && !force) return false;
-
-      this.current_page = id;
-      this.scrolling = true;
-
-      document.getElementsByTagName("section")[id].scrollIntoView({ behavior: "smooth", inline: "nearest" }); // 执行滚动
-
-      clearTimeout(timeout);
-      timeout = setTimeout(() => {
-        this.scrolling = false;
-      }, 400);
-    },
-  },
-
-  mounted() {
-    axios.get("/data/introduction-preload").then((res) => {
-      this.$store.commit("preloadIntroductionData", res.data);
-
-      for (let e of this.$store.state.all_institution) {
-        let r = this.$store.state.all_province.find((el) => el.id == e.province_id);
-        if (!r.child) r.child = [];
-        if (e.id != "0000") r.child.push(e.id);
-      }
-      this.complete = true;
-      this.$emit("endLoading");
-
-      this.calculateSectionOffsets();
-
-      window.addEventListener("DOMMouseScroll", this.handleMouseWheelDOM); // Mozilla Firefox
-      window.addEventListener("mousewheel", this.handleMouseWheel, {
-        passive: false,
-      });
-      // Other browsers
-      window.addEventListener("touchstart", this.touchStart, {
-        passive: false,
-      });
-      // mobile devices
-      window.addEventListener("touchmove", this.touchMove, { passive: false }); // mobile devices
-
-      // 浏览过程中加载
-      axios.get("/data/introduction-load").then((res) => {
-        this.$store.commit("loadIntroductionData", res.data);
-      });
-    });
-  },
-  unmounted() {
-    this.$emit("startLoading");
-    window.removeEventListener("mousewheel", this.handleMouseWheel, {
-      passive: false,
-    });
-    // Other browsers
-    window.removeEventListener("DOMMouseScroll", this.handleMouseWheelDOM); // Mozilla Firefox
-
-    window.removeEventListener("touchstart", this.touchStart); // mobile devices
-    window.removeEventListener("touchmove", this.touchMove); // mobile devices
-  },
-};
-</script>
 
 <style lang="less" scoped>
 .introduction {

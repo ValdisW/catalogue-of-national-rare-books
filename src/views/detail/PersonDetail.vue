@@ -1,87 +1,9 @@
-<template>
-  <div class="person-detail" v-show="show">
-    <div class="content">
-      <div class="close-button" @click="close"></div>
-
-      <!-- 页面上半部分内容 -->
-      <div class="person-card">
-        <div class="person-info">
-          <div class="person-brief">
-            <div class="person-name">
-              <h1 v-text="person_data.name"></h1>
-            </div>
-            <div class="person-info-list">
-              <div class="person-birth">
-                <p>
-                  生卒：
-                  <span v-text="`${person_data.year_of_birth} - ${person_data.year_of_death}`"></span>
-                </p>
-              </div>
-              <div class="person-title">
-                <p>字:<span v-text="person_data.courtesy_name || '不詳'"></span></p>
-                <p>
-                  號:
-                  <span v-text="person_data.pseudonym_name || '不詳'"></span>
-                </p>
-              </div>
-              <p></p>
-              <span></span>
-            </div>
-          </div>
-          <div class="person-intro" v-text="person_data.introduction || ''"></div>
-        </div>
-
-        <div class="related-person">
-          <h4>相關人物</h4>
-          <div class="person-responsibility">
-            <p
-              v-for="b in related_person"
-              :key="b"
-              @click="openPersonDetail(b.person_id)"
-              v-text="store.state.persons.find((ele) => ele.id == b.person_id)!.name + '（' + b.count + '）'"
-            ></p>
-            <!-- <router-link
-                :to="/person-detail/ + b.person_id"
-                v-text="$store.state.persons.find((ele) => ele.id == b.person_id).name + '（' + b.count + '）'"
-              ></router-link> -->
-          </div>
-        </div>
-      </div>
-
-      <div class="related-books">
-        <div class="responsibility-select">
-          <h4>責任目録</h4>
-          <button
-            v-for="n in action_types"
-            :key="n.name"
-            v-text="`${n.name}(${n.count})`"
-            class="responsibility-type"
-            :class="{ invalid: !n.count }"
-            @click="if (n.count) filterType(n.name);"
-          ></button>
-        </div>
-        <div class="book-responsibility">
-          <ul>
-            <li v-for="e in filtered_related_books" :key="e" @click="emit('openBookDetail', e.book_id)">
-              <span v-text="e.book_id + ' '"></span>
-              <span v-text="e.title + ' '"></span>
-              <span v-text="e.action + ' '"></span>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </div>
-    <BookInfoDialog ref="book-info-dialog" :id="hover_data.id" :title="hover_data.title" :detail="hover_data.detail" />
-  </div>
-</template>
-
 <script lang="ts" setup>
 import { ref, reactive } from "vue";
-import axios from "axios";
-import BookInfoDialog from "@/components/BookInfoDialog.vue";
 import { Relation, RelatedPerson } from "#/axios";
 
 import { store } from "@/store";
+import { getPersonDetailData } from "@/api";
 
 const emit = defineEmits(["openPersonDetail", "openBookDetail"]);
 
@@ -131,7 +53,8 @@ function close() {
 }
 
 function openPersonDetail(person_id: string) {
-  emit("openPersonDetail", person_id);
+  // emit("openPersonDetail", person_id);
+  open(person_id);
 }
 
 function open(person_id: string) {
@@ -139,7 +62,7 @@ function open(person_id: string) {
 
   show.value = true;
 
-  axios.get(`/data/person-detail/${person_id}`).then((d) => {
+  getPersonDetailData(person_id).then((d) => {
     person_data.value = { ...d.data[0][0] };
 
     filtered_related_books.push(...d.data[1]);
@@ -161,6 +84,82 @@ function filterType(type: string) {
 
 defineExpose({ open, close });
 </script>
+
+<template>
+  <div class="person-detail" v-show="show">
+    <div class="content">
+      <div class="close-button" @click="close"></div>
+
+      <!-- 页面上半部分内容 -->
+      <div class="person-card">
+        <div class="person-info">
+          <div class="person-brief">
+            <div class="person-name">
+              <h1 v-text="person_data.name"></h1>
+            </div>
+            <div class="person-info-list">
+              <div class="person-birth">
+                <p>
+                  生卒：
+                  <span v-text="`${person_data.year_of_birth} - ${person_data.year_of_death}`"></span>
+                </p>
+              </div>
+              <div class="person-title">
+                <p>字:<span v-text="person_data.courtesy_name || '不詳'"></span></p>
+                <p>
+                  號:
+                  <span v-text="person_data.pseudonym_name || '不詳'"></span>
+                </p>
+              </div>
+              <p></p>
+              <span></span>
+            </div>
+          </div>
+          <div class="person-intro" v-text="person_data.introduction || ''"></div>
+        </div>
+
+        <div class="related-person">
+          <h4>相關人物</h4>
+          <div class="person-responsibility">
+            <p
+              v-for="b in related_person"
+              :key="b.person_id"
+              @click="openPersonDetail(b.person_id)"
+              v-text="store.state.persons.find((ele) => ele.id == b.person_id)!.name + '（' + b.count + '）'"
+            ></p>
+            <!-- <router-link
+                :to="/person-detail/ + b.person_id"
+                v-text="$store.state.persons.find((ele) => ele.id == b.person_id).name + '（' + b.count + '）'"
+              ></router-link> -->
+          </div>
+        </div>
+      </div>
+
+      <div class="related-books">
+        <div class="responsibility-select">
+          <h4>責任目録</h4>
+          <button
+            v-for="n in action_types"
+            :key="n.name"
+            v-text="`${n.name}(${n.count})`"
+            class="responsibility-type"
+            :class="{ invalid: !n.count }"
+            @click="if (n.count) filterType(n.name);"
+          ></button>
+        </div>
+        <div class="book-responsibility">
+          <ul>
+            <li v-for="e in filtered_related_books" :key="e" @click="emit('openBookDetail', e.book_id)">
+              <span v-text="e.book_id + ' '"></span>
+              <span v-text="e.title + ' '"></span>
+              <span v-text="e.action + ' '"></span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
 
 <style lang="less" scoped>
 .person-detail {
@@ -186,7 +185,7 @@ defineExpose({ open, close });
       top: 0.5rem;
       width: 2rem;
       height: 2rem;
-      background: url(../assets/icons/back.svg) center no-repeat;
+      background: url(../../assets/icons/back.svg) center no-repeat;
       background-size: 100%;
       cursor: pointer;
     }
@@ -245,21 +244,22 @@ defineExpose({ open, close });
         padding: 0.5rem;
         border-radius: 0.5rem;
         background: #3331;
+        display: flex;
+        flex-direction: column;
         a {
           color: #201d1d;
         }
         .person-responsibility {
           position: relative;
           font-size: 0.7rem;
-          width: 200px;
-          height: 170px;
+          width: 10rem;
           overflow-y: scroll;
-          // p {
-          //   cursor: pointer;
-          //   &:hover {
-          //     background: #3331;
-          //   }
-          // }
+          p {
+            cursor: pointer;
+            &:hover {
+              background: #3331;
+            }
+          }
         }
       }
     }
