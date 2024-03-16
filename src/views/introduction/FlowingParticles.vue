@@ -1,10 +1,24 @@
 <script lang="ts" setup>
-import * as d3 from "d3";
-import DynastySelector from "@/components/introduction/DynastySelector.vue";
-import BookDetailTooltip from "@/components/introduction/BookDetailTooltip.vue";
 import { onMounted, onUnmounted, ref, watch } from "vue";
+import * as d3 from "d3";
 import { store } from "@/store";
 import { Book } from "#/axios";
+
+import DynastySelector from "@/components/introduction/DynastySelector.vue";
+import BookDetailTooltip from "@/components/introduction/BookDetailTooltip.vue";
+
+interface Particle {
+  x: number;
+  y: number;
+  info: Book;
+  diameter: number;
+  duration: number;
+  amplitude: number;
+  offsetY: number;
+  arc: number;
+  startTime: number;
+  color: string;
+}
 
 const MAX_PARTICLES = 250;
 const NUM_PARTICLES = 100;
@@ -19,19 +33,6 @@ const curr_time = ref(0);
 const particles_original_data = ref<Book[]>([]);
 const tooltip_id = ref("");
 const curr_comment = ref("");
-
-interface Particle {
-  x: number;
-  y: number;
-  info: Book;
-  diameter: number;
-  duration: number;
-  amplitude: number;
-  offsetY: number;
-  arc: number;
-  startTime: number;
-  colour: string;
-}
 
 const BookDetailTooltipRef = ref<InstanceType<typeof BookDetailTooltip> | null>(null);
 
@@ -119,7 +120,7 @@ function rand(low: number, high: number) {
 
 // 根据古籍数据，生成粒子
 function generateParticleData(e: Book): Particle {
-  const colour = {
+  const color = {
     r: 60,
     g: randomNormal({ mean: 50, dev: 20 }),
     b: 50,
@@ -146,7 +147,7 @@ function generateParticleData(e: Book): Particle {
     offsetY: randomNormal({ mean: 0, dev: 10 }),
     arc: Math.PI * 2,
     startTime: curr_time.value - rand(0, SPEED),
-    colour: `rgba(${colour.r}, ${colour.g}, ${colour.b}, ${colour.a})`,
+    color: `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a})`,
   };
 }
 
@@ -175,7 +176,7 @@ function draw() {
   svg
     .value!.selectAll("circle")
     .data(particles.value)
-    .attr("fill", (e) => e.colour)
+    .attr("fill", (e) => e.color)
     .attr("cx", (e) => e.x * parseInt(svg.value!.attr("width")))
     .attr("cy", (e) => e.y * vh + parseInt(svg.value!.attr("height")) / 2)
     .attr("r", (e) => e.diameter * vh)

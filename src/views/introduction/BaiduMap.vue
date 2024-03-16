@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import { computed, onMounted, ref, watch } from "vue";
 import { store } from "@/store";
-// import { View } from "vue3-baidu-map-gl";
 import { Intensity, PointLayer, View } from "mapvgl";
 
 import { mapState } from "vuex";

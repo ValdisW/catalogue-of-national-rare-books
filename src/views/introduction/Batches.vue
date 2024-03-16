@@ -8,12 +8,9 @@ import { mapState } from "vuex";
 import BarChart from "@/components/introduction/BarChart.vue";
 import BookItem from "@/components/introduction/BookItem.vue";
 import sta from "@/data/statistics.json";
-// import AOS from "aos";
-// import "aos/dist/aos.css";
 
 const emit = defineEmits(["openBookDetail"]);
 
-// AOS.init();
 
 const batchInfo = [
   {
