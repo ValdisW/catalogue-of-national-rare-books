@@ -1,9 +1,16 @@
 <script lang="ts" setup>
-import { computed } from "vue";
+import { computed, ref } from "vue";
 
 import { store } from "@/store";
+import { readData } from "@/store/idb";
 
 const emit = defineEmits(["openBookDetail"]);
+
+const title = ref("");
+
+readData("books").then((d) => {
+  title.value = d.find((e) => e.id == props.id).name;
+});
 
 const props = defineProps({
   id: String,
@@ -27,8 +34,6 @@ function openBookDetail() {
 function showDefaultImg(e) {
   e.target.src = "/data/images/thumbnails/placeholder.jpg";
 }
-
-const title = store.state.books.find((e) => e.id == props.id).name;
 
 defineExpose({
   showDefaultImg,

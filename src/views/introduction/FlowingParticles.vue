@@ -6,6 +6,7 @@ import { Book } from "#/axios";
 
 import DynastySelector from "@/components/introduction/DynastySelector.vue";
 import BookDetailTooltip from "@/components/introduction/BookDetailTooltip.vue";
+import { readData } from "@/store/idb";
 
 interface Particle {
   x: number;
@@ -45,14 +46,15 @@ watch(playing, (n) => {
  * 接收子组件传入的对象，包括id列表和要显示的备注
  * @param {Object} o
  */
-function changeDynasty(o: { text: string; ids: string[] }) {
+async function changeDynasty(o: { text: string; ids: string[] }) {
   curr_comment.value = o.text;
 
   // 更新粒子数据
   particles_original_data.value = [];
+  let d = await readData("books");
   o.ids.forEach((id: string) => {
     particles_original_data.value = particles_original_data.value.concat(
-      store.state.books.filter((el: Book) => el.edition_dynasty_id == id)
+      d.filter((el: Book) => el.edition_dynasty_id == id)
     );
   });
 
@@ -98,6 +100,7 @@ function continuePlay() {
 }
 
 function togglePause() {
+  console.log(playing.value);
   if (playing.value) pause();
   else continuePlay();
 }
@@ -163,6 +166,7 @@ function moveParticle(particle: Particle) {
 
 // 每帧绘制的内容
 function draw() {
+  console.log(233);
   // 动画句柄，用来控制播放
   animation_handler.value = requestAnimationFrame(draw);
 
@@ -197,7 +201,7 @@ function draw() {
   curr_time.value += 16;
 }
 
-function start() {
+async function start() {
   // 配置画布
   svg.value = d3
     .select("#particles-svg")
@@ -205,8 +209,8 @@ function start() {
     .attr("height", window.innerHeight * 0.8);
 
   // 生成某数量的粒子
-  for (let i = 0; i < NUM_PARTICLES; i++)
-    particles_original_data.value.push(store.state.books[Math.floor(Math.random() * store.state.books.length)]);
+  let d = await readData("books");
+  for (let i = 0; i < NUM_PARTICLES; i++) particles_original_data.value.push(d[Math.floor(Math.random() * d.length)]);
 
   for (let e of particles_original_data.value) particles.value.push(generateParticleData(e));
 

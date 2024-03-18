@@ -1,19 +1,25 @@
 <script lang="ts" setup>
-import { computed, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { store } from "@/store";
 import { Book } from "#/axios";
+import { readData } from "@/store/idb";
 
 const show = ref(true);
 
 const emit = defineEmits(["openBookDetail"]);
 
-const detail_data = computed(() => {
-  if (!props.id) return { content: "　" };
-  else return store.state.books.find((el: Book) => el.id == props.id);
-});
+const detail_data = ref<{}>({});
 
 const props = defineProps({
   id: String,
+});
+
+onMounted(() => {
+  if (!props.id) detail_data.value = { content: "　" };
+  else
+    readData("books").then((d) => {
+      detail_data.value = d.find((el: Book) => el.id == props.id);
+    });
 });
 
 function open() {

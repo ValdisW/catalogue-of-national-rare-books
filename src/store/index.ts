@@ -3,6 +3,8 @@ import { createStore } from "vuex";
 
 import { BookImage, RelatedPerson, Book } from "#/axios";
 
+import { addData, readData } from "./idb";
+
 const store = createStore({
   state: {
     books: Array<Book>,
@@ -27,8 +29,19 @@ const store = createStore({
       state.persons = _data;
     },
     preloadIntroductionData(state, _data) {
+      addData("all_edition_dynasty", _data[1]);
+      addData("all_document_type", _data[2]);
+      addData("all_catalogue", _data[3]);
+      addData("all_edition_type", _data[4]);
+      addData("all_language", _data[5]);
+      addData("all_province", _data[6]);
+      addData("all_institution", _data[7]);
+      addData("all_image", _data[8]);
+      addData("books", _data[0]);
+
+      let temp = [];
       [
-        state.books,
+        temp,
         state.all_edition_dynasty,
         state.all_document_type,
         state.all_catalogue,

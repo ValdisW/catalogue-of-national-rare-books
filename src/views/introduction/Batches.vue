@@ -8,9 +8,9 @@ import { mapState } from "vuex";
 import BarChart from "@/components/introduction/BarChart.vue";
 import BookItem from "@/components/introduction/BookItem.vue";
 import sta from "@/data/statistics.json";
+import { readData } from "@/store/idb";
 
 const emit = defineEmits(["openBookDetail"]);
-
 
 const batchInfo = [
   {
@@ -76,11 +76,9 @@ function toHeight(p: number) {
 /**
  * 从store中随机抽取6本古籍，显示在页面上
  */
-function showMore() {
-  let arr =
-    current_batch.value == 0
-      ? store.state.books
-      : store.state.books.filter((el: Relation) => el.batch == current_batch.value);
+async function showMore() {
+  let d = await readData("books");
+  let arr = current_batch.value == 0 ? d : d.filter((el: Relation) => el.batch == current_batch.value);
 
   showing_books.length = 0;
   setTimeout(() => {

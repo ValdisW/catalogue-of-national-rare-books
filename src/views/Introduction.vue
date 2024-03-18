@@ -1,27 +1,20 @@
 <script lang="ts" setup>
-import { computed, onMounted, onUnmounted, ref } from "vue";
+import { onMounted, onUnmounted, ref } from "vue";
 import { store } from "@/store";
 import FlowingParticles from "@/views/introduction/FlowingParticles.vue";
 // import BaiduMap from "@/views/introduction/BaiduMap.vue";
 import Batches from "@/views/introduction/Batches.vue";
 import { getImageURL } from "@/utils/thumbnail";
 import { Book, Province } from "#/axios";
-import { loadIntroductionData, preloadIntroductionData } from "@/api";
+import { loadIntroductionData } from "@/api";
 
 import MyWorker from "@/utils/worker.js?worker";
+import { readData } from "@/store/idb";
 
 const sectionSum = 3;
 const emit = defineEmits(["openBookDetail", "startLoading", "endLoading"]);
 
-const recommendBook = computed(() => {
-  let t = store.state.books.filter(
-    (el: Book) => el.name.length > 3 && el.name.length < 8 && !el.name.match(/(·|\?|（|\[)/i)
-  );
-  let d_books: Array<Book> = [];
-  for (let e of t) if (!d_books.find((el) => el.name == e.name)) d_books.push(e);
-
-  return d_books[Math.floor(new Date().getTime() / 8.64e7) % d_books.length];
-});
+const recommendBook = ref({ id: "", image: "" });
 
 const FlowingParticlesRef = ref<InstanceType<typeof FlowingParticles> | null>(null);
 
@@ -116,6 +109,14 @@ onMounted(() => {
   //     store.commit("loadIntroductionData", res.data);
   //   });
   // });
+
+  readData("books").then((d) => {
+    let t = d.filter((el: Book) => el.name.length > 3 && el.name.length < 8 && !el.name.match(/(·|\?|（|\[)/i));
+    let d_books: Array<Book> = [];
+    for (let e of t) if (!d_books.find((el) => el.name == e.name)) d_books.push(e);
+
+    recommendBook.value = d_books[Math.floor(new Date().getTime() / 8.64e7) % d_books.length];
+  });
 });
 
 onUnmounted(() => {
