@@ -10,6 +10,7 @@ import BookItem from "@/components/introduction/BookItem.vue";
 import sta from "@/data/statistics.json";
 import { readData } from "@/store/idb";
 
+const changeKey = ref(0);
 const emit = defineEmits(["openBookDetail"]);
 
 const batchInfo = [
@@ -77,6 +78,7 @@ function toHeight(p: number) {
  * 从store中随机抽取6本古籍，显示在页面上
  */
 async function showMore() {
+  changeKey.value++;
   let d = await readData("books");
   let arr = current_batch.value == 0 ? d : d.filter((el: Relation) => el.batch == current_batch.value);
 
@@ -193,9 +195,11 @@ statistics.value = sta; // 要求统计数据写死，因此直接读取json文�
             <span class="icon"></span>
             <span @click="showMore">换一組</span>
           </div>
-          <TransitionGroup name="fade1" class="books" tag="div">
-            <BookItem @openBookDetail="openBookDetail" v-for="b in showing_books" :key="b" :id="b" />
-          </TransitionGroup>
+          <Transition name="books">
+            <div class="book-items" :key="changeKey">
+              <BookItem @openBookDetail="openBookDetail" v-for="b in showing_books" :key="b" :id="b" />
+            </div>
+          </Transition>
         </div>
       </div>
     </div>
@@ -203,11 +207,11 @@ statistics.value = sta; // 要求统计数据写死，因此直接读取json文�
 </template>
 
 <style lang="less" scoped>
-.fade1-enter-active {
+.books-enter-active {
   transition: all 0.5s;
 }
 
-.fade1-enter-from {
+.books-enter-from {
   opacity: 0;
   transform: translateY(1rem);
 }
@@ -330,7 +334,7 @@ statistics.value = sta; // 要求统计数据写死，因此直接读取json文�
           }
         }
 
-        .books {
+        .book-items {
           display: flex;
           flex: auto 1 1;
         }
