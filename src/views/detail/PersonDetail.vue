@@ -2,12 +2,14 @@
 import { ref, reactive } from "vue";
 import { Relation, RelatedPerson } from "#/axios";
 
-import { store } from "@/store";
+import { useStore } from "@/store";
 import { getPersonDetailData } from "@/api";
 
 const emit = defineEmits(["openPersonDetail", "openBookDetail"]);
 
 const show = ref(false); // 控制本组件是否显示
+
+const store = useStore();
 
 const related_person = <RelatedPerson[]>reactive([]); // 相关的其他人物
 const all_related_books = <Relation[]>reactive([]); // 该人物的所有相关书籍
@@ -71,7 +73,7 @@ function open(person_id: string) {
     related_person.push(...d.data[2]);
     related_person.sort((a, b) => b.count - a.count);
 
-    // for (let e of this.all_related_books) e.type = this.$store.state.all_action.find((el) => el.id == e.action_id).type;
+    // for (let e of this.all_related_books) e.type = this.$store.all_action.find((el) => el.id == e.action_id).type;
     for (let e of action_types) for (let f of all_related_books) if (e.name == f.type) e.count++;
   });
 }
@@ -125,11 +127,11 @@ defineExpose({ open, close });
               v-for="b in related_person"
               :key="b.person_id"
               @click="openPersonDetail(b.person_id)"
-              v-text="store.state.persons.find((ele) => ele.id == b.person_id)!.name + '（' + b.count + '）'"
+              v-text="store.persons.find((ele) => ele.id == b.person_id)!.name + '（' + b.count + '）'"
             ></p>
             <!-- <router-link
                 :to="/person-detail/ + b.person_id"
-                v-text="$store.state.persons.find((ele) => ele.id == b.person_id).name + '（' + b.count + '）'"
+                v-text="$store.persons.find((ele) => ele.id == b.person_id).name + '（' + b.count + '）'"
               ></router-link> -->
           </div>
         </div>

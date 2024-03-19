@@ -28,7 +28,7 @@ export default {
     node_list: function () {
       let arr = [];
       this.curr_nodes.forEach((e) => {
-        let item = this.$store.state.persons.find((ele) => ele.id == e.id);
+        let item = this.$store.persons.find((ele) => ele.id == e.id);
         item.active = false;
         item.curr_books = e.books;
         arr.push(item);
@@ -43,7 +43,7 @@ export default {
           this.curr_relation.target.id
         )}`;
 
-        let r = this.$store.state.person_ralations.filter(
+        let r = this.$store.person_ralations.filter(
           (e) =>
             (e.person1_id == this.curr_relation.source.id && e.person2_id == this.curr_relation.target.id) ||
             (e.person2_id == this.curr_relation.source.id && e.person1_id == this.curr_relation.target.id)
@@ -55,7 +55,7 @@ export default {
   },
   watch: {
     selected_id(value) {
-      this.selected_info = this.$store.state.persons.find((ele) => ele.id == value);
+      this.selected_info = this.$store.persons.find((ele) => ele.id == value);
     },
   },
   methods: {
@@ -68,17 +68,17 @@ export default {
       return t.join("");
     },
     getPersonNameById(id) {
-      let r = this.$store.state.persons.find((e) => e.id == id);
+      let r = this.$store.persons.find((e) => e.id == id);
       if (r) return r.name;
       else return "未知人名";
     },
     getBookNameById(id) {
-      let r = this.$store.state.books.find((e) => e.id == this.convertBookId(id));
+      let r = this.$store.books.find((e) => e.id == this.convertBookId(id));
       if (r) return r.name;
       else return "未知书名";
     },
     getActionNameById(id) {
-      let r = this.$store.state.all_action.find((e) => e.id == id);
+      let r = this.$store.all_action.find((e) => e.id == id);
       if (r) return r.name;
       else return "未知行为";
     },

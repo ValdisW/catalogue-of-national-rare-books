@@ -1,16 +1,16 @@
 <script lang="ts" setup>
-import { computed, ref } from "vue";
+import { computed, inject, ref } from "vue";
 
-import { store } from "@/store";
-import { readData } from "@/store/idb";
+import { useStore } from "@/store";
+// import { readData } from "@/store/idb";
 
 const emit = defineEmits(["openBookDetail"]);
 
 const title = ref("");
 
-readData("books").then((d) => {
-  title.value = d.find((e) => e.id == props.id).name;
-});
+const books = inject("introductionData").value[0];
+const store = useStore();
+title.value = books.find((e) => e.id == props.id).name;
 
 const props = defineProps({
   id: String,
@@ -21,7 +21,7 @@ const props = defineProps({
  * （使用缺省封面的逻辑：allowed为0表示不公开，或filename为空表示无图片）
  */
 const cover_url = computed(() => {
-  let img_res = store.state.all_image.filter((el) => el.id == props.id)[0]; // 从vuex获取书影数据
+  let img_res = store.all_image.filter((el) => el.id == props.id)[0]; // 从vuex获取书影数据
   return img_res.allowed && img_res.filename
     ? `/data/images/thumbnails/${props.id}.jpg`
     : "/data/images/thumbnails/placeholder.jpg";

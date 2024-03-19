@@ -1,13 +1,13 @@
 <script lang="ts" setup>
 import { computed, onMounted, ref } from "vue";
-import { store } from "@/store";
+import { useStore } from "@/store";
 import { Book } from "#/axios";
 import { readData } from "@/store/idb";
 
 const show = ref(true);
 
 const emit = defineEmits(["openBookDetail"]);
-
+const store = useStore();
 const detail_data = ref<{}>({});
 
 const props = defineProps({
@@ -34,37 +34,37 @@ function openBookDetail() {
 }
 
 // function getPersonNameById(id: string) {
-//   let r = store.state.persons.find((e) => e.id == id);
+//   let r = store.persons.find((e) => e.id == id);
 //   if (r) return r.name;
 //   else return "未知人名";
 // }
 // function getBookNameById(id: string) {
-//   let r = store.state.books.find((e) => e.id == id);
+//   let r = store.books.find((e) => e.id == id);
 //   if (r) return r.name;
 //   else return "未知书名";
 // }
 // function getActionNameById(id: string) {
-//   let r = store.state.all_action.find((e) => e.id == id);
+//   let r = store.all_action.find((e) => e.id == id);
 //   if (r) return r.name;
 //   else return "未知行为";
 // }
 function getDocumentTypeNameById(id: string) {
-  let r = store.state.all_document_type.find((e) => e.id == id);
+  let r = store.all_document_type.find((e) => e.id == id);
   if (r) return r.name;
   else return "未知行为";
 }
 function getEditionDynastyNameById(id: string) {
-  let r = store.state.all_edition_dynasty.find((e) => e.id == id);
+  let r = store.all_edition_dynasty.find((e) => e.id == id);
   if (r) return r.name;
   else return "未知行为";
 }
 function getInstitutionNameById(id: string) {
-  let r = store.state.all_institution.find((e) => e.id == id);
+  let r = store.all_institution.find((e) => e.id == id);
   if (r) return r.name;
   else return "未知行为";
 }
 function getLanguageNameById(id: string) {
-  let r = store.state.all_language.find((e) => e.id == id);
+  let r = store.all_language.find((e) => e.id == id);
   if (r) return r.name;
   else return "未知语言";
 }

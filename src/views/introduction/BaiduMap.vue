@@ -1,13 +1,15 @@
 <script lang="ts" setup>
 import { computed, onMounted, ref, watch } from "vue";
-import { store } from "@/store";
+import { useStore } from "@/store";
 import { Intensity, PointLayer, View } from "mapvgl";
 
-import { mapState } from "vuex";
+// import { mapState } from "vuex";
 
-const rem = computed(() => {
-  return mapState(["rem"]).rem;
-});
+const store = useStore();
+
+// const rem = computed(() => {
+//   return mapState(["rem"]).rem;
+// });
 
 interface province {
   name: string;
@@ -81,8 +83,8 @@ function showTooltip(e: MouseEvent, d: { id: string; count: number; name: string
   ToolTipBoxRef.value.style.top = top + 20 + "px";
   // text
   current_institution_name.value = d.name;
-  current_institution_intro.value = store.state.all_institution.find((el) => el.id == d.id)
-    ? store.state.all_institution.find((el) => el.id == d.id).intro
+  current_institution_intro.value = store.all_institution.find((el) => el.id == d.id)
+    ? store.all_institution.find((el) => el.id == d.id).intro
     : "";
   current_institution_books.value = `入選古籍數: ${d.count}`;
 
@@ -124,7 +126,7 @@ function initProvinceLayer() {
   let data = []; // 省份点的几何数据
   province_info.value = []; // 省份列表的数据
 
-  for (let city of store.state.all_province) {
+  for (let city of store.all_province) {
     data.push({
       geometry: {
         type: "Point",
@@ -182,7 +184,7 @@ function initProvinceLayer() {
 // 设置机构点的属性
 function initInstitutionLayer() {
   let data = [];
-  let institution_list = store.state.all_institution; // 机构id数组
+  let institution_list = store.all_institution; // 机构id数组
 
   for (let inst of institution_list) {
     data.push({
@@ -330,11 +332,11 @@ onMounted(() => {
               <li
                 v-for="e in city.child"
                 :key="e"
-                @click="flyToInstitution(store.state.all_institution.find((el) => el.id == e))"
+                @click="flyToInstitution(store.all_institution.find((el) => el.id == e))"
                 v-text="
-                  store.state.all_institution.find((el) => el.id == e).name +
+                  store.all_institution.find((el) => el.id == e).name +
                   ' - ' +
-                  store.state.all_institution.find((el) => el.id == e).books
+                  store.all_institution.find((el) => el.id == e).books
                 "
               ></li>
             </ul>

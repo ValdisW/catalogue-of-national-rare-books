@@ -1,14 +1,15 @@
 <script lang="ts" setup>
 import { ref } from "vue";
 
-import { store } from "@/store";
+import { useStore } from "@/store";
 
 import Loading from "@/components/Loading.vue";
 import MobileWarning from "@/components/MobileWarning.vue";
 import BookDetail from "@/views/detail/BookDetail.vue";
 import PersonDetail from "@/views/detail/PersonDetail.vue";
 
-// DOM关联
+const store = useStore();
+
 const BookDetailRef = ref<InstanceType<typeof BookDetail> | null>(null);
 const PersonDetailRef = ref<InstanceType<typeof PersonDetail> | null>(null);
 
@@ -38,7 +39,7 @@ function setRem() {
   // 用于根据页面大小设定rem，以自适应元素大小
   const scale = PageSize().width / 1280;
   let rem = baseSize * Math.min(scale, 50);
-  store.commit("changeRem", rem);
+  store.changeRem(rem);
   document.documentElement.style.fontSize = rem + "px";
 }
 

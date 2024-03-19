@@ -13,10 +13,10 @@
     "axios": "^0.27.2",
     "d3": "^7.4.4",
     "mapvgl": "1.0.0-beta.188",
-    "vue": "^3.2.45",
+    "pinia": "^2.0.33",
+    "vue": "^3.2.47",
     "vue-baidu-map-3x": "^1.0.15",
-    "vue-router": "^4.0.13",
-    "vuex": "^4.0.2"
+    "vue-router": "^4.0.13"
   },
   "devDependencies": {
     "@types/d3": "^7.4.3",

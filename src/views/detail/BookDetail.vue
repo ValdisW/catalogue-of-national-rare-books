@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref } from "vue";
-import { store } from "@/store";
+import { useStore } from "@/store";
 import type { Book, BookImage, Relation } from "#/axios";
 
 import ImageViewer from "@/components/ImageViewer.vue";
@@ -18,6 +18,7 @@ const book_data = ref<Book>({ content: "" });
 const related_person = ref<Relation[]>([]);
 const seals = ref([]);
 
+const store = useStore();
 const emit = defineEmits(["startLoading", "endLoading", "openPersonDetail"]);
 
 function clickPerson(id: string) {
@@ -39,7 +40,7 @@ function open(book_id: string) {
     related_person.value = d.data[1];
     seals.value = d.data[2];
 
-    let img_res = (store.state.all_image as unknown as Array<BookImage>).filter((el) => el.id == book_id); // 从vuex获取书影数据
+    let img_res = (store.all_image as unknown as Array<BookImage>).filter((el) => el.id == book_id); // 从vuex获取书影数据
     if (img_res && img_res[0].filename && img_res[0].allowed)
       for (let e of img_res) image_filenames.value.push(`/data/images/${e.folder}/${e.filename}`);
     else image_filenames.value[0] = "none";
@@ -94,21 +95,21 @@ defineExpose({
             <td class="detail-title">文獻類型：</td>
             <td
               class="detail-content document-type"
-              v-text="id2name(store.state.all_document_type, book_data.document_type_id, '-')"
+              v-text="id2name(store.all_document_type, book_data.document_type_id, '-')"
             ></td>
           </tr>
           <tr>
             <td class="detail-title">文種：</td>
             <td
               class="detail-content language"
-              v-text="id2name(store.state.all_language, book_data.language_id, '-')"
+              v-text="id2name(store.all_language, book_data.language_id, '-')"
             ></td>
           </tr>
           <tr>
             <td class="detail-title">分類：</td>
             <td
               class="detail-content name"
-              v-text="id2name(store.state.all_catalogue, book_data.catalogue_id, '-')"
+              v-text="id2name(store.all_catalogue, book_data.catalogue_id, '-')"
             ></td>
           </tr>
           <tr>
@@ -119,7 +120,7 @@ defineExpose({
             <td class="detail-title">版本類型：</td>
             <td
               class="detail-content edition-type"
-              v-text="id2name(store.state.all_document_type, book_data.edition_type_id, '-')"
+              v-text="id2name(store.all_document_type, book_data.edition_type_id, '-')"
             ></td>
           </tr> -->
           <tr>
@@ -154,14 +155,14 @@ defineExpose({
             <td class="detail-title">收藏省份：</td>
             <td
               class="detail-content institute"
-              v-text="id2name(store.state.all_province, book_data.province_id, '-')"
+              v-text="id2name(store.all_province, book_data.province_id, '-')"
             ></td>
           </tr>
           <tr>
             <td class="detail-title">收藏單位：</td>
             <td
               class="detail-content institute"
-              v-text="id2name(store.state.all_institution, book_data.institution_id, '-')"
+              v-text="id2name(store.all_institution, book_data.institution_id, '-')"
             ></td>
           </tr>
           <tr>

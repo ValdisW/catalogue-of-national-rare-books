@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { onMounted, onUnmounted, reactive, ref } from "vue";
 import { loadExplorationData, searchForBooks, serachAll } from "@/api";
-import { store } from "@/store";
+import { useStore } from "@/store";
 
 import SearchBar from "@/components/exploration/SearchBar.vue";
 import PageDivider from "@/components/exploration/PageDivider.vue";
@@ -16,12 +16,10 @@ const show_results = ref(false);
 const search_result = ref([]); // 所有检索结果
 const curr_d = ref([]); // 当前页的检索结果
 const each_page_items = ref(50); // 每页的检索结果数量
-
 const wait = ref(false); // 点击搜索按钮的等待，防止重复点击
-
 const curr_filter = ref({}); // 当前的筛选条件
-
 const has_filtered = ref(false); // 标记是否已经进行过筛选（用于正确显示检索结果数量以及页码数）
+const store = useStore();
 
 // 筛选器数据
 const filter_data: {
@@ -135,7 +133,7 @@ function updateFilter() {
       temp.push({
         id: e.name,
         value: e.value,
-        type: store.state["all_" + filter_data[i].id].find((el) => el.id == e.name)[filter_data[i].db_column],
+        type: store["all_" + filter_data[i].id].find((el) => el.id == e.name)[filter_data[i].db_column],
       });
     for (let i in temp) {
       if (!result.find((el) => el.name == temp[i].type))
@@ -157,8 +155,8 @@ function updateFilter() {
 function convertResult() {
   curr_d.value.forEach((e) => {
     ["edition_dynasty", "document_type", "language", "province", "institution"].map((attr) => {
-      e[attr] = store.state[`all_${attr}`].find((ele) => ele.id == e[`${attr}_id`])
-        ? store.state[`all_${attr}`].find((ele) => ele.id == e[`${attr}_id`]).name
+      e[attr] = store[`all_${attr}`].find((ele) => ele.id == e[`${attr}_id`])
+        ? store[`all_${attr}`].find((ele) => ele.id == e[`${attr}_id`]).name
         : "-";
     });
   });
@@ -271,12 +269,12 @@ function choose(e) {
 
 onMounted(() => {
   loadExplorationData().then((res) => {
-    store.commit("loadExplorationData", res.data);
+    store.loadExplorationData(res.data);
 
     complete.value = true;
     emit("endLoading");
 
-    filtered_result.value = search_result.value = store.state.books;
+    filtered_result.value = search_result.value = store.books;
 
     curr_d.value = search_result.value.slice(0, each_page_items.value); // 当前页数据
     convertResult();

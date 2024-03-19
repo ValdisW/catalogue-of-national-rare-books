@@ -1,31 +1,61 @@
 <script lang="ts" setup>
-import { onMounted, onUnmounted, ref } from "vue";
-import { store } from "@/store";
+import { onUnmounted, provide, ref } from "vue";
+import { useStore } from "@/store";
+import { readData } from "@/store/idb";
+import { getImageURL } from "@/utils/thumbnail";
+import { Book, Province } from "#/axios";
+import { loadIntroductionData, preloadIntroductionData } from "@/api";
+// import MyWorker from "@/utils/worker.js?worker";
 import FlowingParticles from "@/views/introduction/FlowingParticles.vue";
 // import BaiduMap from "@/views/introduction/BaiduMap.vue";
 import Batches from "@/views/introduction/Batches.vue";
-import { getImageURL } from "@/utils/thumbnail";
-import { Book, Province } from "#/axios";
-import { loadIntroductionData } from "@/api";
-
-import MyWorker from "@/utils/worker.js?worker";
-import { readData } from "@/store/idb";
 
 const sectionSum = 3;
+const now = new Date(); // 显示今日古籍上的日期
+const scrolling = ref(false); // 是否正在滚动，简单节流
+const current_page = ref(0); // 当前的section，从0开始
+const complete = ref(false);
+const recommendBook = ref({ id: "", image: "" });
+const store = useStore();
+const introductionData = ref({ name: "test" });
+const FlowingParticlesRef = ref<InstanceType<typeof FlowingParticles> | null>(null);
 const emit = defineEmits(["openBookDetail", "startLoading", "endLoading"]);
 
-const recommendBook = ref({ id: "", image: "" });
+provide("introductionData", introductionData);
 
-const FlowingParticlesRef = ref<InstanceType<typeof FlowingParticles> | null>(null);
+// 加载数据
+preloadIntroductionData().then((d) => {
+  // new MyWorker().onmessage = (event: MessageEvent) => {
+  //   store.preloadIntroductionData(event.data);
+  store.preloadIntroductionData(d.data);
+  introductionData.value = d.data;
+  for (let e of store.all_institution) {
+    let r = store.all_province.find((el: Province) => el.id == e.province_id);
+    if (!r.child) r.child = [];
+    if (e.id != "0000") r.child.push(e.id);
+  }
+  complete.value = true;
 
-const now = new Date();
-const scrolling = ref(false);
-const current_page = ref(0);
-// const page_width = Number;
-// const offsets = [];
-const complete = ref(false);
+  // 浏览过程中加载
+  loadIntroductionData().then((res) => {
+    store.loadIntroductionData(res.data);
+  });
 
-// getImageURL,
+  readData("books").then((books) => {
+    let t = books.filter((el: Book) => el.name.length > 3 && el.name.length < 8 && !el.name.match(/(·|\?|（|\[)/i));
+    let d_books: Array<Book> = [];
+    for (let e of t) if (!d_books.find((el) => el.name == e.name)) d_books.push(e);
+
+    recommendBook.value = d_books[Math.floor(new Date().getTime() / 8.64e7) % d_books.length];
+
+    emit("endLoading");
+  });
+});
+
+function readIntroductionData() {
+  return;
+}
+
 function openBookDetail(book_id: string) {
   emit("openBookDetail", book_id);
 }
@@ -75,50 +105,6 @@ function scrollToSection(id: number, force = false) {
   }, 400);
 }
 
-onMounted(() => {
-  const worker = new MyWorker();
-  worker.onmessage = function (event: MessageEvent) {
-    // 加载数据
-    store.commit("preloadIntroductionData", event.data);
-    for (let e of store.state.all_institution) {
-      let r = store.state.all_province.find((el: Province) => el.id == e.province_id);
-      if (!r.child) r.child = [];
-      if (e.id != "0000") r.child.push(e.id);
-    }
-    complete.value = true;
-    emit("endLoading");
-
-    // 浏览过程中加载
-    loadIntroductionData().then((res) => {
-      store.commit("loadIntroductionData", res.data);
-    });
-  };
-  // preloadIntroductionData().then((res) => {
-  //   // 加载数据
-  //   store.commit("preloadIntroductionData", res.data);
-  //   for (let e of store.state.all_institution) {
-  //     let r = store.state.all_province.find((el: Province) => el.id == e.province_id);
-  //     if (!r.child) r.child = [];
-  //     if (e.id != "0000") r.child.push(e.id);
-  //   }
-  //   complete.value = true;
-  //   emit("endLoading");
-
-  //   // 浏览过程中加载
-  //   loadIntroductionData().then((res) => {
-  //     store.commit("loadIntroductionData", res.data);
-  //   });
-  // });
-
-  readData("books").then((d) => {
-    let t = d.filter((el: Book) => el.name.length > 3 && el.name.length < 8 && !el.name.match(/(·|\?|（|\[)/i));
-    let d_books: Array<Book> = [];
-    for (let e of t) if (!d_books.find((el) => el.name == e.name)) d_books.push(e);
-
-    recommendBook.value = d_books[Math.floor(new Date().getTime() / 8.64e7) % d_books.length];
-  });
-});
-
 onUnmounted(() => {
   emit("startLoading");
 });
@@ -144,7 +130,7 @@ onUnmounted(() => {
         <div class="image-wrapper" @click="$emit('openBookDetail', recommendBook.id)">
           <img
             @click="$emit('openBookDetail', d.data[0])"
-            :src="getImageURL(recommendBook.id, store.state.all_image)"
+            :src="getImageURL(recommendBook.id, store.all_image)"
             alt="书影"
           />
         </div>

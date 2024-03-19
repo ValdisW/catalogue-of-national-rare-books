@@ -1,10 +1,10 @@
 <script lang="ts" setup>
-import { ref, reactive, computed } from "vue";
-import { store } from "@/store";
+import { ref, reactive, computed, inject } from "vue";
+import { useStore } from "@/store";
 
 import type { Relation } from "@/types";
 
-import { mapState } from "vuex";
+// import { mapState } from "vuex";
 import BarChart from "@/components/introduction/BarChart.vue";
 import BookItem from "@/components/introduction/BookItem.vue";
 import sta from "@/data/statistics.json";
@@ -12,6 +12,7 @@ import { readData } from "@/store/idb";
 
 const changeKey = ref(0);
 const emit = defineEmits(["openBookDetail"]);
+const store = useStore();
 
 const batchInfo = [
   {
@@ -53,10 +54,11 @@ const batchInfo = [
 const current_batch = ref(0);
 const statistics = ref([]);
 const showing_books = <Relation[]>reactive([]);
+const books = inject("introductionData").value[0];
 
-const rem = computed(() => {
-  return mapState(["rem"]).rem;
-});
+// const rem = computed(() => {
+//   return mapState(["rem"]).rem;
+// });
 
 /**
  * 打开古籍详情页，逐级传递古籍id到App.vue
@@ -79,13 +81,9 @@ function toHeight(p: number) {
  */
 async function showMore() {
   changeKey.value++;
-  let d = await readData("books");
-  let arr = current_batch.value == 0 ? d : d.filter((el: Relation) => el.batch == current_batch.value);
+  let arr = current_batch.value == 0 ? books : books.filter((el: Relation) => el.batch == current_batch.value); // 随机选择的范围
 
-  showing_books.length = 0;
-  setTimeout(() => {
-    for (let i = 0; i < 6; i++) showing_books.push(arr[Math.floor(Math.random() * arr.length)].id);
-  }, 50);
+  for (let i = 0; i < 6; i++) showing_books[i] = arr[Math.floor(Math.random() * arr.length)].id;
 }
 
 /**
@@ -144,8 +142,8 @@ statistics.value = sta; // 要求统计数据写死，因此直接读取json文�
                   title="文獻類型"
                   ref="document_type"
                   bar_color="#C4A1A1"
-                  :canvasWidth="15 * store.state.rem!"
-                  :canvasHeight="7 * store.state.rem!"
+                  :canvasWidth="15 * store.rem!"
+                  :canvasHeight="7 * store.rem!"
                   :margin_left="0.46"
                   :info="statistics[current_batch].document_type"
                 />
@@ -155,8 +153,8 @@ statistics.value = sta; // 要求统计数据写死，因此直接读取json文�
                   title="版本朝代"
                   ref="edition_dynasty"
                   bar_color="#76978F"
-                  :canvasWidth="15 * store.state.rem!"
-                  :canvasHeight="5.6 * store.state.rem!"
+                  :canvasWidth="15 * store.rem!"
+                  :canvasHeight="5.6 * store.rem!"
                   :margin_left="0.46"
                   :info="statistics[current_batch].edition_dynasty"
                 />
@@ -166,8 +164,8 @@ statistics.value = sta; // 要求统计数据写死，因此直接读取json文�
                   title="版本類型"
                   ref="edition_type"
                   bar_color="#B1B098"
-                  :canvasWidth="15 * store.state.rem!"
-                  :canvasHeight="9.6 * store.state.rem!"
+                  :canvasWidth="15 * store.rem!"
+                  :canvasHeight="9.6 * store.rem!"
                   :margin_left="0.46"
                   :info="statistics[current_batch].edition_type"
                 />
@@ -179,8 +177,8 @@ statistics.value = sta; // 要求统计数据写死，因此直接读取json文�
                   title="文種"
                   ref="language"
                   bar_color="#B0A1B8"
-                  :canvasWidth="14 * store.state.rem!"
-                  :canvasHeight="23.7 * store.state.rem!"
+                  :canvasWidth="14 * store.rem!"
+                  :canvasHeight="23.7 * store.rem!"
                   :margin_left="0.55"
                   :info="statistics[current_batch].language"
                 />
@@ -214,6 +212,10 @@ statistics.value = sta; // 要求统计数据写死，因此直接读取json文�
 .books-enter-from {
   opacity: 0;
   transform: translateY(1rem);
+}
+
+.books-leave-active {
+  opacity: 0;
 }
 
 .batches {

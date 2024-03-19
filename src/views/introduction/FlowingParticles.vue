@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { onMounted, onUnmounted, ref, watch } from "vue";
 import * as d3 from "d3";
-import { store } from "@/store";
+import { useStore } from "@/store";
 import { Book } from "#/axios";
 
 import DynastySelector from "@/components/introduction/DynastySelector.vue";
@@ -34,6 +34,7 @@ const curr_time = ref(0);
 const particles_original_data = ref<Book[]>([]);
 const tooltip_id = ref("");
 const curr_comment = ref("");
+const store = useStore();
 
 const BookDetailTooltipRef = ref<InstanceType<typeof BookDetailTooltip> | null>(null);
 
@@ -166,7 +167,7 @@ function moveParticle(particle: Particle) {
 
 // 每帧绘制的内容
 function draw() {
-  console.log(233);
+  // console.log(233);
   // 动画句柄，用来控制播放
   animation_handler.value = requestAnimationFrame(draw);
 
