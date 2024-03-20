@@ -26,11 +26,12 @@ const NUM_PARTICLES = 100;
 const PARTICLE_SIZE = 0.5;
 const SPEED = 20000;
 
+let animation_handler = 0;
+let curr_time = 0;
+
 const svg = ref<d3.Selection<SVGSVGElement, unknown, HTMLElement, any> | null>(null);
 const particles = ref<Particle[]>([]);
-const animation_handler = ref(0);
 const playing = ref(true);
-const curr_time = ref(0);
 const particles_original_data = ref<Book[]>([]);
 const tooltip_id = ref("");
 const curr_comment = ref("");
@@ -62,7 +63,7 @@ async function changeDynasty(o: { text: string; ids: string[] }) {
   // 清零
   svg.value?.html("");
   particles.value = [];
-  curr_time.value = 0;
+  curr_time = 0;
 
   // 如果粒子数量太多，只显示其中一部分
   if (particles_original_data.value.length > MAX_PARTICLES) {
@@ -81,27 +82,26 @@ async function changeDynasty(o: { text: string; ids: string[] }) {
   svg.value?.selectAll("circle").data(particles.value).enter().append("circle");
 
   if (!playing.value) {
-    animation_handler.value = requestAnimationFrame(draw);
+    animation_handler = requestAnimationFrame(draw);
     playing.value = true;
   }
 }
 
 function pause() {
   if (playing.value) {
-    cancelAnimationFrame(animation_handler.value);
+    cancelAnimationFrame(animation_handler);
     playing.value = false;
   }
 }
 
 function continuePlay() {
   if (!playing.value) {
-    animation_handler.value = requestAnimationFrame(draw);
+    animation_handler = requestAnimationFrame(draw);
     playing.value = true;
   }
 }
 
 function togglePause() {
-  console.log(playing.value);
   if (playing.value) pause();
   else continuePlay();
 }
@@ -150,14 +150,14 @@ function generateParticleData(e: Book): Particle {
     amplitude: randomNormal({ mean: 16, dev: 2 }),
     offsetY: randomNormal({ mean: 0, dev: 10 }),
     arc: Math.PI * 2,
-    startTime: curr_time.value - rand(0, SPEED),
+    startTime: curr_time - rand(0, SPEED),
     color: `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a})`,
   };
 }
 
 // 计算粒子的新位置
 function moveParticle(particle: Particle) {
-  const progress = ((curr_time.value - particle.startTime) % particle.duration) / particle.duration;
+  const progress = ((curr_time - particle.startTime) % particle.duration) / particle.duration;
   return {
     ...particle,
     x: progress,
@@ -169,7 +169,7 @@ function moveParticle(particle: Particle) {
 function draw() {
   // console.log(233);
   // 动画句柄，用来控制播放
-  animation_handler.value = requestAnimationFrame(draw);
+  animation_handler = requestAnimationFrame(draw);
 
   // 更新粒子位置数据
   particles.value.forEach((particle, index) => {
@@ -199,7 +199,7 @@ function draw() {
   });
 
   // 计时器
-  curr_time.value += 16;
+  curr_time += 16;
 }
 
 async function start() {
@@ -220,6 +220,7 @@ async function start() {
 
   // 动画
   draw();
+  pause();
 }
 onMounted(() => {
   if (document.readystate !== "loading") start();
@@ -227,11 +228,10 @@ onMounted(() => {
     document.addEventListener("DOMContentLoaded", () => {
       start();
     });
-  pause();
 });
 
 onUnmounted(() => {
-  cancelAnimationFrame(animation_handler.value);
+  cancelAnimationFrame(animation_handler);
 });
 
 defineExpose({
