@@ -29,11 +29,12 @@ const SPEED = 20000;
 let animation_handler = 0;
 let curr_time = 0;
 
+const emits = defineEmits(["openBookDetail"]);
+
 const svg = ref<d3.Selection<SVGSVGElement, unknown, HTMLElement, any> | null>(null);
 const particles = ref<Particle[]>([]);
 const playing = ref(true);
 const particles_original_data = ref<Book[]>([]);
-const tooltip_id = ref("");
 const curr_comment = ref("");
 const store = useStore();
 
@@ -187,15 +188,13 @@ function draw() {
     .attr("r", (e) => e.diameter * vh)
     .attr("cursor", "pointer");
 
-  // 交互
+  // 点击圆点，显示BookDetailTooltip
   svg.value?.selectAll("circle").on("click", (e: MouseEvent, d) => {
     pause();
     e.stopPropagation();
     BookDetailTooltipRef.value.$el.style.left = e.clientX + 30 + "px";
     BookDetailTooltipRef.value.$el.style.top = e.clientY - 140 + "px";
-    BookDetailTooltipRef.value.$el.style.display = "block";
-    BookDetailTooltipRef.value.open();
-    tooltip_id.value = d.info.id;
+    BookDetailTooltipRef.value.open(d.info.id);
   });
 
   // 计时器
@@ -222,6 +221,11 @@ async function start() {
   draw();
   pause();
 }
+
+function openBookDetail(book_id: string) {
+  emits("openBookDetail", book_id);
+}
+
 onMounted(() => {
   if (document.readystate !== "loading") start();
   else
@@ -263,11 +267,7 @@ defineExpose({
         <div class="comment" v-text="curr_comment"></div>
 
         <!-- 悬浮窗 -->
-        <BookDetailTooltip
-          @openBookDetail="$emit('openBookDetail', tooltip_id)"
-          ref="BookDetailTooltipRef"
-          :id="tooltip_id"
-        />
+        <BookDetailTooltip @openBookDetail="openBookDetail" ref="BookDetailTooltipRef" />
       </div>
     </div>
   </div>

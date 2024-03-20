@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { onUnmounted, provide, ref } from "vue";
 import { useStore } from "@/store";
-import { readData } from "@/store/idb";
+import { addManyData, readData, readManyData } from "@/store/idb";
 import { getImageURL } from "@/utils/thumbnail";
 import { Book, Province } from "#/axios";
 import { loadIntroductionData, preloadIntroductionData } from "@/api";
@@ -11,24 +11,21 @@ import FlowingParticles from "@/views/introduction/FlowingParticles.vue";
 import Batches from "@/views/introduction/Batches.vue";
 
 const sectionSum = 3;
-const now = new Date(); // 显示今日古籍上的日期
+const now = new Date(); // 用于显示今日古籍上的日期
 const scrolling = ref(false); // 是否正在滚动，简单节流
 const current_page = ref(0); // 当前的section，从0开始
 const complete = ref(false);
 const recommendBook = ref({ id: "", image: "" });
 const store = useStore();
-const introductionData = ref({ name: "test" });
+const introductionData = ref();
 const FlowingParticlesRef = ref<InstanceType<typeof FlowingParticles> | null>(null);
 const emit = defineEmits(["openBookDetail", "startLoading", "endLoading"]);
 
 provide("introductionData", introductionData);
 
-// 加载数据
-preloadIntroductionData().then((d) => {
-  // new MyWorker().onmessage = (event: MessageEvent) => {
-  //   store.preloadIntroductionData(event.data);
-  store.preloadIntroductionData(d.data);
-  introductionData.value = d.data;
+// 请求数据
+_loadIntroductionData().then((d) => {
+  store.preloadIntroductionData(d);
   for (let e of store.all_institution) {
     let r = store.all_province.find((el: Province) => el.id == e.province_id);
     if (!r.child) r.child = [];
@@ -41,19 +38,50 @@ preloadIntroductionData().then((d) => {
     store.loadIntroductionData(res.data);
   });
 
-  readData("books").then((books) => {
-    let t = books.filter((el: Book) => el.name.length > 3 && el.name.length < 8 && !el.name.match(/(·|\?|（|\[)/i));
-    let d_books: Array<Book> = [];
-    for (let e of t) if (!d_books.find((el) => el.name == e.name)) d_books.push(e);
+  recommendBook.value = getRecommendBook(d[0]);
 
-    recommendBook.value = d_books[Math.floor(new Date().getTime() / 8.64e7) % d_books.length];
-
-    emit("endLoading");
-  });
+  emit("endLoading");
 });
 
-function readIntroductionData() {
-  return;
+function getRecommendBook(all_books: Book[]) {
+  let t = all_books.filter(
+    (el: Book) => el.name!.length > 3 && el.name!.length < 8 && !el.name!.match(/(·|\?|（|\[)/i)
+  );
+  let d_books: Array<Book> = [];
+  for (let e of t) if (!d_books.find((el) => el.name == e.name)) d_books.push(e);
+  return d_books[Math.floor(new Date().getTime() / 8.64e7) % d_books.length];
+}
+
+// 加载introduction的数据。
+// 优先从IDB中读取，如果IDB数据不完整就通过axios读取。
+function _loadIntroductionData() {
+  return new Promise((resolve) => {
+    const tables = [
+      "books",
+      "all_edition_dynasty",
+      "all_document_type",
+      "all_catalogue",
+      "all_edition_type",
+      "all_language",
+      "all_province",
+      "all_institution",
+      "all_image",
+    ];
+    readManyData(tables).then((d) => {
+      if (d.every((el) => el.length > 0)) {
+        // indexedDB已经有数据了，直接读
+        introductionData.value = d;
+        resolve(d);
+      } else {
+        // indexedDB没有数据，需要访问后端读取，同时将数据写入indexedDB
+        preloadIntroductionData().then((d) => {
+          introductionData.value = d.data; // 热乎的后端数据，这里先用来给provide变量
+          addManyData(tables, d.data); // 将数据添加进indexedDB
+          resolve(d.data);
+        });
+      }
+    });
+  });
 }
 
 function openBookDetail(book_id: string) {

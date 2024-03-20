@@ -1,53 +1,32 @@
 <script lang="ts" setup>
-import { computed, onMounted, ref } from "vue";
+import { inject, ref } from "vue";
 import { useStore } from "@/store";
 import { Book } from "#/axios";
-import { readData } from "@/store/idb";
 
 const show = ref(true);
+const inner_id = ref("");
+const detail_data = ref<Book>({});
 
 const emit = defineEmits(["openBookDetail"]);
 const store = useStore();
-const detail_data = ref<{}>({});
 
-const props = defineProps({
-  id: String,
-});
+const books = inject("introductionData").value[0];
 
-onMounted(() => {
-  if (!props.id) detail_data.value = { content: "　" };
-  else
-    readData("books").then((d) => {
-      detail_data.value = d.find((el: Book) => el.id == props.id);
-    });
-});
+function open(id: string) {
+  inner_id.value = id;
+  if (!inner_id.value) detail_data.value = { content: "　" };
+  else detail_data.value = books.find((book: Book) => book.id === inner_id.value);
 
-function open() {
   show.value = true;
 }
 function close() {
   show.value = false;
 }
-function openBookDetail() {
+function openBookDetail(id: string) {
   close();
-  emit("openBookDetail", props.id);
+  emit("openBookDetail", id);
 }
 
-// function getPersonNameById(id: string) {
-//   let r = store.persons.find((e) => e.id == id);
-//   if (r) return r.name;
-//   else return "未知人名";
-// }
-// function getBookNameById(id: string) {
-//   let r = store.books.find((e) => e.id == id);
-//   if (r) return r.name;
-//   else return "未知书名";
-// }
-// function getActionNameById(id: string) {
-//   let r = store.all_action.find((e) => e.id == id);
-//   if (r) return r.name;
-//   else return "未知行为";
-// }
 function getDocumentTypeNameById(id: string) {
   let r = store.all_document_type.find((e) => e.id == id);
   if (r) return r.name;
@@ -80,7 +59,7 @@ defineExpose({
     <div class="container">
       <div class="content">
         <h4>
-          <span v-text="id"></span>
+          <span v-text="detail_data.id"></span>
           <span v-text="detail_data.name"></span>
         </h4>
         <div class="detail">
@@ -105,7 +84,7 @@ defineExpose({
             <span v-text="getInstitutionNameById(detail_data.institution_id)"></span>
           </p>
         </div>
-        <span class="to-detail" @click="openBookDetail">查看詳情</span>
+        <span class="to-detail" @click="openBookDetail(detail_data.id)">查看詳情</span>
       </div>
     </div>
   </div>

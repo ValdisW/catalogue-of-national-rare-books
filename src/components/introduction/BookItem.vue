@@ -1,8 +1,6 @@
 <script lang="ts" setup>
 import { computed, inject, ref } from "vue";
-
 import { useStore } from "@/store";
-// import { readData } from "@/store/idb";
 
 const store = useStore();
 const emit = defineEmits(["openBookDetail"]);
