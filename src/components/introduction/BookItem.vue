@@ -4,17 +4,16 @@ import { computed, inject, ref } from "vue";
 import { useStore } from "@/store";
 // import { readData } from "@/store/idb";
 
-const emit = defineEmits(["openBookDetail"]);
-
-const title = ref("");
-
-const books = inject("introductionData").value[0];
 const store = useStore();
-title.value = books.find((e) => e.id == props.id).name;
-
+const emit = defineEmits(["openBookDetail"]);
 const props = defineProps({
   id: String,
 });
+
+const title = ref("");
+const books = inject("introductionData").value[0];
+
+title.value = books.find((e) => e.id == props.id).name;
 
 /**
  * 计算书影缩略图的url
