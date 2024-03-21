@@ -2,6 +2,7 @@
 import { onMounted, ref, watch } from "vue";
 import { useStore } from "@/store";
 import { Intensity, PointLayer, View } from "mapvgl";
+import { BaiduMap } from "vue-baidu-map-3x";
 
 // import { mapState } from "vuex";
 
@@ -29,7 +30,7 @@ interface institution {
   province_id: string;
 }
 
-const map = ref(null);
+const mapInstance = ref(null);
 const current_institution_name = ref("");
 const current_institution_intro = ref("");
 const current_institution_books = ref("");
@@ -97,10 +98,9 @@ function removeTooltip() {
 
 // 点击省份列表的省份项
 function expandProvince(d: province) {
-  if (d.selected) {
-    map.value.reset();
-  } else {
-    map.value.flyTo(d.pos, (zoom.value = 7));
+  if (d.selected) mapInstance.value.reset();
+  else {
+    mapInstance.value.flyTo(d.pos, (zoom.value = 7));
     province_info.value.forEach((el) => (el.selected = false)); // 折叠全部省份
   }
   d.selected = !d.selected;
@@ -108,7 +108,7 @@ function expandProvince(d: province) {
 
 // 点击列表中的机构项
 function flyToInstitution(e: institution) {
-  map.value.flyTo({ lat: e.lat, lng: e.lng }, (zoom.value = 10));
+  mapInstance.value.flyTo({ lat: e.lat, lng: e.lng }, (zoom.value = 10));
 }
 
 function removeAllSublist() {
@@ -171,7 +171,7 @@ function initProvinceLayer() {
     onClick: (e: PointerEvent) => {
       // 点击事件
       let id = e.dataIndex;
-      if (id == -1) map.value.reset();
+      if (id == -1) mapInstance.value.reset();
       else expandProvince(province_info.value[id]);
     },
   });
@@ -222,7 +222,7 @@ function initInstitutionLayer() {
       // 点击机构点
       let id = e.dataIndex;
       if (id == -1) {
-        map.value.reset();
+        mapInstance.value.reset();
         removeAllSublist();
       }
     },
@@ -231,7 +231,10 @@ function initInstitutionLayer() {
   institutionLayer.value.setData(data);
 }
 
-function initMap(options: { tilt: number; heading: number; center: [number, number]; zoom: number; [n: string]: any }) {
+function initMap(
+  BMap,
+  options: { tilt: number; heading: number; center: [number, number]; zoom: number; [n: string]: any }
+) {
   options = Object.assign(
     {
       tilt: 60,
@@ -239,33 +242,33 @@ function initMap(options: { tilt: number; heading: number; center: [number, numb
     },
     options
   );
-  let map = new BMapGL.Map("map-container", {
-    restrictCenter: false,
-    // style: {styleJson: options.style || darkStyle }
-  });
-  map.enableKeyboard();
-  map.enableScrollWheelZoom();
-  map.enableInertialDragging();
-  map.enableContinuousZoom();
-  map.setDefaultCursor("default");
+  // let map = new BMapGL.Map("map-container", {
+  //   restrictCenter: false,
+  //   // style: {styleJson: options.style || darkStyle }
+  // });
+  mapInstance.value.enableKeyboard();
+  mapInstance.value.enableScrollWheelZoom();
+  mapInstance.value.enableInertialDragging();
+  mapInstance.value.enableContinuousZoom();
+  mapInstance.value.setDefaultCursor("default");
 
   if (options.center && options.zoom) {
     let center = options.center;
-    if (center instanceof Array) center = new BMapGL.Point(options.center[0], options.center[1]);
-    map.centerAndZoom(center, options.zoom);
+    if (center instanceof Array) center = new BMap.Point(options.center[0], options.center[1]);
+    mapInstance.value.centerAndZoom(center, options.zoom);
   }
 
-  map.setTilt(options.tilt);
-  map.setHeading(options.heading);
+  mapInstance.value.setTilt(options.tilt);
+  mapInstance.value.setHeading(options.heading);
 
-  map.setMapStyleV2({
+  mapInstance.value.setMapStyleV2({
     styleId: "89e1e7d01eec9442b2747defbdcddb8b",
   });
 
-  map.on("zoomend", function (e) {
+  mapInstance.value.on("zoomend", function (e) {
     zoom.value = e.target.zoomLevel;
   });
-  map.addEventListener("mousemove", function (e: MouseEvent) {
+  mapInstance.value.addEventListener("mousemove", function (e: MouseEvent) {
     if (pointLayer.value == null) return;
     let index = pointLayer.value.pick(e.x, e.y);
     if (index.dataIndex == -1) {
@@ -274,26 +277,32 @@ function initMap(options: { tilt: number; heading: number; center: [number, numb
     }
     showTooltip(e, index.dataItem.properties);
   });
-  return map;
+  mapInstance.value.addEventListener("click", function (e: MouseEvent) {
+    e.preventDefault();
+  });
+
+  mapInstance.value.disableScrollWheelZoom();
+  mapInstance.value.disableDoubleClickZoom();
 }
 
-onMounted(() => {
+const mapReady = ({ BMap, map }) => {
+  mapInstance.value = map;
   zoom.value = 5;
   // 初始化地图参数
-  map.value = initMap({
+  initMap(BMap, {
     tilt: 0,
     heading: 0,
     center: [104.438656, 37.753594],
     zoom: zoom.value,
   });
   view.value = new View({
-    map: map.value,
+    map: mapInstance.value,
   });
 
   // tooltipBox.value = document.getElementById("tooltip-box");
   initProvinceLayer();
   initInstitutionLayer();
-});
+};
 </script>
 
 <template>
@@ -308,7 +317,18 @@ onMounted(() => {
       </div>
 
       <!-- 左侧地图 -->
-      <div id="map-container" @wheel.stop=""></div>
+      <div id="map-container" @wheel.stop="">
+        <baidu-map
+          class="map"
+          ak="1rhcTPAuchh7EM6ovKAw84oGUmAElH70"
+          v="3.0"
+          type="WebGL"
+          :center="{ lng: 104.438656, lat: 37.753594 }"
+          :zoom="5"
+          @ready="mapReady"
+        >
+        </baidu-map>
+      </div>
 
       <!-- 右侧列表 -->
       <div id="map-list">
@@ -370,6 +390,9 @@ onMounted(() => {
       width: 80%;
       height: 100%;
       border: 2px solid #201d1d;
+      .map {
+        height: 100%;
+      }
     }
 
     #tooltip {
