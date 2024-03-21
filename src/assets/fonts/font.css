@@ -3,6 +3,7 @@
   font-family: "huawenkaiti";
   font-weight: normal;
   src: url("./huawenkaiti.ttf");
+  font-display: swap;
 }
 
 /* 思源宋体-粗体 */
@@ -10,6 +11,7 @@
   font-family: "SourceHanSerif";
   font-weight: bold;
   src: url("./SourceHanSerifCN-Bold.ttf");
+  font-display: swap;
 }
 
 /* 思源宋体-常规 */
@@ -17,4 +19,5 @@
   font-family: "SourceHanSerif";
   font-weight: normal;
   src: url("./SourceHanSerifCN-Regular.ttf");
+  font-display: swap;
 }
