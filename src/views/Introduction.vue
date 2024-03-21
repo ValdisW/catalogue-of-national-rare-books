@@ -7,10 +7,10 @@ import { Book, Province } from "#/axios";
 import { loadIntroductionData, preloadIntroductionData } from "@/api";
 // import MyWorker from "@/utils/worker.js?worker";
 import FlowingParticles from "@/views/introduction/FlowingParticles.vue";
-// import BaiduMap from "@/views/introduction/BaiduMap.vue";
+import BaiduMap from "@/views/introduction/BaiduMap.vue";
 import Batches from "@/views/introduction/Batches.vue";
 
-const sectionSum = 3;
+const sectionSum = 4;
 const now = new Date(); // 用于显示今日古籍上的日期
 const scrolling = ref(false); // 是否正在滚动，简单节流
 const current_page = ref(0); // 当前的section，从0开始
@@ -183,9 +183,9 @@ onUnmounted(() => {
     <section class="section-2">
       <Batches @openBookDetail="openBookDetail" />
     </section>
-    <!-- <section class="section-3">
+    <section class="section-3">
       <BaiduMap />
-    </section> -->
+    </section>
     <section class="section-4">
       <FlowingParticles ref="FlowingParticlesRef" @openBookDetail="openBookDetail" />
     </section>

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, onMounted, ref, watch } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { useStore } from "@/store";
 import { Intensity, PointLayer, View } from "mapvgl";
 
@@ -148,7 +148,6 @@ function initProvinceLayer() {
     });
   }
 
-  /* eslint-disable */
   let intensity = new Intensity({
     max: 3081,
     min: 0,
@@ -162,7 +161,6 @@ function initProvinceLayer() {
     minSize: zoom.value * 2,
   });
 
-  /* eslint-disable */
   provinceLayer.value = new PointLayer({
     // blend: 'lighter',
     size: (data) => intensity.getSize(data.properties.count),
@@ -213,7 +211,6 @@ function initInstitutionLayer() {
     minSize: zoom.value * 1.5,
   });
 
-  /* eslint-disable */
   institutionLayer.value = new PointLayer({
     // blend: 'lighter',
     size: (data) => intensity.getSize(data.properties.count),
@@ -242,7 +239,6 @@ function initMap(options: { tilt: number; heading: number; center: [number, numb
     },
     options
   );
-  /* eslint-disable */
   let map = new BMapGL.Map("map-container", {
     restrictCenter: false,
     // style: {styleJson: options.style || darkStyle }
@@ -290,7 +286,6 @@ onMounted(() => {
     center: [104.438656, 37.753594],
     zoom: zoom.value,
   });
-  /* eslint-disable */
   view.value = new View({
     map: map.value,
   });
@@ -356,85 +351,85 @@ onMounted(() => {
   </div>
 </template>
 
-<style lang="less" scoped>
+<style lang="less">
 .exploration-map {
   width: 100vw;
   height: 100vh;
   position: relative;
-}
+  .spatial-sampling {
+    display: flex;
+    align-items: center;
+    position: absolute;
+    top: 10vh;
+    left: 5vw;
+    width: 90vw;
+    height: 80vh;
 
-.spatial-sampling {
-  display: flex;
-  align-items: center;
-  position: absolute;
-  top: 10vh;
-  left: 5vw;
-  width: 90vw;
-  height: 80vh;
+    #map-container {
+      // position: fixed;
+      width: 80%;
+      height: 100%;
+      border: 2px solid #201d1d;
+    }
 
-  #map-container {
-    // position: fixed;
-    width: 80%;
-    height: 100%;
-    border: 2px solid #201d1d;
-  }
-
-  #tooltip {
-    #tooltip-box {
-      background-color: #333;
-      z-index: 10;
-      padding: 0.6rem;
-      font-size: 0.8rem;
-      width: auto;
-      height: auto;
-      position: absolute;
-      display: block;
-      visibility: hidden;
-      max-width: 33%;
-      color: #efefef;
-      h2 {
-        font-size: 1rem;
+    #tooltip {
+      #tooltip-box {
+        background-color: #333;
+        z-index: 10;
+        padding: 0.6rem;
+        font-size: 0.8rem;
+        width: auto;
+        height: auto;
+        position: absolute;
+        display: block;
+        visibility: hidden;
+        max-width: 33%;
         color: #efefef;
-      }
-      .intro {
-        font-size: 0.7rem;
-        margin: 0.1rem 0 0.1rem;
-      }
-      .books {
-        font-size: 0.7rem;
-        color: #bbb;
+        h2 {
+          font-size: 1rem;
+          color: #efefef;
+        }
+        .intro {
+          font-size: 0.7rem;
+          margin: 0.1rem 0 0.1rem;
+        }
+        .books {
+          font-size: 0.7rem;
+          color: #bbb;
+        }
       }
     }
-  }
 
-  #map-list {
-    border: 2px solid #201d1d;
-    border-left: none;
-    width: 20%;
-    top: 0%;
-    right: 0%;
-    height: 100%;
-    cursor: pointer;
-    overflow-y: scroll;
-    font-size: 0.7rem;
-    text-align: left;
+    #map-list {
+      border: 2px solid #201d1d;
+      border-left: none;
+      width: 20%;
+      top: 0%;
+      right: 0%;
+      height: 100%;
+      cursor: pointer;
+      overflow-y: scroll;
+      font-size: 0.7rem;
+      text-align: left;
 
-    ul.provinces {
-      li {
-        // background: rgb(255, 255, 255);
-        padding: 0.3rem 0 0.3rem 0.3rem;
-        ul.institutions {
-          padding: 0.5rem 0 0;
-          font-size: 0.6rem;
-          li {
-            padding: 0.2rem 0 0.2rem 0.6rem;
-            // color:  rgba(106, 50, 63, 0.7);
+      ul.provinces {
+        li {
+          // background: rgb(255, 255, 255);
+          padding: 0.3rem 0 0.3rem 0.3rem;
+          ul.institutions {
+            padding: 0.5rem 0 0;
+            font-size: 0.6rem;
+            li {
+              padding: 0.2rem 0 0.2rem 0.6rem;
+              // color:  rgba(106, 50, 63, 0.7);
+            }
           }
         }
       }
     }
   }
 }
+
 .anchorBL {
   filter: saturate(0.7);
 }
