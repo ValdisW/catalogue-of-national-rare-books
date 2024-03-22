@@ -1,12 +1,12 @@
 <script lang="ts" setup>
-import { onMounted, ref, watch } from "vue";
-import { useStore } from "@/store";
+import { inject, ref, watch } from "vue";
 import { Intensity, PointLayer, View } from "mapvgl";
 import { BaiduMap } from "vue-baidu-map-3x";
 
 // import { mapState } from "vuex";
 
-const store = useStore();
+const all_province = inject("introductionData").value[6];
+const all_institution = inject("introductionData").value[7];
 
 // const rem = computed(() => {
 //   return mapState(["rem"]).rem;
@@ -84,8 +84,8 @@ function showTooltip(e: MouseEvent, d: { id: string; count: number; name: string
   ToolTipBoxRef.value.style.top = top + 20 + "px";
   // text
   current_institution_name.value = d.name;
-  current_institution_intro.value = store.all_institution.find((el) => el.id == d.id)
-    ? store.all_institution.find((el) => el.id == d.id).intro
+  current_institution_intro.value = all_institution.find((el) => el.id == d.id)
+    ? all_institution.find((el) => el.id == d.id).intro
     : "";
   current_institution_books.value = `入選古籍數: ${d.count}`;
 
@@ -126,7 +126,7 @@ function initProvinceLayer() {
   let data = []; // 省份点的几何数据
   province_info.value = []; // 省份列表的数据
 
-  for (let city of store.all_province) {
+  for (let city of all_province) {
     data.push({
       geometry: {
         type: "Point",
@@ -182,7 +182,7 @@ function initProvinceLayer() {
 // 设置机构点的属性
 function initInstitutionLayer() {
   let data = [];
-  let institution_list = store.all_institution; // 机构id数组
+  let institution_list = all_institution; // 机构id数组
 
   for (let inst of institution_list) {
     data.push({
@@ -261,9 +261,7 @@ function initMap(
   mapInstance.value.setTilt(options.tilt);
   mapInstance.value.setHeading(options.heading);
 
-  mapInstance.value.setMapStyleV2({
-    styleId: "89e1e7d01eec9442b2747defbdcddb8b",
-  });
+  mapInstance.value.setMapStyleV2({ styleId: "89e1e7d01eec9442b2747defbdcddb8b" });
 
   mapInstance.value.on("zoomend", function (e) {
     zoom.value = e.target.zoomLevel;
@@ -347,11 +345,9 @@ const mapReady = ({ BMap, map }) => {
               <li
                 v-for="e in city.child"
                 :key="e"
-                @click="flyToInstitution(store.all_institution.find((el) => el.id == e))"
+                @click="flyToInstitution(all_institution.find((el) => el.id == e))"
                 v-text="
-                  store.all_institution.find((el) => el.id == e).name +
-                  ' - ' +
-                  store.all_institution.find((el) => el.id == e).books
+                  all_institution.find((el) => el.id == e).name + ' - ' + all_institution.find((el) => el.id == e).books
                 "
               ></li>
             </ul>

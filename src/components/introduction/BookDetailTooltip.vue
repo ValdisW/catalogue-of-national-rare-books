@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { inject, ref } from "vue";
-import { useStore } from "@/store";
 import { Book } from "#/axios";
 
 const show = ref(true);
@@ -8,9 +7,13 @@ const inner_id = ref("");
 const detail_data = ref<Book>({});
 
 const emit = defineEmits(["openBookDetail"]);
-const store = useStore();
 
-const books = inject("introductionData").value[0];
+const introductionData = inject("introductionData").value;
+const books = introductionData[0];
+const all_edition_dynasty = introductionData[1];
+const all_document_type = introductionData[2];
+const all_language = introductionData[5];
+const all_institution = introductionData[7];
 
 function open(id: string) {
   inner_id.value = id;
@@ -28,22 +31,22 @@ function openBookDetail(id: string) {
 }
 
 function getDocumentTypeNameById(id: string) {
-  let r = store.all_document_type.find((e) => e.id == id);
+  let r = all_document_type.find((e) => e.id == id);
   if (r) return r.name;
   else return "未知行为";
 }
 function getEditionDynastyNameById(id: string) {
-  let r = store.all_edition_dynasty.find((e) => e.id == id);
+  let r = all_edition_dynasty.find((e) => e.id == id);
   if (r) return r.name;
   else return "未知行为";
 }
 function getInstitutionNameById(id: string) {
-  let r = store.all_institution.find((e) => e.id == id);
+  let r = all_institution.find((e) => e.id == id);
   if (r) return r.name;
   else return "未知行为";
 }
 function getLanguageNameById(id: string) {
-  let r = store.all_language.find((e) => e.id == id);
+  let r = all_language.find((e) => e.id == id);
   if (r) return r.name;
   else return "未知语言";
 }

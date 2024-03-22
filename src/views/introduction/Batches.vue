@@ -8,7 +8,6 @@ import type { Relation } from "@/types";
 import BarChart from "@/components/introduction/BarChart.vue";
 import BookItem from "@/components/introduction/BookItem.vue";
 import sta from "@/data/statistics.json";
-import { readData } from "@/store/idb";
 
 const changeKey = ref(0);
 const emit = defineEmits(["openBookDetail"]);
@@ -66,14 +65,6 @@ const books = inject("introductionData").value[0];
  */
 function openBookDetail(book_id: string) {
   emit("openBookDetail", book_id);
-}
-
-function toWidth(p: number) {
-  return window.innerWidth * p;
-}
-
-function toHeight(p: number) {
-  return window.innerHeight * p;
 }
 
 /**

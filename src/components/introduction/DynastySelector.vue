@@ -1,13 +1,12 @@
 <script lang="ts" setup>
-import { ref } from "vue";
-import { useStore } from "@/store";
+import { inject, ref } from "vue";
 
 const list = ref([]);
 const current_dynasty = ref(-1);
 const show_text = ref("");
 
 const emit = defineEmits(["changeDynastyIDs"]);
-const store = useStore();
+const all_edition_dynasty = inject("introductionData").value[1];
 
 function changeEra(e, data, i) {
   current_dynasty.value = i;
@@ -49,7 +48,7 @@ function changeEra(e, data, i) {
   emit("changeDynastyIDs", { ids: data.ids, text: show_text.value });
 }
 
-store.all_edition_dynasty.forEach((el) => {
+all_edition_dynasty.forEach((el) => {
   if (el.type_p != "其他") {
     if (!list.value.find((e) => e.name == el.type_p)) list.value.push({ name: el.type_p, ids: [el.id] });
     else list.value.find((e) => e.name == el.type_p).ids.push(el.id);

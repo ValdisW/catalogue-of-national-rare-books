@@ -26,11 +26,7 @@ provide("introductionData", introductionData);
 // 请求数据
 _loadIntroductionData().then((d) => {
   store.preloadIntroductionData(d);
-  for (let e of store.all_institution) {
-    let r = store.all_province.find((el: Province) => el.id == e.province_id);
-    if (!r.child) r.child = [];
-    if (e.id != "0000") r.child.push(e.id);
-  }
+
   complete.value = true;
 
   // 浏览过程中加载
@@ -75,6 +71,12 @@ function _loadIntroductionData() {
       } else {
         // indexedDB没有数据，需要访问后端读取，同时将数据写入indexedDB
         preloadIntroductionData().then((d) => {
+          // 设置机构和省份的归属关系，用来在地图界面展示
+          for (let e of d.data[7]) {
+            let r = d.data[6].find((el: Province) => el.id == e.province_id);
+            if (!r.child) r.child = [];
+            if (e.id != "0000") r.child.push(e.id);
+          }
           introductionData.value = d.data; // 热乎的后端数据，这里先用来给provide变量
           addManyData(tables, d.data); // 将数据添加进indexedDB
           resolve(d.data);
@@ -158,7 +160,7 @@ onUnmounted(() => {
         <div class="image-wrapper" @click="$emit('openBookDetail', recommendBook.id)">
           <img
             @click="$emit('openBookDetail', d.data[0])"
-            :src="getImageURL(recommendBook.id, store.all_image)"
+            :src="getImageURL(recommendBook.id, introductionData[8])"
             alt="书影"
           />
         </div>

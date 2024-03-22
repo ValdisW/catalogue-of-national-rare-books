@@ -1,12 +1,10 @@
 <script lang="ts" setup>
-import { onMounted, onUnmounted, ref, watch } from "vue";
+import { inject, onMounted, onUnmounted, ref, watch } from "vue";
 import * as d3 from "d3";
-import { useStore } from "@/store";
 import { Book } from "#/axios";
 
 import DynastySelector from "@/components/introduction/DynastySelector.vue";
 import BookDetailTooltip from "@/components/introduction/BookDetailTooltip.vue";
-import { readData } from "@/store/idb";
 
 interface Particle {
   x: number;
@@ -30,13 +28,13 @@ let animation_handler = 0;
 let curr_time = 0;
 
 const emits = defineEmits(["openBookDetail"]);
+const books = inject("introductionData").value[0];
 
 const svg = ref<d3.Selection<SVGSVGElement, unknown, HTMLElement, any> | null>(null);
 const particles = ref<Particle[]>([]);
 const playing = ref(true);
 const particles_original_data = ref<Book[]>([]);
 const curr_comment = ref("");
-const store = useStore();
 
 const BookDetailTooltipRef = ref<InstanceType<typeof BookDetailTooltip> | null>(null);
 
@@ -54,10 +52,9 @@ async function changeDynasty(o: { text: string; ids: string[] }) {
 
   // 更新粒子数据
   particles_original_data.value = [];
-  let d = await readData("books");
   o.ids.forEach((id: string) => {
     particles_original_data.value = particles_original_data.value.concat(
-      d.filter((el: Book) => el.edition_dynasty_id == id)
+      books.filter((el: Book) => el.edition_dynasty_id == id)
     );
   });
 
@@ -209,8 +206,7 @@ async function start() {
     .attr("height", window.innerHeight * 0.8);
 
   // 生成某数量的粒子
-  let d = await readData("books");
-  for (let i = 0; i < NUM_PARTICLES; i++) particles_original_data.value.push(d[Math.floor(Math.random() * d.length)]);
+  for (let i = 0; i < NUM_PARTICLES; i++) particles_original_data.value.push(books[Math.floor(Math.random() * books.length)]);
 
   for (let e of particles_original_data.value) particles.value.push(generateParticleData(e));
 
