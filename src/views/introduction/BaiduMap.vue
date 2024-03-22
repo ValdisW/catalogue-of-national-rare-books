@@ -98,7 +98,8 @@ function removeTooltip() {
 
 // 点击省份列表的省份项
 function expandProvince(d: province) {
-  if (d.selected) mapInstance.value.reset();
+  // if (d.selected) mapInstance.value.reset();
+  if (d.selected) mapInstance.value.flyTo({ lng: 104.438656, lat: 37.753594 }, (zoom.value = 5));
   else {
     mapInstance.value.flyTo(d.pos, (zoom.value = 7));
     province_info.value.forEach((el) => (el.selected = false)); // 折叠全部省份
