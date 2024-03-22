@@ -25,7 +25,8 @@ provide("introductionData", introductionData);
 
 // 请求数据
 _loadIntroductionData().then((d) => {
-  store.preloadIntroductionData(d);
+  console.log(d)
+  // store.preloadIntroductionData(d);
 
   complete.value = true;
 

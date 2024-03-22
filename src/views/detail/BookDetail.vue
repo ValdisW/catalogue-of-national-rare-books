@@ -1,24 +1,18 @@
 <script lang="ts" setup>
 import { ref } from "vue";
-import { useStore } from "@/store";
-import type { Book, BookImage, Relation } from "#/axios";
-
-import ImageViewer from "@/components/ImageViewer.vue";
-
-import { id2name } from "@/utils/id2name.ts";
 import { getBookDetailData } from "@/api";
+import type { Book, BookImage, Relation } from "#/axios";
+import ImageViewer from "@/components/ImageViewer.vue";
 
 const ImageViewerRef = ref<InstanceType<typeof ImageViewer> | null>(null);
 
 const show = ref(false);
-// const bookID = ref("");
 const image_filenames = ref<string[]>([]); // 书影图片
 const image_showed_index = ref(0);
 const book_data = ref<Book>({ content: "" });
 const related_person = ref<Relation[]>([]);
-const seals = ref([]);
+const images = ref([]);
 
-const store = useStore();
 const emit = defineEmits(["startLoading", "endLoading", "openPersonDetail"]);
 
 function clickPerson(id: string) {
@@ -36,13 +30,12 @@ function open(book_id: string) {
 
   // 获取书影数据
   getBookDetailData(book_id).then((d) => {
-    book_data.value = d.data[0][0];
-    related_person.value = d.data[1];
-    seals.value = d.data[2];
+    book_data.value = d.data[0][0]; // 古籍详情数据
+    related_person.value = d.data[1]; // 相关人物数据
+    images.value = d.data[2]; // 书影数据
 
-    let img_res = (store.all_image as unknown as Array<BookImage>).filter((el) => el.id == book_id); // 从vuex获取书影数据
-    if (img_res && img_res[0].filename && img_res[0].allowed)
-      for (let e of img_res) image_filenames.value.push(`/data/images/${e.folder}/${e.filename}`);
+    if (images.value && images.value[0].filename && images.value[0].allowed)
+      for (let e of images.value) image_filenames.value.push(`/data/images/${e.folder}/${e.filename}`);
     else image_filenames.value[0] = "none";
   });
 }
@@ -56,10 +49,6 @@ function openImageViewer() {
 function switchImage(index: number) {
   image_showed_index.value = index;
 }
-// const normalized_title = computed(() => {
-//   // 临时规范题名
-//   return book_data.value.content.split("　")[0];
-// });
 
 // onMounted(() => {
 //   show.value = true;
@@ -93,36 +82,20 @@ defineExpose({
           </tr>
           <tr>
             <td class="detail-title">文獻類型：</td>
-            <td
-              class="detail-content document-type"
-              v-text="id2name(store.all_document_type, book_data.document_type_id, '-')"
-            ></td>
+            <td class="detail-content document-type" v-text="book_data.document_type"></td>
           </tr>
           <tr>
             <td class="detail-title">文種：</td>
-            <td
-              class="detail-content language"
-              v-text="id2name(store.all_language, book_data.language_id, '-')"
-            ></td>
+            <td class="detail-content language" v-text="book_data.language"></td>
           </tr>
           <tr>
             <td class="detail-title">分類：</td>
-            <td
-              class="detail-content name"
-              v-text="id2name(store.all_catalogue, book_data.catalogue_id, '-')"
-            ></td>
+            <td class="detail-content name" v-text="book_data.catalogue"></td>
           </tr>
           <tr>
             <td class="detail-title">題名：</td>
             <td class="detail-content name" v-text="book_data.name || '-'"></td>
           </tr>
-          <!-- <tr>
-            <td class="detail-title">版本類型：</td>
-            <td
-              class="detail-content edition-type"
-              v-text="id2name(store.all_document_type, book_data.edition_type_id, '-')"
-            ></td>
-          </tr> -->
           <tr>
             <td class="detail-title">版本：</td>
             <td class="detail-content edition" v-text="book_data.edition || '-'"></td>
@@ -153,17 +126,11 @@ defineExpose({
           </tr>
           <tr>
             <td class="detail-title">收藏省份：</td>
-            <td
-              class="detail-content institute"
-              v-text="id2name(store.all_province, book_data.province_id, '-')"
-            ></td>
+            <td class="detail-content institute" v-text="book_data.province"></td>
           </tr>
           <tr>
             <td class="detail-title">收藏單位：</td>
-            <td
-              class="detail-content institute"
-              v-text="id2name(store.all_institution, book_data.institution_id, '-')"
-            ></td>
+            <td class="detail-content institute" v-text="book_data.institution"></td>
           </tr>
           <tr>
             <td class="detail-title">索書號：</td>

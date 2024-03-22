@@ -28,20 +28,7 @@ export const useStore = defineStore("rare", {
     loadIntroductionData(_data) {
       this.persons = _data;
     },
-    preloadIntroductionData(_data) {
-      let temp = [];
-      [
-        temp,
-        this.all_edition_dynasty,
-        this.all_document_type,
-        this.all_catalogue,
-        this.all_edition_type,
-        this.all_language,
-        this.all_province,
-        this.all_institution,
-        this.all_image,
-      ] = _data;
-    },
+
     loadExplorationData(_data) {
       [
         this.all_document_type,
