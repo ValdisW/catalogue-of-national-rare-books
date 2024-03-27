@@ -4,7 +4,7 @@ import { Intensity, PointLayer, View } from "mapvgl";
 import { BaiduMap } from "vue-baidu-map-3x";
 
 // import { mapState } from "vuex";
-
+const emit = defineEmits(["mapWheel"]);
 const all_province = inject("introductionData").value[6];
 const all_institution = inject("introductionData").value[7];
 
@@ -302,6 +302,10 @@ const mapReady = ({ BMap, map }) => {
   initProvinceLayer();
   initInstitutionLayer();
 };
+
+function mapWheel(e: WheelEvent) {
+  emit("mapWheel", e);
+}
 </script>
 
 <template>
@@ -316,7 +320,7 @@ const mapReady = ({ BMap, map }) => {
       </div>
 
       <!-- 左侧地图 -->
-      <div id="map-container" @wheel.stop="">
+      <div id="map-container" @wheel.stop="mapWheel">
         <baidu-map
           class="map"
           ak="1rhcTPAuchh7EM6ovKAw84oGUmAElH70"

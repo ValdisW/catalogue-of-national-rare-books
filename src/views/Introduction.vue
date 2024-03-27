@@ -134,7 +134,7 @@ onUnmounted(() => {
       <Batches @open-book-detail="openBookDetail" />
     </section>
     <section class="section-3">
-      <BaiduMap />
+      <BaiduMap @map-wheel="rowScroll" />
     </section>
     <section class="section-4">
       <FlowingParticles ref="FlowingParticlesRef" @open-book-detail="openBookDetail" />
