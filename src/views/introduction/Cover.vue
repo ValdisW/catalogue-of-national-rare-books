@@ -6,16 +6,16 @@ import { Book } from "#/axios";
 const emit = defineEmits(["openBookDetail", "toNextPage"]);
 const { 0: books, 8: images } = inject("introductionData").value;
 const now = new Date(); // 用于显示今日古籍上的日期
-const recommendBook = ref({ id: "", name: "", image: "" });
+const recommendBook = ref({ id: books[0].id, name: books[0].name });
 
 recommendBook.value = getRecommendBook(books);
 
 function getRecommendBook(all_books: Book[]) {
-  let t = all_books.filter(
-    (el: Book) => el.name!.length > 3 && el.name!.length < 8 && !el.name!.match(/(·|\?|（|\[)/i)
-  );
+  let t = all_books
+    .map((e) => ({ id: e.id, name: e.name }))
+    .filter((el: Book) => el.name!.length > 3 && el.name!.length < 8 && !el.name!.match(/(·|\?|（|\[)/i));
   let d_books: Array<Book> = [];
-  for (let e of t) if (!d_books.find((el) => el.name == e.name)) d_books.push(e);
+  for (let e of t) if (!d_books.find((el) => el.name === e.name)) d_books.push(e);
   return d_books[Math.floor(new Date().getTime() / 8.64e7) % d_books.length];
 }
 </script>
