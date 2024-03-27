@@ -20,12 +20,6 @@ const routes = [
     meta: { title: "名録分析 | 國家珍貴古籍名録" },
     component: () => import("../views/Relationship.vue"),
   },
-  // {
-  //   path: "/relationship-new",
-  //   name: "Relationship",
-  //   meta: { title: "流傳分析 | 國家珍貴古籍名録" },
-  //   component: () => import("../views/Relationship.vue"),
-  // },
   {
     path: "/about",
     name: "About",

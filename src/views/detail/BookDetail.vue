@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref } from "vue";
 import { getBookDetailData } from "@/api";
-import type { Book, BookImage, Relation } from "#/axios";
+import type { Book, Relation } from "#/axios";
 import ImageViewer from "@/components/ImageViewer.vue";
 
 const ImageViewerRef = ref<InstanceType<typeof ImageViewer> | null>(null);
