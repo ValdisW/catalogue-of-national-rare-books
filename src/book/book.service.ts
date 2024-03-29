@@ -2,8 +2,8 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Book } from './book.entity';
 import { Repository } from 'typeorm';
-import { appKeyCheck, hashCodeCheck, timestampCheck } from '../utlis/check';
-import { sm4_decrypt, sm4_encrypt } from 'src/utlis/cipher';
+import { appKeyCheck, hashCodeCheck, timestampCheck } from '../utils/check';
+import { sm4_decrypt, sm4_encrypt } from 'src/utils/cipher';
 
 import {
   nl_req,
@@ -13,7 +13,7 @@ import {
   nl_advanced_decrypted_req_data,
   nl_advanced_decrypted_res_data,
 } from './book.type';
-import { regularSearchSQL, advancedSearchSQL } from 'src/utlis/sql-make';
+import { regularSearchSQL, advancedSearchSQL } from 'src/utils/sql-make';
 
 function check(
   timestamp: string,

@@ -7,7 +7,7 @@ import { BookModule } from './book/book.module';
 import { Book } from './book/book.entity';
 import { join } from 'path';
 
-import { getMySQLUsernameAndPassword } from './utlis';
+import { getMySQLUsernameAndPassword } from './utils';
 const { username, password } = getMySQLUsernameAndPassword();
 
 @Module({

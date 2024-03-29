@@ -1,9 +1,10 @@
 /**
  * 验证请求
  */
+import { getCipher } from '.';
 import { sm3_encrypt } from './cipher';
 
-const cipher = 'sed69sdlfgseg578';
+const cipher = getCipher();
 
 // 验证：时间戳是否在5分钟内
 export function timestampCheck(timestamp: string): boolean {

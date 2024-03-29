@@ -75,17 +75,26 @@ export class AppService {
   }
 
   bookDetail(id: string) {
+    const sql_book_info = `select b.id id,batch,content_sc,b.name name,dt.name document_type,c.name catalogue,edition_type_id,edition_dynasty_id,edition,l.name language,p.name province,i.name institution,call_number,unearth,is_complete,quantity,measurement,link,decoration,book_size,frame_size,typeset,copyright
+    from rare.books b
+    left join rare.document_types dt on b.document_type_id = dt.id
+    left join rare.languages l on b.language_id = l.id
+    left join rare.catalogues c on b.catalogue_id = c.id
+    left join rare.provinces p on b.province_id = p.id
+    left join rare.institutions i on b.institution_id = i.id
+    where b.id="${id}";`;
+    const sql_related_person_info = `select dynasty_or_nation,person_id,t2.name person_name,action_id,t3.name action_name from rare.book_person t1 left join rare.persons t2 on t1.person_id=t2.id left join rare.actions t3 on t1.action_id=t3.id where book_id="${id}";`;
+    const sql_images_info = `select folder,filename,allowed from rare.images where id = "${id}";`;
+    // const sql_seals_info = `select book_id,inner_id,text,person_name from rare.book_seal where book_id="${id}";`; // 钤印数据，暂时用不到
     return this.bookRepository.query(
-      `select id,batch,content_sc,name,document_type_id,catalogue_id,edition_type_id,edition_dynasty_id,edition,language_id,province_id,institution_id,call_number,unearth,is_complete,quantity,measurement,link,decoration,book_size,frame_size,typeset,copyright from rare.books where id="${id}";
-      select dynasty_or_nation,person_id,t2.name person_name,action_id,t3.name action_name from rare.book_person t1 left join rare.persons t2 on t1.person_id=t2.id left join rare.actions t3 on t1.action_id=t3.id where book_id="${id}";
-      select book_id,inner_id,text,person_name from rare.book_seal where book_id="${id}";`,
+      sql_book_info + sql_related_person_info + sql_images_info,
     );
   }
 
   personDetail(id: string) {
-    let sql_person_info = `select id,name,courtesy_name,pseudonym_name,posthumous_name,nation_id,dynasty_id,year_of_birth,year_of_death,introduction from rare.persons where id ="${id}";`;
-    let sql_person_actions = `select book_id,inner_id,title,scroll,record,dynasty_or_nation,person_id,person,institution_name,action_id,action,t.type,person_status,level,edition,edition_type,edition_type_id,start_reign,start_year,end_reign,end_year,place_ancient,place_modern,mark,edition_dynasty from book_person left join rare.actions t on action_id=id where person_id='${id}';`;
-    let sql_person_related = `select person_id,count(person_id) count from book_person where person_id not in ("${id}","","P000000") and book_id in (select book_id from rare.book_person where person_id="${id}") group by person_id;`;
+    const sql_person_info = `select id,name,courtesy_name,pseudonym_name,posthumous_name,nation_id,dynasty_id,year_of_birth,year_of_death,introduction from rare.persons where id ="${id}";`;
+    const sql_person_actions = `select book_id,inner_id,title,scroll,record,dynasty_or_nation,person_id,person,institution_name,action_id,action,t.type,person_status,level,edition,edition_type,edition_type_id,start_reign,start_year,end_reign,end_year,place_ancient,place_modern,mark,edition_dynasty from book_person left join rare.actions t on action_id=id where person_id='${id}';`;
+    const sql_person_related = `select person_id,count(person_id) count from book_person where person_id not in ("${id}","","P000000") and book_id in (select book_id from rare.book_person where person_id="${id}") group by person_id;`;
     return this.bookRepository.query(
       sql_person_info + sql_person_actions + sql_person_related,
     );
