@@ -32,7 +32,13 @@ defineExpose({
       <span></span>
     </div>
     <ul class="list" v-show="show_list">
-      <li v-for="attr in attr_list" :key="attr" @click="select" v-text="attr.name" :name="attr.value"></li>
+      <li
+        v-for="attr in attr_list"
+        :key="attr"
+        @click="select"
+        v-text="attr.name"
+        :name="attr.value"
+      ></li>
     </ul>
   </div>
 </template>

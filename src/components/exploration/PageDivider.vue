@@ -11,7 +11,9 @@ const props = defineProps({
 });
 
 const pages_sum = computed(() => {
-  return props.items_sum ? Math.ceil(props.items_sum / props.each_page_items!) : 1; // 暂时这样处理，如果没有任何内容，就有1页而不是0页
+  return props.items_sum
+    ? Math.ceil(props.items_sum / props.each_page_items!)
+    : 1; // 暂时这样处理，如果没有任何内容，就有1页而不是0页
 });
 
 watch(current_page, (n) => {
@@ -33,7 +35,8 @@ function toNextPage() {
 }
 
 function turnTo(page_index: number) {
-  if (page_index >= 1 && page_index <= pages_sum.value) current_page.value = page_index;
+  if (page_index >= 1 && page_index <= pages_sum.value)
+    current_page.value = page_index;
 }
 </script>
 

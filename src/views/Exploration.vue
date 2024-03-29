@@ -124,16 +124,26 @@ function allAttrSearch(query: string) {
 // 更新统计数据
 function updateFilter() {
   for (let i in filter_data) {
-    filter_data[i].value = getSum(search_result.value, filter_data[i].id + "_id");
+    filter_data[i].value = getSum(
+      search_result.value,
+      filter_data[i].id + "_id",
+    );
 
     // 根据大类，作进一步统计
     let temp: { id: string; value: string; type: string }[] = [],
-      result: { name: string; ids: string[]; value: string; selected: boolean }[] = [];
+      result: {
+        name: string;
+        ids: string[];
+        value: string;
+        selected: boolean;
+      }[] = [];
     for (let e of filter_data[i].value)
       temp.push({
         id: e.name,
         value: e.value,
-        type: store["all_" + filter_data[i].id].find((el) => el.id == e.name)[filter_data[i].db_column],
+        type: store["all_" + filter_data[i].id].find((el) => el.id == e.name)[
+          filter_data[i].db_column
+        ],
       });
     for (let i in temp) {
       if (!result.find((el) => el.name == temp[i].type))
@@ -154,7 +164,13 @@ function updateFilter() {
 
 function convertResult() {
   curr_d.value.forEach((e) => {
-    ["edition_dynasty", "document_type", "language", "province", "institution"].map((attr) => {
+    [
+      "edition_dynasty",
+      "document_type",
+      "language",
+      "province",
+      "institution",
+    ].map((attr) => {
       e[attr] = store[`all_${attr}`].find((ele) => ele.id == e[`${attr}_id`])
         ? store[`all_${attr}`].find((ele) => ele.id == e[`${attr}_id`]).name
         : "-";
@@ -170,7 +186,8 @@ function filterResult(e) {
     for (let i in curr_filter.value) {
       if (!curr_filter.value[i].length) continue;
       let _flag = false;
-      for (let v of curr_filter.value[i]) _flag = _flag || "" + el[i + "_id"] == v;
+      for (let v of curr_filter.value[i])
+        _flag = _flag || "" + el[i + "_id"] == v;
       flag = flag && _flag;
     }
     return flag;
@@ -244,24 +261,30 @@ function alterPage(page_index) {
   if (has_filtered.value)
     curr_d.value = filtered_result.value.slice(
       each_page_items.value * (page_index - 1),
-      each_page_items.value * page_index
+      each_page_items.value * page_index,
     );
   else
     curr_d.value = search_result.value.slice(
       each_page_items.value * (page_index - 1),
-      each_page_items.value * page_index
+      each_page_items.value * page_index,
     );
   convertResult();
 }
 
 function showFilterOptions(e) {
   let b = e.currentTarget.querySelector(".options").style.display == "block";
-  document.querySelectorAll(".options").forEach((e) => (e.style.display = "none"));
-  e.currentTarget.querySelector(".options").style.display = b ? "none" : "block";
+  document
+    .querySelectorAll(".options")
+    .forEach((e) => (e.style.display = "none"));
+  e.currentTarget.querySelector(".options").style.display = b
+    ? "none"
+    : "block";
 }
 
 function choose(e) {
-  document.querySelectorAll(".options").forEach((e) => (e.style.display = "none"));
+  document
+    .querySelectorAll(".options")
+    .forEach((e) => (e.style.display = "none"));
   let parent_filter_value = e.path[3].querySelector(".value");
   parent_filter_value.setAttribute("val", e.currentTarget.getAttribute("val"));
   parent_filter_value.innerText = e.currentTarget.innerText;
@@ -292,7 +315,12 @@ onUnmounted(() => {
   <div class="exploration" :class="{ new: !show_results }" v-if="complete">
     <div class="container">
       <div class="search" :class="{ new: !show_results }">
-        <SearchBar :wait="wait" :attr_list="search_attrs" @search="search" @allAttrSearch="allAttrSearch" />
+        <SearchBar
+          :wait="wait"
+          :attr_list="search_attrs"
+          @search="search"
+          @allAttrSearch="allAttrSearch"
+        />
       </div>
 
       <div class="main-content" v-show="show_results">
@@ -320,7 +348,11 @@ onUnmounted(() => {
             <table class="results-list">
               <thead>
                 <tr>
-                  <th v-for="e in display_attrs" :key="e.name" @click="toggleRank(e.value, e.order)">
+                  <th
+                    v-for="e in display_attrs"
+                    :key="e.name"
+                    @click="toggleRank(e.value, e.order)"
+                  >
                     <span class="attr-title" v-text="e.name"></span>
                     <span class="rank">
                       <span :class="{ active: e.order == false }"></span>
@@ -330,7 +362,12 @@ onUnmounted(() => {
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="item in curr_d" :key="item.id" class="item-block" @click="$emit('openBookDetail', item.id)">
+                <tr
+                  v-for="item in curr_d"
+                  :key="item.id"
+                  class="item-block"
+                  @click="$emit('openBookDetail', item.id)"
+                >
                   <td v-text="'第' + item.batch + '批'"></td>
                   <td v-text="item.id || '-'"></td>
                   <td v-text="item.name || '-'"></td>
@@ -346,7 +383,9 @@ onUnmounted(() => {
           </div>
           <PageDivider
             @turnTo="alterPage"
-            :items_sum="has_filtered ? filtered_result.length : search_result.length"
+            :items_sum="
+              has_filtered ? filtered_result.length : search_result.length
+            "
             :each_page_items="each_page_items"
             ref="PageDividerRef"
           />

@@ -30,13 +30,17 @@ let curr_time = 0;
 const emits = defineEmits(["openBookDetail"]);
 const books = inject("introductionData").value[0];
 
-const svg = ref<d3.Selection<SVGSVGElement, unknown, HTMLElement, any> | null>(null);
+const svg = ref<d3.Selection<SVGSVGElement, unknown, HTMLElement, any> | null>(
+  null,
+);
 const particles = ref<Particle[]>([]);
 const playing = ref(true);
 const particles_original_data = ref<Book[]>([]);
 const curr_comment = ref("");
 
-const BookDetailTooltipRef = ref<InstanceType<typeof BookDetailTooltip> | null>(null);
+const BookDetailTooltipRef = ref<InstanceType<typeof BookDetailTooltip> | null>(
+  null,
+);
 
 watch(playing, (n) => {
   if (n) BookDetailTooltipRef.value?.close();
@@ -54,7 +58,7 @@ async function changeDynasty(o: { text: string; ids: string[] }) {
   particles_original_data.value = [];
   o.ids.forEach((id: string) => {
     particles_original_data.value = particles_original_data.value.concat(
-      books.filter((el: Book) => el.edition_dynasty_id == id)
+      books.filter((el: Book) => el.edition_dynasty_id == id),
     );
   });
 
@@ -65,7 +69,9 @@ async function changeDynasty(o: { text: string; ids: string[] }) {
 
   // 如果粒子数量太多，只显示其中一部分
   if (particles_original_data.value.length > MAX_PARTICLES) {
-    let temp_arr: Book[] = JSON.parse(JSON.stringify(particles_original_data.value));
+    let temp_arr: Book[] = JSON.parse(
+      JSON.stringify(particles_original_data.value),
+    );
     particles_original_data.value = [];
     for (let i = 0; i < MAX_PARTICLES; i++) {
       let temp = temp_arr.pop();
@@ -74,7 +80,8 @@ async function changeDynasty(o: { text: string; ids: string[] }) {
   }
 
   // 生成某数量的粒子
-  for (let e of particles_original_data.value) particles.value.push(generateParticleData(e));
+  for (let e of particles_original_data.value)
+    particles.value.push(generateParticleData(e));
 
   // 绘制
   svg.value?.selectAll("circle").data(particles.value).enter().append("circle");
@@ -139,7 +146,7 @@ function generateParticleData(e: Book): Particle {
         randomNormal({
           mean: PARTICLE_SIZE,
           dev: PARTICLE_SIZE / 2,
-        })
+        }),
       ),
     duration: randomNormal({
       mean: SPEED,
@@ -155,11 +162,13 @@ function generateParticleData(e: Book): Particle {
 
 // 计算粒子的新位置
 function moveParticle(particle: Particle) {
-  const progress = ((curr_time - particle.startTime) % particle.duration) / particle.duration;
+  const progress =
+    ((curr_time - particle.startTime) % particle.duration) / particle.duration;
   return {
     ...particle,
     x: progress,
-    y: Math.sin(progress * particle.arc) * particle.amplitude + particle.offsetY,
+    y:
+      Math.sin(progress * particle.arc) * particle.amplitude + particle.offsetY,
   };
 }
 
@@ -206,9 +215,13 @@ async function start() {
     .attr("height", window.innerHeight * 0.8);
 
   // 生成某数量的粒子
-  for (let i = 0; i < NUM_PARTICLES; i++) particles_original_data.value.push(books[Math.floor(Math.random() * books.length)]);
+  for (let i = 0; i < NUM_PARTICLES; i++)
+    particles_original_data.value.push(
+      books[Math.floor(Math.random() * books.length)],
+    );
 
-  for (let e of particles_original_data.value) particles.value.push(generateParticleData(e));
+  for (let e of particles_original_data.value)
+    particles.value.push(generateParticleData(e));
 
   // 绘制
   svg.value.selectAll("circle").data(particles.value).enter().append("circle");
@@ -254,7 +267,11 @@ defineExpose({
         <DynastySelector @changeDynastyIDs="changeDynasty" />
 
         <!-- 暂停/继续 -->
-        <div class="togglePause" :class="{ continue: !playing }" @click="togglePause"></div>
+        <div
+          class="togglePause"
+          :class="{ continue: !playing }"
+          @click="togglePause"
+        ></div>
 
         <!-- 画布 -->
         <svg id="particles-svg" ref="particles-svg" @click="togglePause"></svg>
@@ -263,7 +280,10 @@ defineExpose({
         <div class="comment" v-text="curr_comment"></div>
 
         <!-- 悬浮窗 -->
-        <BookDetailTooltip @openBookDetail="openBookDetail" ref="BookDetailTooltipRef" />
+        <BookDetailTooltip
+          @openBookDetail="openBookDetail"
+          ref="BookDetailTooltipRef"
+        />
       </div>
     </div>
   </div>

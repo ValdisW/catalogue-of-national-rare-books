@@ -74,14 +74,17 @@ function open(person_id: string) {
     related_person.sort((a, b) => b.count - a.count);
 
     // for (let e of this.all_related_books) e.type = this.$store.all_action.find((el) => el.id == e.action_id).type;
-    for (let e of action_types) for (let f of all_related_books) if (e.name == f.type) e.count++;
+    for (let e of action_types)
+      for (let f of all_related_books) if (e.name == f.type) e.count++;
   });
 }
 
 // 筛选
 function filterType(type: string) {
   filtered_related_books.length = 0;
-  filtered_related_books.push(...all_related_books.filter((el) => el.type == type));
+  filtered_related_books.push(
+    ...all_related_books.filter((el) => el.type == type),
+  );
 }
 
 defineExpose({ open, close });
@@ -103,11 +106,17 @@ defineExpose({ open, close });
               <div class="person-birth">
                 <p>
                   生卒：
-                  <span v-text="`${person_data.year_of_birth} - ${person_data.year_of_death}`"></span>
+                  <span
+                    v-text="
+                      `${person_data.year_of_birth} - ${person_data.year_of_death}`
+                    "
+                  ></span>
                 </p>
               </div>
               <div class="person-title">
-                <p>字:<span v-text="person_data.courtesy_name || '不詳'"></span></p>
+                <p>
+                  字:<span v-text="person_data.courtesy_name || '不詳'"></span>
+                </p>
                 <p>
                   號:
                   <span v-text="person_data.pseudonym_name || '不詳'"></span>
@@ -117,7 +126,10 @@ defineExpose({ open, close });
               <span></span>
             </div>
           </div>
-          <div class="person-intro" v-text="person_data.introduction || ''"></div>
+          <div
+            class="person-intro"
+            v-text="person_data.introduction || ''"
+          ></div>
         </div>
 
         <div class="related-person">
@@ -127,7 +139,12 @@ defineExpose({ open, close });
               v-for="b in related_person"
               :key="b.person_id"
               @click="openPersonDetail(b.person_id)"
-              v-text="store.persons.find((ele) => ele.id == b.person_id)!.name + '（' + b.count + '）'"
+              v-text="
+                store.persons.find((ele) => ele.id == b.person_id)!.name +
+                '（' +
+                b.count +
+                '）'
+              "
             ></p>
             <!-- <router-link
                 :to="/person-detail/ + b.person_id"
@@ -151,7 +168,11 @@ defineExpose({ open, close });
         </div>
         <div class="book-responsibility">
           <ul>
-            <li v-for="e in filtered_related_books" :key="e" @click="emit('openBookDetail', e.book_id)">
+            <li
+              v-for="e in filtered_related_books"
+              :key="e"
+              @click="emit('openBookDetail', e.book_id)"
+            >
               <span v-text="e.book_id + ' '"></span>
               <span v-text="e.title + ' '"></span>
               <span v-text="e.action + ' '"></span>

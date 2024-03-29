@@ -71,52 +71,92 @@ defineProps({
 @keyframes loading {
   0%,
   100% {
-    box-shadow: 0 -3 * @unit 0 0.2 * @unit @circle-color, 2 * @unit -2 * @unit 0 0 * @unit @circle-color,
-      3 * @unit 0 0 -1 * @unit @circle-color, 2 * @unit 2 * @unit 0 -1 * @unit @circle-color,
-      0 3 * @unit 0 -1 * @unit @circle-color, -2 * @unit 2 * @unit 0 -1 * @unit @circle-color,
-      -3 * @unit 0 0 -1 * @unit @circle-color, -2 * @unit -2 * @unit 0 0 @circle-color;
+    box-shadow:
+      0 -3 * @unit 0 0.2 * @unit @circle-color,
+      2 * @unit -2 * @unit 0 0 * @unit @circle-color,
+      3 * @unit 0 0 -1 * @unit @circle-color,
+      2 * @unit 2 * @unit 0 -1 * @unit @circle-color,
+      0 3 * @unit 0 -1 * @unit @circle-color,
+      -2 * @unit 2 * @unit 0 -1 * @unit @circle-color,
+      -3 * @unit 0 0 -1 * @unit @circle-color,
+      -2 * @unit -2 * @unit 0 0 @circle-color;
   }
   12.5% {
-    box-shadow: 0 -3 * @unit 0 0 @circle-color, 2 * @unit -2 * @unit 0 0.2 * @unit @circle-color,
-      3 * @unit 0 0 0 @circle-color, 2 * @unit 2 * @unit 0 -1 * @unit @circle-color,
-      0 3 * @unit 0 -1 * @unit @circle-color, -2 * @unit 2 * @unit 0 -1 * @unit @circle-color,
-      -3 * @unit 0 0 -1 * @unit @circle-color, -2 * @unit -2 * @unit 0 -1 * @unit @circle-color;
+    box-shadow:
+      0 -3 * @unit 0 0 @circle-color,
+      2 * @unit -2 * @unit 0 0.2 * @unit @circle-color,
+      3 * @unit 0 0 0 @circle-color,
+      2 * @unit 2 * @unit 0 -1 * @unit @circle-color,
+      0 3 * @unit 0 -1 * @unit @circle-color,
+      -2 * @unit 2 * @unit 0 -1 * @unit @circle-color,
+      -3 * @unit 0 0 -1 * @unit @circle-color,
+      -2 * @unit -2 * @unit 0 -1 * @unit @circle-color;
   }
   25% {
-    box-shadow: 0 -3 * @unit 0 -0.5 * @unit @circle-color, 2 * @unit -2 * @unit 0 0 @circle-color,
-      3 * @unit 0 0 0.2 * @unit @circle-color, 2 * @unit 2 * @unit 0 0 @circle-color,
-      0 3 * @unit 0 -1 * @unit @circle-color, -2 * @unit 2 * @unit 0 -1 * @unit @circle-color,
-      -3 * @unit 0 0 -1 * @unit @circle-color, -2 * @unit -2 * @unit 0 -1 * @unit @circle-color;
+    box-shadow:
+      0 -3 * @unit 0 -0.5 * @unit @circle-color,
+      2 * @unit -2 * @unit 0 0 @circle-color,
+      3 * @unit 0 0 0.2 * @unit @circle-color,
+      2 * @unit 2 * @unit 0 0 @circle-color,
+      0 3 * @unit 0 -1 * @unit @circle-color,
+      -2 * @unit 2 * @unit 0 -1 * @unit @circle-color,
+      -3 * @unit 0 0 -1 * @unit @circle-color,
+      -2 * @unit -2 * @unit 0 -1 * @unit @circle-color;
   }
   37.5% {
-    box-shadow: 0 -3 * @unit 0 -1 * @unit @circle-color, 2 * @unit -2 * @unit 0 -1 * @unit @circle-color,
-      3 * @unit 0 * @unit 0 0 @circle-color, 2 * @unit 2 * @unit 0 0.2 * @unit @circle-color,
-      0 3 * @unit 0 0 * @unit @circle-color, -2 * @unit 2 * @unit 0 -1 * @unit @circle-color,
-      -3 * @unit 0 * @unit 0 -1 * @unit @circle-color, -2 * @unit -2 * @unit 0 -1 * @unit @circle-color;
+    box-shadow:
+      0 -3 * @unit 0 -1 * @unit @circle-color,
+      2 * @unit -2 * @unit 0 -1 * @unit @circle-color,
+      3 * @unit 0 * @unit 0 0 @circle-color,
+      2 * @unit 2 * @unit 0 0.2 * @unit @circle-color,
+      0 3 * @unit 0 0 * @unit @circle-color,
+      -2 * @unit 2 * @unit 0 -1 * @unit @circle-color,
+      -3 * @unit 0 * @unit 0 -1 * @unit @circle-color,
+      -2 * @unit -2 * @unit 0 -1 * @unit @circle-color;
   }
   50% {
-    box-shadow: 0 -3 * @unit 0 -1 * @unit @circle-color, 2 * @unit -2 * @unit 0 -1 * @unit @circle-color,
-      3 * @unit 0 0 -1 * @unit @circle-color, 2 * @unit 2 * @unit 0 0 * @unit @circle-color,
-      0 3 * @unit 0 0.2 * @unit @circle-color, -2 * @unit 2 * @unit 0 0 @circle-color,
-      -3 * @unit 0 * @unit 0 -1 * @unit @circle-color, -2 * @unit -2 * @unit 0 -1 * @unit @circle-color;
+    box-shadow:
+      0 -3 * @unit 0 -1 * @unit @circle-color,
+      2 * @unit -2 * @unit 0 -1 * @unit @circle-color,
+      3 * @unit 0 0 -1 * @unit @circle-color,
+      2 * @unit 2 * @unit 0 0 * @unit @circle-color,
+      0 3 * @unit 0 0.2 * @unit @circle-color,
+      -2 * @unit 2 * @unit 0 0 @circle-color,
+      -3 * @unit 0 * @unit 0 -1 * @unit @circle-color,
+      -2 * @unit -2 * @unit 0 -1 * @unit @circle-color;
   }
   62.5% {
-    box-shadow: 0 -3 * @unit 0 -1 * @unit @circle-color, 2 * @unit -2 * @unit 0 -1 * @unit @circle-color,
-      3 * @unit 0 0 -1 * @unit @circle-color, 2 * @unit 2 * @unit 0 -1 * @unit @circle-color,
-      0 3 * @unit 0 0 @circle-color, -2 * @unit 2 * @unit 0 0.2 * @unit @circle-color, -3 * @unit 0 0 0 @circle-color,
+    box-shadow:
+      0 -3 * @unit 0 -1 * @unit @circle-color,
+      2 * @unit -2 * @unit 0 -1 * @unit @circle-color,
+      3 * @unit 0 0 -1 * @unit @circle-color,
+      2 * @unit 2 * @unit 0 -1 * @unit @circle-color,
+      0 3 * @unit 0 0 @circle-color,
+      -2 * @unit 2 * @unit 0 0.2 * @unit @circle-color,
+      -3 * @unit 0 0 0 @circle-color,
       -2 * @unit -2 * @unit 0 -1 * @unit @circle-color;
   }
   75% {
-    box-shadow: 0 * @unit -3 * @unit 0 -1 * @unit @circle-color, 2 * @unit -2 * @unit 0 -1 * @unit @circle-color,
-      3 * @unit 0 * @unit 0 -1 * @unit @circle-color, 2 * @unit 2 * @unit 0 -1 * @unit @circle-color,
-      0 3 * @unit 0 -1 * @unit @circle-color, -2 * @unit 2 * @unit 0 0 @circle-color,
-      -3 * @unit 0 * @unit 0 0.2 * @unit @circle-color, -2 * @unit -2 * @unit 0 0 @circle-color;
+    box-shadow:
+      0 * @unit -3 * @unit 0 -1 * @unit @circle-color,
+      2 * @unit -2 * @unit 0 -1 * @unit @circle-color,
+      3 * @unit 0 * @unit 0 -1 * @unit @circle-color,
+      2 * @unit 2 * @unit 0 -1 * @unit @circle-color,
+      0 3 * @unit 0 -1 * @unit @circle-color,
+      -2 * @unit 2 * @unit 0 0 @circle-color,
+      -3 * @unit 0 * @unit 0 0.2 * @unit @circle-color,
+      -2 * @unit -2 * @unit 0 0 @circle-color;
   }
   87.5% {
-    box-shadow: 0 * @unit -3 * @unit 0 0 @circle-color, 2 * @unit -2 * @unit 0 -1 * @unit @circle-color,
-      3 * @unit 0 0 -1 * @unit @circle-color, 2 * @unit 2 * @unit 0 -1 * @unit @circle-color,
-      0 3 * @unit 0 -1 * @unit @circle-color, -2 * @unit 2 * @unit 0 0 @circle-color,
-      -3 * @unit 0 * @unit 0 0 @circle-color, -2 * @unit -2 * @unit 0 0.2 * @unit @circle-color;
+    box-shadow:
+      0 * @unit -3 * @unit 0 0 @circle-color,
+      2 * @unit -2 * @unit 0 -1 * @unit @circle-color,
+      3 * @unit 0 0 -1 * @unit @circle-color,
+      2 * @unit 2 * @unit 0 -1 * @unit @circle-color,
+      0 3 * @unit 0 -1 * @unit @circle-color,
+      -2 * @unit 2 * @unit 0 0 @circle-color,
+      -3 * @unit 0 * @unit 0 0 @circle-color,
+      -2 * @unit -2 * @unit 0 0.2 * @unit @circle-color;
   }
 }
 </style>

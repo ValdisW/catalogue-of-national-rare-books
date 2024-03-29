@@ -18,7 +18,8 @@ const all_institution = introductionData[7];
 function open(id: string) {
   inner_id.value = id;
   if (!inner_id.value) detail_data.value = { content: "　" };
-  else detail_data.value = books.find((book: Book) => book.id === inner_id.value);
+  else
+    detail_data.value = books.find((book: Book) => book.id === inner_id.value);
 
   show.value = true;
 }
@@ -72,7 +73,9 @@ defineExpose({
           </p>
           <p>
             <span>文獻類型：</span>
-            <span v-text="getDocumentTypeNameById(detail_data.document_type_id)"></span>
+            <span
+              v-text="getDocumentTypeNameById(detail_data.document_type_id)"
+            ></span>
           </p>
           <p>
             <span>文種：</span>
@@ -80,14 +83,20 @@ defineExpose({
           </p>
           <p>
             <span>版本朝代：</span>
-            <span v-text="getEditionDynastyNameById(detail_data.edition_dynasty_id)"></span>
+            <span
+              v-text="getEditionDynastyNameById(detail_data.edition_dynasty_id)"
+            ></span>
           </p>
           <p>
             <span>收藏單位：</span>
-            <span v-text="getInstitutionNameById(detail_data.institution_id)"></span>
+            <span
+              v-text="getInstitutionNameById(detail_data.institution_id)"
+            ></span>
           </p>
         </div>
-        <span class="to-detail" @click="openBookDetail(detail_data.id)">查看詳情</span>
+        <span class="to-detail" @click="openBookDetail(detail_data.id)"
+          >查看詳情</span
+        >
       </div>
     </div>
   </div>

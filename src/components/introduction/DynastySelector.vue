@@ -22,16 +22,19 @@ function changeEra(e, data, i) {
       show_text.value = "*入選古籍涉及：晋（西晋、東晋）、北凉、西凉";
       break;
     case "南北朝":
-      show_text.value = "*入選古籍涉及：南北朝（南朝梁、南朝陳、北魏、西魏、北齊）、六朝、高昌";
+      show_text.value =
+        "*入選古籍涉及：南北朝（南朝梁、南朝陳、北魏、西魏、北齊）、六朝、高昌";
       break;
     case "隋唐":
-      show_text.value = "*入選古籍涉及：隋、唐、武周、吐蕃統治敦煌時期、歸義軍時期";
+      show_text.value =
+        "*入選古籍涉及：隋、唐、武周、吐蕃統治敦煌時期、歸義軍時期";
       break;
     case "五代十國":
       show_text.value = "*入選古籍涉及：五代（後梁、後唐、後周）、吴越";
       break;
     case "宋":
-      show_text.value = "*入選古籍涉及：宋（北宋、南宋）、遼、大理國、僞齊、西夏、金";
+      show_text.value =
+        "*入選古籍涉及：宋（北宋、南宋）、遼、大理國、僞齊、西夏、金";
       break;
     case "元":
       show_text.value = "*入選古籍涉及：蒙古、元";
@@ -50,7 +53,8 @@ function changeEra(e, data, i) {
 
 all_edition_dynasty.forEach((el) => {
   if (el.type_p != "其他") {
-    if (!list.value.find((e) => e.name == el.type_p)) list.value.push({ name: el.type_p, ids: [el.id] });
+    if (!list.value.find((e) => e.name == el.type_p))
+      list.value.push({ name: el.type_p, ids: [el.id] });
     else list.value.find((e) => e.name == el.type_p).ids.push(el.id);
   }
 });

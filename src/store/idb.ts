@@ -22,7 +22,8 @@ export function initIDB() {
       const db: IDBDatabase = event.target!.result;
 
       stores.forEach((store) => {
-        if (!db.objectStoreNames.contains(store.name)) db.createObjectStore(store.name, { keyPath: store.primaryKey });
+        if (!db.objectStoreNames.contains(store.name))
+          db.createObjectStore(store.name, { keyPath: store.primaryKey });
       });
     };
 
@@ -49,7 +50,9 @@ function addData2ObjectStore(data: {}, store: IDBObjectStore): Promise<void> {
 }
 
 function addManyData2ObjectStore(dataArr: {}[], store: IDBObjectStore) {
-  return Promise.all(dataArr.map((data) => addData2ObjectStore(data, store))).catch((err) => {
+  return Promise.all(
+    dataArr.map((data) => addData2ObjectStore(data, store)),
+  ).catch((err) => {
     console.warn(`上传失败: ${err}`);
   });
 }
@@ -91,7 +94,9 @@ export async function addManyData(storeNames: string[], dataArr: {}[][]) {
 
   return await (() =>
     Promise.all(
-      storeNames.map((storeName, i) => addManyData2ObjectStore(dataArr[i], transaction.objectStore(storeName)))
+      storeNames.map((storeName, i) =>
+        addManyData2ObjectStore(dataArr[i], transaction.objectStore(storeName)),
+      ),
     )
       .then((d) => d)
       .catch((e) => console.error(e)))();
@@ -140,8 +145,8 @@ export async function readManyData(storeNames: string[]) {
             let req = transaction.objectStore(storeName).getAll();
             req.onsuccess = () => resolve(req.result);
             req.onerror = () => reject("读取失败");
-          })
-      )
+          }),
+      ),
     )
       .then((d) => d)
       .catch((e) => console.error(e)))();
@@ -165,8 +170,8 @@ export async function haveData(stores: string[]) {
             let req = transaction.objectStore(storeName).getAll();
             req.onsuccess = () => resolve(req.result);
             req.onerror = () => reject("读取失败");
-          })
-      )
+          }),
+      ),
     )
       .then((d) => {
         return d.every((data) => data.length > 0);

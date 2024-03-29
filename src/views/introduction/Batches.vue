@@ -72,9 +72,13 @@ function openBookDetail(book_id: string) {
  */
 async function showMore() {
   changeKey.value++;
-  let arr = current_batch.value == 0 ? books : books.filter((el: Relation) => el.batch == current_batch.value); // 随机选择的范围
+  let arr =
+    current_batch.value == 0
+      ? books
+      : books.filter((el: Relation) => el.batch == current_batch.value); // 随机选择的范围
 
-  for (let i = 0; i < 6; i++) showing_books[i] = arr[Math.floor(Math.random() * arr.length)].id;
+  for (let i = 0; i < 6; i++)
+    showing_books[i] = arr[Math.floor(Math.random() * arr.length)].id;
 }
 
 /**
@@ -119,10 +123,16 @@ statistics.value = sta; // 要求统计数据写死，因此直接读取json文�
           <!-- 基本文字介绍 -->
           <div class="col-1">
             <h3 v-if="current_batch == 0">國家珍貴古籍名録</h3>
-            <h3 v-else v-text="`國家珍貴古籍名録 第${batchInfo[current_batch].name}批`"></h3>
+            <h3
+              v-else
+              v-text="`國家珍貴古籍名録 第${batchInfo[current_batch].name}批`"
+            ></h3>
 
             <!-- 批次描述 -->
-            <p class="batch-description" v-text="batchInfo[current_batch].description"></p>
+            <p
+              class="batch-description"
+              v-text="batchInfo[current_batch].description"
+            ></p>
           </div>
 
           <!-- 条形图表 -->
@@ -186,7 +196,12 @@ statistics.value = sta; // 要求统计数据写死，因此直接读取json文�
           </div>
           <Transition name="books">
             <div class="book-items" :key="changeKey">
-              <BookItem @openBookDetail="openBookDetail" v-for="b in showing_books" :key="b" :id="b" />
+              <BookItem
+                @openBookDetail="openBookDetail"
+                v-for="b in showing_books"
+                :key="b"
+                :id="b"
+              />
             </div>
           </Transition>
         </div>

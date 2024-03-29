@@ -69,7 +69,10 @@ function drawInstitutionMap() {
   view.value.addLayer(institutionLayer.value);
 }
 
-function showTooltip(e: MouseEvent, d: { id: string; count: number; name: string }) {
+function showTooltip(
+  e: MouseEvent,
+  d: { id: string; count: number; name: string },
+) {
   // position
   let left = e.x;
   let top = e.y;
@@ -77,7 +80,8 @@ function showTooltip(e: MouseEvent, d: { id: string; count: number; name: string
   // 保证 Tooltip 提示框不会超出浏览器的窗口
   if (left + ToolTipBoxRef.value.offsetWidth > document.body.clientWidth) {
     let demoLeft = document.getElementById("map-container")?.offsetLeft;
-    left = document.body.clientWidth - ToolTipBoxRef.value.offsetWidth - demoLeft;
+    left =
+      document.body.clientWidth - ToolTipBoxRef.value.offsetWidth - demoLeft;
     if (left < 0) left = 0;
   }
   ToolTipBoxRef.value.style.left = left + "px";
@@ -99,7 +103,11 @@ function removeTooltip() {
 // 点击省份列表的省份项
 function expandProvince(d: province) {
   // if (d.selected) mapInstance.value.reset();
-  if (d.selected) mapInstance.value.flyTo({ lng: 104.438656, lat: 37.753594 }, (zoom.value = 5));
+  if (d.selected)
+    mapInstance.value.flyTo(
+      { lng: 104.438656, lat: 37.753594 },
+      (zoom.value = 5),
+    );
   else {
     mapInstance.value.flyTo(d.pos, (zoom.value = 7));
     province_info.value.forEach((el) => (el.selected = false)); // 折叠全部省份
@@ -234,14 +242,20 @@ function initInstitutionLayer() {
 
 function initMap(
   BMap,
-  options: { tilt: number; heading: number; center: [number, number]; zoom: number; [n: string]: any }
+  options: {
+    tilt: number;
+    heading: number;
+    center: [number, number];
+    zoom: number;
+    [n: string]: any;
+  },
 ) {
   options = Object.assign(
     {
       tilt: 60,
       heading: 0,
     },
-    options
+    options,
   );
   // let map = new BMapGL.Map("map-container", {
   //   restrictCenter: false,
@@ -255,14 +269,17 @@ function initMap(
 
   if (options.center && options.zoom) {
     let center = options.center;
-    if (center instanceof Array) center = new BMap.Point(options.center[0], options.center[1]);
+    if (center instanceof Array)
+      center = new BMap.Point(options.center[0], options.center[1]);
     mapInstance.value.centerAndZoom(center, options.zoom);
   }
 
   mapInstance.value.setTilt(options.tilt);
   mapInstance.value.setHeading(options.heading);
 
-  mapInstance.value.setMapStyleV2({ styleId: "89e1e7d01eec9442b2747defbdcddb8b" });
+  mapInstance.value.setMapStyleV2({
+    styleId: "89e1e7d01eec9442b2747defbdcddb8b",
+  });
 
   mapInstance.value.on("zoomend", function (e) {
     zoom.value = e.target.zoomLevel;
@@ -344,15 +361,22 @@ function mapWheel(e: WheelEvent) {
             :id="`list-${index}`"
             :show="false"
           >
-            <span v-text="`${city.name} - ${city.count}`" @click.self="expandProvince(city)"></span>
+            <span
+              v-text="`${city.name} - ${city.count}`"
+              @click.self="expandProvince(city)"
+            ></span>
             <!-- 机构列表 -->
             <ul class="institutions" v-show="city.selected">
               <li
                 v-for="e in city.child"
                 :key="e"
-                @click="flyToInstitution(all_institution.find((el) => el.id == e))"
+                @click="
+                  flyToInstitution(all_institution.find((el) => el.id == e))
+                "
                 v-text="
-                  all_institution.find((el) => el.id == e).name + ' - ' + all_institution.find((el) => el.id == e).books
+                  all_institution.find((el) => el.id == e).name +
+                  ' - ' +
+                  all_institution.find((el) => el.id == e).books
                 "
               ></li>
             </ul>

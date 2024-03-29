@@ -11,7 +11,7 @@ async function run() {
 
   // loadBaiduMap(app);
   setupStore(app);
-  
+
   setupRouter(app);
 
   app.mount("#app");

@@ -16,7 +16,9 @@ const current_page = ref(0); // 当前的section，从0开始
 const complete = ref(false);
 const store = useStore();
 const introductionData = ref();
-const FlowingParticlesRef = ref<InstanceType<typeof FlowingParticles> | null>(null);
+const FlowingParticlesRef = ref<InstanceType<typeof FlowingParticles> | null>(
+  null,
+);
 const emit = defineEmits(["openBookDetail", "startLoading", "endLoading"]);
 
 provide("introductionData", introductionData);
@@ -78,7 +80,8 @@ function openBookDetail(book_id: string) {
 function rowScroll(e: WheelEvent) {
   if (e.deltaY > 0 && !scrolling.value) toNextPage();
   else if (e.deltaY < 0 && !scrolling.value) toPrevPage();
-  if (current_page.value == sectionSum - 1) FlowingParticlesRef.value?.continuePlay();
+  if (current_page.value == sectionSum - 1)
+    FlowingParticlesRef.value?.continuePlay();
   else FlowingParticlesRef.value?.pause();
 }
 
@@ -112,7 +115,9 @@ function scrollToSection(id: number, force = false) {
   current_page.value = id;
   scrolling.value = true;
 
-  document.getElementsByTagName("section")[id].scrollIntoView({ behavior: "smooth", inline: "nearest" }); // 执行滚动
+  document
+    .getElementsByTagName("section")
+    [id].scrollIntoView({ behavior: "smooth", inline: "nearest" }); // 执行滚动
 
   clearTimeout(timeout);
   timeout = setTimeout(() => {
@@ -126,7 +131,12 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="introduction" @wheel.prevent="rowScroll" ref="introduction" v-if="complete">
+  <div
+    class="introduction"
+    @wheel.prevent="rowScroll"
+    ref="introduction"
+    v-if="complete"
+  >
     <section class="section-1">
       <Cover @open-book-detail="openBookDetail" @to-next-page="toNextPage" />
     </section>
@@ -137,7 +147,10 @@ onUnmounted(() => {
       <BaiduMap @map-wheel="rowScroll" />
     </section>
     <section class="section-4">
-      <FlowingParticles ref="FlowingParticlesRef" @open-book-detail="openBookDetail" />
+      <FlowingParticles
+        ref="FlowingParticlesRef"
+        @open-book-detail="openBookDetail"
+      />
     </section>
 
     <div class="badges">

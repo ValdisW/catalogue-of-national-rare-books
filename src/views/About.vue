@@ -57,7 +57,9 @@ onUnmounted(() => {
           </div>
           <div>
             <p>數據生産</p>
-            <h5>包菊香、張鴻鳴、王林旭、閆建飛<br />曹杰、張良、席雲帆、張欣雨<br />徐禮涵、黄輝凡、徐藝軒<br /></h5>
+            <h5>
+              包菊香、張鴻鳴、王林旭、閆建飛<br />曹杰、張良、席雲帆、張欣雨<br />徐禮涵、黄輝凡、徐藝軒<br />
+            </h5>
           </div>
           <div>
             <p>元數據設計</p>
@@ -91,7 +93,9 @@ onUnmounted(() => {
             <p>郵箱：<a href="mailto:gdhc@pku.edu.cn">gdhc@pku.edu.cn</a></p>
           </div>
           <div class="logo">
-            <a href="http://www.nlc.cn/" target="_blank"><img src="../assets/icons/logo-nlc.svg" alt="logo-nlc" /></a>
+            <a href="http://www.nlc.cn/" target="_blank"
+              ><img src="../assets/icons/logo-nlc.svg" alt="logo-nlc"
+            /></a>
             <a href="https://pkudh.org/" target="_blank"
               ><img src="../assets/icons/logo-pkudh.svg" alt="logo-pkudh"
             /></a>

@@ -51,7 +51,9 @@ function init() {
 }
 
 function onMobileDevice() {
-  return navigator.userAgent.match(/(Android|webOS|iPhone|iPad|iPod|BlackBerry|Windows Phone)/i);
+  return navigator.userAgent.match(
+    /(Android|webOS|iPhone|iPad|iPod|BlackBerry|Windows Phone)/i,
+  );
 }
 
 init();

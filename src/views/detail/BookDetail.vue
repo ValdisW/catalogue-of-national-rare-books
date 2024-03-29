@@ -35,7 +35,8 @@ function open(book_id: string) {
     images.value = d.data[2]; // 书影数据
 
     if (images.value && images.value[0].filename && images.value[0].allowed)
-      for (let e of images.value) image_filenames.value.push(`/data/images/${e.folder}/${e.filename}`);
+      for (let e of images.value)
+        image_filenames.value.push(`/data/images/${e.folder}/${e.filename}`);
     else image_filenames.value[0] = "none";
   });
 }
@@ -82,11 +83,17 @@ defineExpose({
           </tr>
           <tr>
             <td class="detail-title">文獻類型：</td>
-            <td class="detail-content document-type" v-text="book_data.document_type"></td>
+            <td
+              class="detail-content document-type"
+              v-text="book_data.document_type"
+            ></td>
           </tr>
           <tr>
             <td class="detail-title">文種：</td>
-            <td class="detail-content language" v-text="book_data.language"></td>
+            <td
+              class="detail-content language"
+              v-text="book_data.language"
+            ></td>
           </tr>
           <tr>
             <td class="detail-title">分類：</td>
@@ -98,11 +105,17 @@ defineExpose({
           </tr>
           <tr>
             <td class="detail-title">版本：</td>
-            <td class="detail-content edition" v-text="book_data.edition || '-'"></td>
+            <td
+              class="detail-content edition"
+              v-text="book_data.edition || '-'"
+            ></td>
           </tr>
           <tr>
             <td class="detail-title">數量：</td>
-            <td class="detail-content quantity" v-text="book_data.quantity || '-' + book_data.measurement || '-'"></td>
+            <td
+              class="detail-content quantity"
+              v-text="book_data.quantity || '-' + book_data.measurement || '-'"
+            ></td>
           </tr>
           <tr>
             <td class="detail-title">裝幀形式：</td>
@@ -110,15 +123,24 @@ defineExpose({
           </tr>
           <tr>
             <td class="detail-title">開本尺寸：</td>
-            <td class="detail-content book-size" v-text="book_data.book_size || '-'"></td>
+            <td
+              class="detail-content book-size"
+              v-text="book_data.book_size || '-'"
+            ></td>
           </tr>
           <tr>
             <td class="detail-title">板框尺寸：</td>
-            <td class="detail-content frame-size" v-text="book_data.frame_size || '-'"></td>
+            <td
+              class="detail-content frame-size"
+              v-text="book_data.frame_size || '-'"
+            ></td>
           </tr>
           <tr>
             <td class="detail-title">版式：</td>
-            <td class="detail-content typeset" v-text="book_data.typeset || '-'"></td>
+            <td
+              class="detail-content typeset"
+              v-text="book_data.typeset || '-'"
+            ></td>
           </tr>
           <tr>
             <td class="detail-title">牌記：</td>
@@ -126,21 +148,34 @@ defineExpose({
           </tr>
           <tr>
             <td class="detail-title">收藏省份：</td>
-            <td class="detail-content institute" v-text="book_data.province"></td>
+            <td
+              class="detail-content institute"
+              v-text="book_data.province"
+            ></td>
           </tr>
           <tr>
             <td class="detail-title">收藏單位：</td>
-            <td class="detail-content institute" v-text="book_data.institution"></td>
+            <td
+              class="detail-content institute"
+              v-text="book_data.institution"
+            ></td>
           </tr>
           <tr>
             <td class="detail-title">索書號：</td>
-            <td class="detail-content" v-text="book_data.call_number || '-'"></td>
+            <td
+              class="detail-content"
+              v-text="book_data.call_number || '-'"
+            ></td>
           </tr>
         </table>
 
         <!-- 责任者 -->
         <ul class="timeline">
-          <li v-for="person in related_person" :key="person.person_id" @click="clickPerson(person.person_id)">
+          <li
+            v-for="person in related_person"
+            :key="person.person_id"
+            @click="clickPerson(person.person_id)"
+          >
             <!-- 责任行为名称 -->
             <div class="actions" v-text="person.action_name"></div>
 
@@ -148,11 +183,19 @@ defineExpose({
             <b></b>
 
             <!-- 责任者名称 -->
-            <span class="person" v-if="person.person_name == '□□'" v-text="`[${person.dynasty_or_nation}]佚名`"></span>
+            <span
+              class="person"
+              v-if="person.person_name == '□□'"
+              v-text="`[${person.dynasty_or_nation}]佚名`"
+            ></span>
             <span
               class="person"
               v-else
-              v-text="(person.dynasty_or_nation ? '[' + person.dynasty_or_nation + ']' : '') + person.person_name"
+              v-text="
+                (person.dynasty_or_nation
+                  ? '[' + person.dynasty_or_nation + ']'
+                  : '') + person.person_name
+              "
             >
             </span>
           </li>
@@ -188,7 +231,10 @@ defineExpose({
         </div>
       </div>
     </div>
-    <ImageViewer ref="ImageViewerRef" :imageUrl="image_filenames[image_showed_index]" />
+    <ImageViewer
+      ref="ImageViewerRef"
+      :imageUrl="image_filenames[image_showed_index]"
+    />
   </div>
 </template>
 

@@ -13,9 +13,15 @@ recommendBook.value = getRecommendBook(books);
 function getRecommendBook(all_books: Book[]) {
   let t = all_books
     .map((e) => ({ id: e.id, name: e.name }))
-    .filter((el: Book) => el.name!.length > 3 && el.name!.length < 8 && !el.name!.match(/(·|\?|（|\[)/i));
+    .filter(
+      (el: Book) =>
+        el.name!.length > 3 &&
+        el.name!.length < 8 &&
+        !el.name!.match(/(·|\?|（|\[)/i),
+    );
   let d_books: Array<Book> = [];
-  for (let e of t) if (!d_books.find((el) => el.name === e.name)) d_books.push(e);
+  for (let e of t)
+    if (!d_books.find((el) => el.name === e.name)) d_books.push(e);
   return d_books[Math.floor(new Date().getTime() / 8.64e7) % d_books.length];
 }
 </script>
@@ -35,8 +41,15 @@ function getRecommendBook(all_books: Book[]) {
     </div>
 
     <!-- 书影 -->
-    <div class="image-wrapper" @click="emit('openBookDetail', recommendBook.id)">
-      <img @click="emit('openBookDetail', recommendBook.id)" :src="getImageURL(recommendBook.id, images)" alt="书影" />
+    <div
+      class="image-wrapper"
+      @click="emit('openBookDetail', recommendBook.id)"
+    >
+      <img
+        @click="emit('openBookDetail', recommendBook.id)"
+        :src="getImageURL(recommendBook.id, images)"
+        alt="书影"
+      />
     </div>
   </div>
 

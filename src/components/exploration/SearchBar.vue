@@ -70,9 +70,13 @@ function add() {
 <template>
   <div class="search-bar">
     <div class="toggle-mode">
-      <span @click="all_attr_mode = true" :class="{ active: all_attr_mode }">全字段檢索</span>
+      <span @click="all_attr_mode = true" :class="{ active: all_attr_mode }"
+        >全字段檢索</span
+      >
       <span> | </span>
-      <span @click="all_attr_mode = false" :class="{ active: !all_attr_mode }">指定字段檢索</span>
+      <span @click="all_attr_mode = false" :class="{ active: !all_attr_mode }"
+        >指定字段檢索</span
+      >
     </div>
     <div class="content">
       <!-- 全字段检索模式 -->
@@ -90,7 +94,11 @@ function add() {
           />
         </div>
         <!-- 全字段检索的检索按钮 -->
-        <button class="search-button" :class="{ invalid: wait }" @click="if (!wait) allAttrSearch();"></button>
+        <button
+          class="search-button"
+          :class="{ invalid: wait }"
+          @click="if (!wait) allAttrSearch();"
+        ></button>
       </div>
 
       <!-- 指定字段检索模式 -->
@@ -114,7 +122,12 @@ function add() {
 
         <!-- 后续的字段 -->
         <Transition name="fade">
-          <TransitionGroup name="fade1" class="more-bars" tag="div" v-show="show_more_bars">
+          <TransitionGroup
+            name="fade1"
+            class="more-bars"
+            tag="div"
+            v-show="show_more_bars"
+          >
             <div class="bar-wrapper" v-for="e in n - 1" :key="e">
               <input
                 placeholder="請輸入關鍵詞"
@@ -130,10 +143,18 @@ function add() {
             </div>
           </TransitionGroup>
         </Transition>
-        <div class="hide" v-show="n > 1" @click="show_more_bars = !show_more_bars"></div>
+        <div
+          class="hide"
+          v-show="n > 1"
+          @click="show_more_bars = !show_more_bars"
+        ></div>
 
         <!-- 指定字段检索的检索按钮 -->
-        <button class="search-button" :class="{ invalid: wait }" @click="if (!wait) search();"></button>
+        <button
+          class="search-button"
+          :class="{ invalid: wait }"
+          @click="if (!wait) search();"
+        ></button>
       </div>
     </div>
   </div>

@@ -6,7 +6,12 @@ import * as d3 from "d3";
 // import Droplist from "@/components/Droplist";
 
 const store = useStore();
-const emit = defineEmits(["endLoading", "startLoading", "openBookDetail", "openPersonDetail"]);
+const emit = defineEmits([
+  "endLoading",
+  "startLoading",
+  "openBookDetail",
+  "openPersonDetail",
+]);
 
 const complete = ref(false);
 const graph_data = { nodes: [], links: [] };
@@ -51,8 +56,10 @@ const relation_list = computed(function () {
 
     let r = store.person_ralations.filter(
       (e) =>
-        (e.person1_id == curr_relation.value.source.id && e.person2_id == curr_relation.value.target.id) ||
-        (e.person2_id == curr_relation.value.source.id && e.person1_id == curr_relation.value.target.id)
+        (e.person1_id == curr_relation.value.source.id &&
+          e.person2_id == curr_relation.value.target.id) ||
+        (e.person2_id == curr_relation.value.source.id &&
+          e.person1_id == curr_relation.value.target.id),
     );
     arr = r;
   }
@@ -150,7 +157,7 @@ function forceGraph(
     width = 640, // outer width, in pixels
     height = 640, // outer height, in pixels
     invalidation, // when this promise resolves, stop the simulation
-  } = {}
+  } = {},
 ) {
   // Compute values.
   const N = d3.map(nodes, (d) => d.id).map(intern);
@@ -159,7 +166,10 @@ function forceGraph(
   if (nodeTitle === undefined) nodeTitle = (_, i) => N[i];
   // const T = nodeTitle == null ? null : d3.map(nodes, nodeTitle);
   const G = nodeGroup == null ? null : d3.map(nodes, nodeGroup).map(intern);
-  const W = typeof linkStrokeWidth !== "function" ? null : d3.map(links, linkStrokeWidth);
+  const W =
+    typeof linkStrokeWidth !== "function"
+      ? null
+      : d3.map(links, linkStrokeWidth);
   const L = typeof linkStroke !== "function" ? null : d3.map(links, linkStroke);
   const R = typeof nodeRadius != "function" ? null : d3.map(nodes, nodeRadius);
 
@@ -185,7 +195,7 @@ function forceGraph(
     .force("charge", forceNode)
     .force(
       "collide",
-      d3.forceCollide().radius((e) => e.value * 1.5 + 3)
+      d3.forceCollide().radius((e) => e.value * 1.5 + 3),
     )
     .force("center", d3.forceCenter())
     .on("tick", ticked);
@@ -203,7 +213,10 @@ function forceGraph(
     .append("g")
     .attr("stroke", typeof linkStroke !== "function" ? linkStroke : null)
     .attr("stroke-opacity", linkStrokeOpacity)
-    .attr("stroke-width", typeof linkStrokeWidth !== "function" ? linkStrokeWidth : null)
+    .attr(
+      "stroke-width",
+      typeof linkStrokeWidth !== "function" ? linkStrokeWidth : null,
+    )
     .attr("stroke-linecap", linkStrokeLinecap)
     .selectAll("line")
     .data(links)
@@ -339,7 +352,11 @@ function forceGraph(
       event.subject.fy = null;
     }
 
-    return d3.drag().on("start", dragstarted).on("drag", dragged).on("end", dragended);
+    return d3
+      .drag()
+      .on("start", dragstarted)
+      .on("drag", dragged)
+      .on("end", dragended);
   }
 
   return Object.assign(svg.node(), { scales: { color } });
@@ -358,7 +375,7 @@ function renderGraphChart(graph_data) {
       width: svgWrapperRef.value.parentNode.parentNode.offsetWidth,
       height: svgWrapperRef.value.parentNode.parentNode.offsetHeight,
       // invalidation, // a promise to stop the simulation when the cell is re-run
-    })
+    }),
   );
 }
 
@@ -371,12 +388,17 @@ function nodeHighlight(node_id, scroll) {
   d3.selectAll(`circle`).attr("fill", "#76978F");
   d3.selectAll("line").attr("stroke", "#C4A1A199");
   d3.select(`circle.n${node_id}`).attr("fill", "#FBB03B");
-  let box = document.querySelector(`circle.n${node_id}`).getBoundingClientRect();
+  let box = document
+    .querySelector(`circle.n${node_id}`)
+    .getBoundingClientRect();
 
   tooltipRef.value.style.left = `${box.x + 40}px`;
   tooltipRef.value.style.top = `${box.y - 40}px`;
 
-  if (scroll) document.querySelector(`li.n${node_id}`).scrollIntoView({ behavior: "smooth" });
+  if (scroll)
+    document
+      .querySelector(`li.n${node_id}`)
+      .scrollIntoView({ behavior: "smooth" });
 }
 
 onMounted(() => {
@@ -413,7 +435,11 @@ onUnmounted(() => {
           "
         />
         <!-- <Droplist ref="drop-list" :attr_list="display_attrs" /> -->
-        <button id="search-button" :class="{ invalid: wait }" @click="search"></button>
+        <button
+          id="search-button"
+          :class="{ invalid: wait }"
+          @click="search"
+        ></button>
         <button id="tip-button">
           <div id="tip-content">
             通過檢索古籍題名，挖掘古籍書目和人物之間的關聯。節點代表人物，節點之間的連線是指兩個人物共同創作、出版或收藏過同一本書。
@@ -452,10 +478,18 @@ onUnmounted(() => {
       <span @click="openPersonDetail(selected_info.id)">查看人物詳情</span>
     </div>
 
-    <div class="list relationship-detail" ref="relationshipDetailRef" v-show="show_relationship_detail">
+    <div
+      class="list relationship-detail"
+      ref="relationshipDetailRef"
+      v-show="show_relationship_detail"
+    >
       <h4>相關古籍</h4>
       <ul>
-        <li v-for="r in relation_list" :key="r" @click="openBookDetail(convertBookId(r.book_id))">
+        <li
+          v-for="r in relation_list"
+          :key="r"
+          @click="openBookDetail(convertBookId(r.book_id))"
+        >
           <!-- 古籍信息 -->
           <div class="book">
             <span v-text="convertBookId(r.book_id)"></span>
@@ -465,9 +499,16 @@ onUnmounted(() => {
           <!-- 人物信息 -->
           <div class="person">
             <span class="name" v-text="getPersonNameById(r.person1_id)"></span
-            ><span class="action" v-text="getActionNameById(r.action1_id)"></span>&nbsp;&nbsp;&nbsp;&nbsp;
+            ><span
+              class="action"
+              v-text="getActionNameById(r.action1_id)"
+            ></span
+            >&nbsp;&nbsp;&nbsp;&nbsp;
             <span class="name" v-text="getPersonNameById(r.person2_id)"></span
-            ><span class="action" v-text="getActionNameById(r.action2_id)"></span>
+            ><span
+              class="action"
+              v-text="getActionNameById(r.action2_id)"
+            ></span>
           </div>
         </li>
       </ul>

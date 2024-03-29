@@ -43,12 +43,19 @@ function updateSelect(e: Filter) {
     <p class="title" v-text="attr_name"></p>
     <div class="content">
       <ul>
-        <li v-for="e in attrs" :class="{ selected: e.selected }" :key="e" :val="e.value" @click="updateSelect(e)">
+        <li
+          v-for="e in attrs"
+          :class="{ selected: e.selected }"
+          :key="e"
+          :val="e.value"
+          @click="updateSelect(e)"
+        >
           <!-- 条形-->
           <div
             class="bar"
             :style="{
-              width: (Math.log(e.value + 1) / Math.log(max_value + 1)) * 100 + '%',
+              width:
+                (Math.log(e.value + 1) / Math.log(max_value + 1)) * 100 + '%',
             }"
           ></div>
 
