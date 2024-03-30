@@ -18,7 +18,7 @@ export function initIDB() {
 
   return new Promise<any>((resolve, reject) => {
     openRequest.onupgradeneeded = (event: IDBVersionChangeEvent) => {
-      console.log("indexedDB已升级");
+      // console.log("indexedDB已升级");
       const db: IDBDatabase = event.target!.result;
 
       stores.forEach((store) => {
@@ -76,9 +76,9 @@ export async function addData(storeName: string, dataArr: {}[]): Promise<void> {
   Promise.all(arr).catch((err) => {
     console.warn(`${storeName}上传失败: ${err}`);
   });
-  transaction.oncomplete = () => {
-    console.log(`transaction ${storeName} completed!`);
-  };
+  // transaction.oncomplete = () => {
+  //   console.log(`transaction ${storeName} completed!`);
+  // };
 }
 
 /**

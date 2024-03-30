@@ -6,15 +6,17 @@ import { useStore } from "@/store";
 import SearchBar from "@/components/exploration/SearchBar.vue";
 import PageDivider from "@/components/exploration/PageDivider.vue";
 import Filter from "@/components/exploration/Filter.vue";
+import { Book } from "#/axios";
 
-const emit = defineEmits(["startLoading", "endLoading"]);
+const emit = defineEmits(["startLoading", "endLoading", "openBookDetail"]);
 
-const PageDividerRef = ref(null);
+const PageDividerRef = ref<InstanceType<typeof PageDivider> | null>(null);
 
 const complete = ref(false);
 const show_results = ref(false);
-const search_result = ref([]); // 所有检索结果
-const curr_d = ref([]); // 当前页的检索结果
+const search_result = ref<Book[]>([]); // 所有检索结果
+const filtered_result = ref<Book[]>([]); // 筛选后的结果
+const curr_d = ref<Book[]>([]); // 当前页的检索结果
 const each_page_items = ref(50); // 每页的检索结果数量
 const wait = ref(false); // 点击搜索按钮的等待，防止重复点击
 const curr_filter = ref({}); // 当前的筛选条件
@@ -43,8 +45,6 @@ const filter_data: {
     value: [],
   },
 ]);
-
-const filtered_result = ref([]); // 筛选后的结果
 
 // 展示字段与检索字段
 const search_attrs = [
@@ -124,10 +124,7 @@ function allAttrSearch(query: string) {
 // 更新统计数据
 function updateFilter() {
   for (let i in filter_data) {
-    filter_data[i].value = getSum(
-      search_result.value,
-      filter_data[i].id + "_id",
-    );
+    filter_data[i].value = getSum(search_result.value, filter_data[i].id + "_id");
 
     // 根据大类，作进一步统计
     let temp: { id: string; value: string; type: string }[] = [],
@@ -141,9 +138,7 @@ function updateFilter() {
       temp.push({
         id: e.name,
         value: e.value,
-        type: store["all_" + filter_data[i].id].find((el) => el.id == e.name)[
-          filter_data[i].db_column
-        ],
+        type: store["all_" + filter_data[i].id].find((el) => el.id == e.name)[filter_data[i].db_column],
       });
     for (let i in temp) {
       if (!result.find((el) => el.name == temp[i].type))
@@ -164,16 +159,8 @@ function updateFilter() {
 
 function convertResult() {
   curr_d.value.forEach((e) => {
-    [
-      "edition_dynasty",
-      "document_type",
-      "language",
-      "province",
-      "institution",
-    ].map((attr) => {
-      e[attr] = store[`all_${attr}`].find((ele) => ele.id == e[`${attr}_id`])
-        ? store[`all_${attr}`].find((ele) => ele.id == e[`${attr}_id`]).name
-        : "-";
+    ["edition_dynasty", "document_type", "language", "province", "institution"].map((attr) => {
+      e[attr] = store[`all_${attr}`].find((ele) => ele.id == e[`${attr}_id`]) ? store[`all_${attr}`].find((ele) => ele.id == e[`${attr}_id`]).name : "-";
     });
   });
 }
@@ -186,8 +173,7 @@ function filterResult(e) {
     for (let i in curr_filter.value) {
       if (!curr_filter.value[i].length) continue;
       let _flag = false;
-      for (let v of curr_filter.value[i])
-        _flag = _flag || "" + el[i + "_id"] == v;
+      for (let v of curr_filter.value[i]) _flag = _flag || "" + el[i + "_id"] == v;
       flag = flag && _flag;
     }
     return flag;
@@ -197,7 +183,7 @@ function filterResult(e) {
   convertResult();
 
   has_filtered.value = true;
-  PageDividerRef.value.turnTo(1);
+  PageDividerRef.value?.turnTo(1);
 }
 
 /**
@@ -206,7 +192,7 @@ function filterResult(e) {
  * @param {string} attr 属性名，应该是r中的某个键名
  * @returns 返回{属性名（id）, 属性值（数量）, 选中状态（给筛选器用）}
  */
-function getSum(r, attr) {
+function getSum(r: Book[], attr: string) {
   let a = {};
   r.forEach((e) => {
     a[e[attr]] = a[e[attr]] || 0;
@@ -224,21 +210,21 @@ function getSum(r, attr) {
 }
 
 // 检索结果按指定字段正序/倒序排序
-function toggleRank(attr, order) {
+function toggleRank(attr: string, order: boolean) {
   // 更新检索结果
   if (order) {
     search_result.value.sort((a, b) => {
       let flag;
-      if (typeof a[attr] == "string") flag = b[attr].localeCompare(a[attr]);
-      else if (typeof a[attr] == "number") flag = b[attr] - a[attr];
+      if (typeof a[attr] === "string") flag = b[attr].localeCompare(a[attr]);
+      else if (typeof a[attr] === "number") flag = b[attr] - a[attr];
       else flag = 1;
       return flag;
     });
   } else {
     search_result.value.sort((a, b) => {
       let flag;
-      if (typeof a[attr] == "string") flag = a[attr].localeCompare(b[attr]);
-      else if (typeof a[attr] == "number") flag = a[attr] - b[attr];
+      if (typeof a[attr] === "string") flag = a[attr].localeCompare(b[attr]);
+      else if (typeof a[attr] === "number") flag = a[attr] - b[attr];
       else flag = 1;
       return flag;
     });
@@ -249,45 +235,18 @@ function toggleRank(attr, order) {
   display_attrs.forEach((el) => {
     el.order = false;
   });
-  display_attrs.find((e) => e.value == attr).order = !t;
+  display_attrs.find((e) => e.value === attr).order = !t;
 
   curr_d.value = search_result.value.slice(0, each_page_items.value);
   convertResult();
 
-  PageDividerRef.value.turnTo(1); // 返回第一页
+  PageDividerRef.value?.turnTo(1); // 返回第一页
 }
 
-function alterPage(page_index) {
-  if (has_filtered.value)
-    curr_d.value = filtered_result.value.slice(
-      each_page_items.value * (page_index - 1),
-      each_page_items.value * page_index,
-    );
-  else
-    curr_d.value = search_result.value.slice(
-      each_page_items.value * (page_index - 1),
-      each_page_items.value * page_index,
-    );
+function alterPage(page_index: number) {
+  if (has_filtered.value) curr_d.value = filtered_result.value.slice(each_page_items.value * (page_index - 1), each_page_items.value * page_index);
+  else curr_d.value = search_result.value.slice(each_page_items.value * (page_index - 1), each_page_items.value * page_index);
   convertResult();
-}
-
-function showFilterOptions(e) {
-  let b = e.currentTarget.querySelector(".options").style.display == "block";
-  document
-    .querySelectorAll(".options")
-    .forEach((e) => (e.style.display = "none"));
-  e.currentTarget.querySelector(".options").style.display = b
-    ? "none"
-    : "block";
-}
-
-function choose(e) {
-  document
-    .querySelectorAll(".options")
-    .forEach((e) => (e.style.display = "none"));
-  let parent_filter_value = e.path[3].querySelector(".value");
-  parent_filter_value.setAttribute("val", e.currentTarget.getAttribute("val"));
-  parent_filter_value.innerText = e.currentTarget.innerText;
 }
 
 onMounted(() => {
@@ -315,26 +274,13 @@ onUnmounted(() => {
   <div class="exploration" :class="{ new: !show_results }" v-if="complete">
     <div class="container">
       <div class="search" :class="{ new: !show_results }">
-        <SearchBar
-          :wait="wait"
-          :attr_list="search_attrs"
-          @search="search"
-          @allAttrSearch="allAttrSearch"
-        />
+        <SearchBar :wait="wait" :attr_list="search_attrs" @search="search" @allAttrSearch="allAttrSearch" />
       </div>
 
       <div class="main-content" v-show="show_results">
         <!-- 左側篩選欄 -->
         <div class="filters">
-          <Filter
-            v-for="e in filter_data"
-            :key="e.id"
-            :attr_name="e.name"
-            :attr_id="e.id"
-            :attrs="e.value"
-            :db_column="e.db_column"
-            @filter="filterResult"
-          />
+          <Filter v-for="e in filter_data" :key="e.id" :attr_name="e.name" :attr_id="e.id" :attrs="e.value" :db_column="e.db_column" @filter="filterResult" />
         </div>
 
         <!-- 右側檢索結果 -->
@@ -348,11 +294,7 @@ onUnmounted(() => {
             <table class="results-list">
               <thead>
                 <tr>
-                  <th
-                    v-for="e in display_attrs"
-                    :key="e.name"
-                    @click="toggleRank(e.value, e.order)"
-                  >
+                  <th v-for="e in display_attrs" :key="e.name" @click="toggleRank(e.value, e.order)">
                     <span class="attr-title" v-text="e.name"></span>
                     <span class="rank">
                       <span :class="{ active: e.order == false }"></span>
@@ -362,12 +304,7 @@ onUnmounted(() => {
                 </tr>
               </thead>
               <tbody>
-                <tr
-                  v-for="item in curr_d"
-                  :key="item.id"
-                  class="item-block"
-                  @click="$emit('openBookDetail', item.id)"
-                >
+                <tr v-for="item in curr_d" :key="item.id" class="item-block" @click="emit('openBookDetail', item.id)">
                   <td v-text="'第' + item.batch + '批'"></td>
                   <td v-text="item.id || '-'"></td>
                   <td v-text="item.name || '-'"></td>
@@ -381,14 +318,7 @@ onUnmounted(() => {
               </tbody>
             </table>
           </div>
-          <PageDivider
-            @turnTo="alterPage"
-            :items_sum="
-              has_filtered ? filtered_result.length : search_result.length
-            "
-            :each_page_items="each_page_items"
-            ref="PageDividerRef"
-          />
+          <PageDivider @turnTo="alterPage" :items_sum="has_filtered ? filtered_result.length : search_result.length" :each_page_items="each_page_items" ref="PageDividerRef" />
         </div>
       </div>
     </div>
