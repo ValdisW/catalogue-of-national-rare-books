@@ -15,6 +15,13 @@ export interface Book {
   content?: string;
   content_sc?: string; // 简体简介
   name?: string; // 书名
+  document_type?: string; // 版本类型
+  catalogue?: string; // 分类
+  edition_type?: string; // 版本类型
+  edition_dynasty?: string; // 版本朝代
+  language?: string; // 语种
+  province?: string; // 收藏省份
+  institution?: string; // 收藏机构
   document_type_id?: string; // 版本类型id
   catalogue_id?: string; // 分类id
   edition_type_id?: string; // 版本类型id
