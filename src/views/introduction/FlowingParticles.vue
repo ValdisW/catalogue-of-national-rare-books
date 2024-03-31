@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { inject, onMounted, onUnmounted, ref, watch } from "vue";
-import * as d3 from "d3";
+import { select } from "d3";
 import { Book } from "#/axios";
 
 import DynastySelector from "@/components/introduction/DynastySelector.vue";
@@ -23,6 +23,8 @@ const MAX_PARTICLES = 250;
 const NUM_PARTICLES = 100;
 const PARTICLE_SIZE = 0.5;
 const SPEED = 20000;
+
+const d3 = { select };
 
 let animation_handler = 0;
 let curr_time = 0;
@@ -187,9 +189,9 @@ function draw() {
   svg.value?.selectAll("circle").on("click", (e: MouseEvent, d) => {
     pause();
     e.stopPropagation();
-    BookDetailTooltipRef.value.$el.style.left = e.clientX + 30 + "px";
-    BookDetailTooltipRef.value.$el.style.top = e.clientY - 140 + "px";
-    BookDetailTooltipRef.value.open(d.info.id);
+    BookDetailTooltipRef.value!.$el.style.left = e.clientX + 30 + "px";
+    BookDetailTooltipRef.value!.$el.style.top = e.clientY - 140 + "px";
+    BookDetailTooltipRef.value!.open(d.info.id);
   });
 
   // 计时器
@@ -209,7 +211,7 @@ async function start() {
   for (let e of particles_original_data.value) particles.value.push(generateParticleData(e));
 
   // 绘制
-  svg.value.selectAll("circle").data(particles.value).enter().append("circle");
+  svg.value!.selectAll("circle").data(particles.value).enter().append("circle");
 
   // 动画
   draw();

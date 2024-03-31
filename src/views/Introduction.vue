@@ -39,7 +39,6 @@ function _loadIntroductionData() {
   return new Promise((resolve) => {
     const tables = ["books", "all_edition_dynasty", "all_document_type", "all_catalogue", "all_edition_type", "all_language", "all_province", "all_institution", "all_image"];
     readManyData(tables).then((d) => {
-      console.log(d);
       if (d.every((el) => el.length > 0)) {
         // indexedDB已经有数据了，直接读
         introductionData.value = d;

@@ -34,12 +34,12 @@ const mapInstance = ref(null);
 const current_institution_name = ref("");
 const current_institution_intro = ref("");
 const current_institution_books = ref("");
-const zoom = ref(null);
+const zoom = ref<number>();
 const pointLayer = ref();
 const institutionLayer = ref<PointLayer>();
 const provinceLayer = ref();
 // const tooltipBox = ref<HTMLElement | null>();
-const ToolTipBoxRef = ref(null);
+const ToolTipBoxRef = ref<HTMLElement | null>(null);
 const province_info = ref<province[]>([]); // 用来控制右侧省份列表的内容
 // const insititution_info = ref({
 //   id: {
@@ -69,47 +69,36 @@ function drawInstitutionMap() {
   view.value.addLayer(institutionLayer.value);
 }
 
-function showTooltip(
-  e: MouseEvent,
-  d: { id: string; count: number; name: string },
-) {
+function showTooltip(e: MouseEvent, d: { id: string; count: number; name: string }) {
   // position
   let left = e.x;
   let top = e.y;
 
   // 保证 Tooltip 提示框不会超出浏览器的窗口
-  if (left + ToolTipBoxRef.value.offsetWidth > document.body.clientWidth) {
+  if (left + ToolTipBoxRef.value!.offsetWidth > document.body.clientWidth) {
     let demoLeft = document.getElementById("map-container")?.offsetLeft;
-    left =
-      document.body.clientWidth - ToolTipBoxRef.value.offsetWidth - demoLeft;
+    left = document.body.clientWidth - ToolTipBoxRef.value!.offsetWidth - demoLeft;
     if (left < 0) left = 0;
   }
-  ToolTipBoxRef.value.style.left = left + "px";
-  ToolTipBoxRef.value.style.top = top + 20 + "px";
+  ToolTipBoxRef.value!.style.left = left + "px";
+  ToolTipBoxRef.value!.style.top = top + 20 + "px";
   // text
   current_institution_name.value = d.name;
-  current_institution_intro.value = all_institution.find((el) => el.id == d.id)
-    ? all_institution.find((el) => el.id == d.id).intro
-    : "";
+  current_institution_intro.value = all_institution.find((el) => el.id == d.id) ? all_institution.find((el) => el.id == d.id).intro : "";
   current_institution_books.value = `入選古籍數: ${d.count}`;
 
-  ToolTipBoxRef.value.style.visibility = "visible";
+  ToolTipBoxRef.value!.style.visibility = "visible";
 }
 
 function removeTooltip() {
-  ToolTipBoxRef.value.style.visibility = "hidden";
+  ToolTipBoxRef.value!.style.visibility = "hidden";
 }
 
 // 点击省份列表的省份项
 function expandProvince(d: province) {
-  // if (d.selected) mapInstance.value.reset();
-  if (d.selected)
-    mapInstance.value.flyTo(
-      { lng: 104.438656, lat: 37.753594 },
-      (zoom.value = 5),
-    );
+  if (d.selected) mapInstance.value!.flyTo({ lng: 104.438656, lat: 37.753594 }, (zoom.value = 5));
   else {
-    mapInstance.value.flyTo(d.pos, (zoom.value = 7));
+    mapInstance.value!.flyTo(d.pos, (zoom.value = 7));
     province_info.value.forEach((el) => (el.selected = false)); // 折叠全部省份
   }
   d.selected = !d.selected;
@@ -180,7 +169,7 @@ function initProvinceLayer() {
     onClick: (e: PointerEvent) => {
       // 点击事件
       let id = e.dataIndex;
-      if (id == -1) mapInstance.value.reset();
+      if (id == -1) mapInstance.value.flyTo({ lng: 104.438656, lat: 37.753594 }, (zoom.value = 5));
       else expandProvince(province_info.value[id]);
     },
   });
@@ -231,7 +220,7 @@ function initInstitutionLayer() {
       // 点击机构点
       let id = e.dataIndex;
       if (id == -1) {
-        mapInstance.value.reset();
+        mapInstance.value!.flyTo({ lng: 104.438656, lat: 37.753594 }, (zoom.value = 5));
         removeAllSublist();
       }
     },
@@ -248,43 +237,38 @@ function initMap(
     center: [number, number];
     zoom: number;
     [n: string]: any;
-  },
+  }
 ) {
   options = Object.assign(
     {
       tilt: 60,
       heading: 0,
     },
-    options,
+    options
   );
   // let map = new BMapGL.Map("map-container", {
   //   restrictCenter: false,
   //   // style: {styleJson: options.style || darkStyle }
   // });
-  mapInstance.value.enableKeyboard();
-  mapInstance.value.enableScrollWheelZoom();
-  mapInstance.value.enableInertialDragging();
-  mapInstance.value.enableContinuousZoom();
-  mapInstance.value.setDefaultCursor("default");
+  mapInstance.value!.enableInertialDragging();
 
   if (options.center && options.zoom) {
     let center = options.center;
-    if (center instanceof Array)
-      center = new BMap.Point(options.center[0], options.center[1]);
-    mapInstance.value.centerAndZoom(center, options.zoom);
+    if (center instanceof Array) center = new BMap.Point(options.center[0], options.center[1]);
+    mapInstance.value!.centerAndZoom(center, options.zoom);
   }
 
-  mapInstance.value.setTilt(options.tilt);
-  mapInstance.value.setHeading(options.heading);
+  mapInstance.value!.setTilt(options.tilt);
+  mapInstance.value!.setHeading(options.heading);
 
-  mapInstance.value.setMapStyleV2({
+  mapInstance.value!.setMapStyleV2({
     styleId: "89e1e7d01eec9442b2747defbdcddb8b",
   });
 
-  mapInstance.value.on("zoomend", function (e) {
+  mapInstance.value!.on("zoomend", function (e) {
     zoom.value = e.target.zoomLevel;
   });
-  mapInstance.value.addEventListener("mousemove", function (e: MouseEvent) {
+  mapInstance.value!.addEventListener("mousemove", function (e: MouseEvent) {
     if (pointLayer.value == null) return;
     let index = pointLayer.value.pick(e.x, e.y);
     if (index.dataIndex == -1) {
@@ -293,14 +277,12 @@ function initMap(
     }
     showTooltip(e, index.dataItem.properties);
   });
-  mapInstance.value.addEventListener("click", function (e: MouseEvent) {
-    e.preventDefault();
-  });
-
-  mapInstance.value.disableScrollWheelZoom();
-  mapInstance.value.disableDoubleClickZoom();
+  mapInstance.value!.disableDoubleClickZoom();
+  mapInstance.value!.disableScrollWheelZoom();
+  mapInstance.value!.disableKeyboard();
 }
 
+// 响应baiduMap的ready事件，在mounted后触发
 const mapReady = ({ BMap, map }) => {
   mapInstance.value = map;
   zoom.value = 5;
@@ -315,7 +297,6 @@ const mapReady = ({ BMap, map }) => {
     map: mapInstance.value,
   });
 
-  // tooltipBox.value = document.getElementById("tooltip-box");
   initProvinceLayer();
   initInstitutionLayer();
 };
@@ -327,7 +308,6 @@ function mapWheel(e: WheelEvent) {
 
 <template>
   <div class="exploration-map">
-    <!-- <Map class="baidumap"></Map> -->
     <div class="spatial-sampling">
       <div class="section-name">
         <span></span>
@@ -338,47 +318,18 @@ function mapWheel(e: WheelEvent) {
 
       <!-- 左侧地图 -->
       <div id="map-container" @wheel.stop="mapWheel">
-        <baidu-map
-          class="map"
-          ak="1rhcTPAuchh7EM6ovKAw84oGUmAElH70"
-          v="3.0"
-          type="WebGL"
-          :center="{ lng: 104.438656, lat: 37.753594 }"
-          :zoom="5"
-          @ready="mapReady"
-        >
-        </baidu-map>
+        <baidu-map class="map" ak="1rhcTPAuchh7EM6ovKAw84oGUmAElH70" v="3.0" type="WebGL" :center="{ lng: 104.438656, lat: 37.753594 }" :zoom="5" @ready="mapReady"> </baidu-map>
       </div>
 
       <!-- 右侧列表 -->
       <div id="map-list">
         <!-- 省份列表 -->
         <ul class="provinces">
-          <li
-            v-for="(city, index) in province_info"
-            :key="index"
-            @click.self="expandProvince(city)"
-            :id="`list-${index}`"
-            :show="false"
-          >
-            <span
-              v-text="`${city.name} - ${city.count}`"
-              @click.self="expandProvince(city)"
-            ></span>
+          <li v-for="(city, index) in province_info" :key="index" @click.self="expandProvince(city)" :id="`list-${index}`" :show="false">
+            <span v-text="`${city.name} - ${city.count}`" @click.self="expandProvince(city)"></span>
             <!-- 机构列表 -->
             <ul class="institutions" v-show="city.selected">
-              <li
-                v-for="e in city.child"
-                :key="e"
-                @click="
-                  flyToInstitution(all_institution.find((el) => el.id == e))
-                "
-                v-text="
-                  all_institution.find((el) => el.id == e).name +
-                  ' - ' +
-                  all_institution.find((el) => el.id == e).books
-                "
-              ></li>
+              <li v-for="e in city.child" :key="e" @click="flyToInstitution(all_institution.find((el) => el.id == e))" v-text="all_institution.find((el) => el.id == e).name + ' - ' + all_institution.find((el) => el.id == e).books"></li>
             </ul>
           </li>
         </ul>
@@ -411,7 +362,6 @@ function mapWheel(e: WheelEvent) {
     height: 80vh;
 
     #map-container {
-      // position: fixed;
       width: 80%;
       height: 100%;
       border: 2px solid #201d1d;
