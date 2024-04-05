@@ -5,8 +5,9 @@ import { Book } from "#/axios";
 
 import DynastySelector from "@/components/introduction/DynastySelector.vue";
 import BookDetailTooltip from "@/components/introduction/BookDetailTooltip.vue";
+import { useStore } from "@/store";
 
-interface Particle {
+interface ParticleData {
   x: number;
   y: number;
   info: Book;
@@ -29,14 +30,19 @@ const d3 = { select };
 let animation_handler = 0;
 let curr_time = 0;
 
+const store = useStore();
 const emits = defineEmits(["openBookDetail"]);
 const books = inject("introductionData").value[0];
 
-const svg = ref<d3.Selection<SVGSVGElement, unknown, HTMLElement, any> | null>(null);
-const particles = ref<Particle[]>([]);
+const svg = ref<d3.Selection<SVGSVGElement, unknown, null, any> | null>(null);
+const particles = ref<ParticleData[]>([]);
 const playing = ref(true);
 const particles_original_data = ref<Book[]>([]);
 const curr_comment = ref("");
+const tooltipPosition = ref({
+  left: 0,
+  top: 0,
+});
 
 const BookDetailTooltipRef = ref<InstanceType<typeof BookDetailTooltip> | null>(null);
 
@@ -116,12 +122,13 @@ function randomNormal(o: { mean: number; dev: number }) {
   return (e = a * Math.sqrt((-2 * Math.log(r)) / r)), t * e + l;
 }
 
+// 生成范围在[low, high)的随机数
 function rand(low: number, high: number) {
   return Math.random() * (high - low) + low;
 }
 
 // 根据古籍数据，生成粒子
-function generateParticleData(e: Book): Particle {
+function generateParticleData(e: Book): ParticleData {
   const color = {
     r: 60,
     g: randomNormal({ mean: 50, dev: 20 }),
@@ -154,7 +161,7 @@ function generateParticleData(e: Book): Particle {
 }
 
 // 计算粒子的新位置
-function moveParticle(particle: Particle) {
+function moveParticle(particle: ParticleData): ParticleData {
   const progress = ((curr_time - particle.startTime) % particle.duration) / particle.duration;
   return {
     ...particle,
@@ -165,8 +172,6 @@ function moveParticle(particle: Particle) {
 
 // 每帧绘制的内容
 function draw() {
-  // console.log(233);
-  // 动画句柄，用来控制播放
   animation_handler = requestAnimationFrame(draw);
 
   // 更新粒子位置数据
@@ -186,11 +191,16 @@ function draw() {
     .attr("cursor", "pointer");
 
   // 点击圆点，显示BookDetailTooltip
-  svg.value?.selectAll("circle").on("click", (e: MouseEvent, d) => {
+  svg.value?.selectAll("circle").on("click", (e: MouseEvent, d): void => {
     pause();
     e.stopPropagation();
-    BookDetailTooltipRef.value!.$el.style.left = e.clientX + 30 + "px";
-    BookDetailTooltipRef.value!.$el.style.top = e.clientY - 140 + "px";
+    const { left: svg_left, top: svg_top } = svg.value!.node()!.getBoundingClientRect();
+
+    let tooltipLeft = e.clientX - svg_left + 30,
+      tooltipTop = e.clientY - svg_top - 50;
+    if (e.clientX + 15 * store.rem > window.innerWidth) tooltipLeft = e.clientX - 15 * store.rem - svg_left - 30;
+
+    tooltipPosition.value = { left: tooltipLeft, top: tooltipTop };
     BookDetailTooltipRef.value!.open(d.info.id);
   });
 
@@ -269,7 +279,7 @@ defineExpose({
         <div class="comment" v-text="curr_comment"></div>
 
         <!-- 悬浮窗 -->
-        <BookDetailTooltip @openBookDetail="openBookDetail" ref="BookDetailTooltipRef" />
+        <BookDetailTooltip @openBookDetail="openBookDetail" :position="tooltipPosition" ref="BookDetailTooltipRef" />
       </div>
     </div>
   </div>
