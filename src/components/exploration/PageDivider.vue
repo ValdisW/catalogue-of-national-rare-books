@@ -11,9 +11,7 @@ const props = defineProps({
 });
 
 const pages_sum = computed(() => {
-  return props.items_sum
-    ? Math.ceil(props.items_sum / props.each_page_items!)
-    : 1; // 暂时这样处理，如果没有任何内容，就有1页而不是0页
+  return props.items_sum ? Math.ceil(props.items_sum / props.each_page_items!) : 1; // 暂时这样处理，如果没有任何内容，就有1页而不是0页
 });
 
 watch(current_page, (n) => {
@@ -35,9 +33,12 @@ function toNextPage() {
 }
 
 function turnTo(page_index: number) {
-  if (page_index >= 1 && page_index <= pages_sum.value)
-    current_page.value = page_index;
+  if (page_index >= 1 && page_index <= pages_sum.value) current_page.value = page_index;
 }
+
+defineExpose({
+  turnTo,
+});
 </script>
 
 <template>
@@ -45,66 +46,27 @@ function turnTo(page_index: number) {
     <!-- 总页码数超过12时 -->
     <div class="all-pages" v-if="pages_sum > 12">
       <li class="prev-page" @click="toPrevPage">上一頁</li>
-      <li
-        v-for="e in 2"
-        :key="e"
-        class="page-index"
-        :class="{ is_current_page: current_page == e }"
-        v-text="e"
-        @click="turnTo(e)"
-      ></li>
+      <li v-for="e in 2" :key="e" class="page-index" :class="{ is_current_page: current_page == e }" v-text="e" @click="turnTo(e)"></li>
       <div v-if="current_page < 6">
-        <li
-          v-for="e in 3"
-          :key="e"
-          v-text="e + 2"
-          @click="turnTo(e + 2)"
-          :class="{ is_current_page: current_page == e + 2 }"
-        ></li>
+        <li v-for="e in 3" :key="e" v-text="e + 2" @click="turnTo(e + 2)" :class="{ is_current_page: current_page == e + 2 }"></li>
       </div>
       <span v-if="current_page < pages_sum - 4 && current_page > 5">…</span>
       <div v-if="current_page > 5 && current_page < pages_sum - 4">
-        <li
-          v-for="e in 5"
-          :key="e"
-          v-text="current_page + e - 3"
-          @click="turnTo(current_page + e - 3)"
-          :class="{ is_current_page: current_page == current_page + e - 3 }"
-        ></li>
+        <li v-for="e in 5" :key="e" v-text="current_page + e - 3" @click="turnTo(current_page + e - 3)" :class="{ is_current_page: current_page == current_page + e - 3 }"></li>
       </div>
       <span>…</span>
       <div v-if="current_page > pages_sum - 5">
-        <li
-          v-for="e in 3"
-          :key="e"
-          v-text="e + pages_sum - 5"
-          @click="turnTo(e + pages_sum - 5)"
-          :class="{ is_current_page: current_page == e + pages_sum - 5 }"
-        ></li>
+        <li v-for="e in 3" :key="e" v-text="e + pages_sum - 5" @click="turnTo(e + pages_sum - 5)" :class="{ is_current_page: current_page == e + pages_sum - 5 }"></li>
       </div>
 
-      <li
-        v-for="e in 2"
-        :key="e"
-        class="page-index"
-        :class="{ is_current_page: current_page == pages_sum + e - 2 }"
-        v-text="pages_sum + e - 2"
-        @click="turnTo(pages_sum + e - 2)"
-      ></li>
+      <li v-for="e in 2" :key="e" class="page-index" :class="{ is_current_page: current_page == pages_sum + e - 2 }" v-text="pages_sum + e - 2" @click="turnTo(pages_sum + e - 2)"></li>
 
       <li class="next-page" @click="toNextPage">下一頁</li>
     </div>
 
     <!-- 总页码数不超过12时，显示所有页面按钮 -->
     <div class="all-pages" v-else>
-      <li
-        class="page-index"
-        v-for="e in pages_sum"
-        :key="e"
-        v-text="e"
-        @click="turnTo(e)"
-        :class="{ is_current_page: e == current_page }"
-      ></li>
+      <li class="page-index" v-for="e in pages_sum" :key="e" v-text="e" @click="turnTo(e)" :class="{ is_current_page: e == current_page }"></li>
     </div>
 
     <!-- 跳转 -->
