@@ -16,11 +16,11 @@ const all_related_books = <Relation[]>reactive([]); // 该人物的所有相关�
 const filtered_related_books = <Relation[]>reactive([]); // 创作/出版/批校题跋/收藏的相关书籍筛选结果
 
 // 实际没用上
-const hover_data = reactive({
-  id: "",
-  title: "",
-  detail: "",
-});
+// const hover_data = reactive({
+//   id: "",
+//   title: "",
+//   detail: "",
+// });
 
 // 用来呈现人物信息
 const person_data = ref({
@@ -65,7 +65,7 @@ function open(person_id: string) {
   show.value = true;
 
   getPersonDetailData(person_id).then((d) => {
-    person_data.value = { ...d.data[0][0] };
+    person_data.value = { ...d.data[0] };
 
     filtered_related_books.push(...d.data[1]);
     all_related_books.push(...d.data[1]);
@@ -74,17 +74,14 @@ function open(person_id: string) {
     related_person.sort((a, b) => b.count - a.count);
 
     // for (let e of this.all_related_books) e.type = this.$store.all_action.find((el) => el.id == e.action_id).type;
-    for (let e of action_types)
-      for (let f of all_related_books) if (e.name == f.type) e.count++;
+    for (let e of action_types) for (let f of all_related_books) if (e.name == f.type) e.count++;
   });
 }
 
 // 筛选
 function filterType(type: string) {
   filtered_related_books.length = 0;
-  filtered_related_books.push(
-    ...all_related_books.filter((el) => el.type == type),
-  );
+  filtered_related_books.push(...all_related_books.filter((el) => el.type == type));
 }
 
 defineExpose({ open, close });
@@ -106,17 +103,11 @@ defineExpose({ open, close });
               <div class="person-birth">
                 <p>
                   生卒：
-                  <span
-                    v-text="
-                      `${person_data.year_of_birth} - ${person_data.year_of_death}`
-                    "
-                  ></span>
+                  <span v-text="`${person_data.year_of_birth} - ${person_data.year_of_death}`"></span>
                 </p>
               </div>
               <div class="person-title">
-                <p>
-                  字:<span v-text="person_data.courtesy_name || '不詳'"></span>
-                </p>
+                <p>字:<span v-text="person_data.courtesy_name || '不詳'"></span></p>
                 <p>
                   號:
                   <span v-text="person_data.pseudonym_name || '不詳'"></span>
@@ -126,10 +117,7 @@ defineExpose({ open, close });
               <span></span>
             </div>
           </div>
-          <div
-            class="person-intro"
-            v-text="person_data.introduction || ''"
-          ></div>
+          <div class="person-intro" v-text="person_data.introduction || ''"></div>
         </div>
 
         <div class="related-person">
@@ -157,22 +145,11 @@ defineExpose({ open, close });
       <div class="related-books">
         <div class="responsibility-select">
           <h4>責任目録</h4>
-          <button
-            v-for="n in action_types"
-            :key="n.name"
-            v-text="`${n.name}(${n.count})`"
-            class="responsibility-type"
-            :class="{ invalid: !n.count }"
-            @click="if (n.count) filterType(n.name);"
-          ></button>
+          <button v-for="n in action_types" :key="n.name" v-text="`${n.name}(${n.count})`" class="responsibility-type" :class="{ invalid: !n.count }" @click="if (n.count) filterType(n.name);"></button>
         </div>
         <div class="book-responsibility">
           <ul>
-            <li
-              v-for="e in filtered_related_books"
-              :key="e"
-              @click="emit('openBookDetail', e.book_id)"
-            >
+            <li v-for="e in filtered_related_books" :key="e" @click="emit('openBookDetail', e.book_id)">
               <span v-text="e.book_id + ' '"></span>
               <span v-text="e.title + ' '"></span>
               <span v-text="e.action + ' '"></span>
