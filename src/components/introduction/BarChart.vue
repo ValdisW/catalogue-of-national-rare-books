@@ -13,7 +13,7 @@ const prop = defineProps<{
   margin_left: number;
 }>();
 
-const svg = ref<d3.Selection<SVGSVGElement, unknown, HTMLElement, any> | null>(null);
+const svg = ref<d3.Selection<SVGSVGElement, unknown, null, any> | null>(null);
 const chart = ref(null);
 const chartRef = ref<HTMLElement | null>(null);
 const margin = ref({
@@ -65,15 +65,16 @@ function initializeBarchart() {
     let svgHeight = prop.canvasHeight * (1 - margin.value.top - margin.value.bottom),
       svgWidth = prop.canvasWidth * (1 - margin.value.left - margin.value.right);
 
-    d3.select(chartRef.value).selectAll("svg").remove();
+    d3.select(chartRef.value).selectAll("svg").remove(); // 清除之前的svg
     svg.value = d3.select(chartRef.value).append("svg").attr("width", prop.canvasWidth).attr("height", svgHeight);
 
     let x = d3
       .scaleLinear()
-      .domain([0, Math.log(d3.max(displayed_data.value, (l) => l.value))])
+      .domain([0, Math.log(d3.max(displayed_data.value, (l) => l.value)!)])
       .range([0, svgWidth]);
     let y = d3.scaleBand().domain(get_name()).range([0, svgHeight]).padding(0.5);
-
+    
+    // chart bars
     chart.value = svg.value
       .selectAll("g")
       .data(displayed_data.value)
@@ -85,26 +86,23 @@ function initializeBarchart() {
 
     // add bar
     chart.value
-      .append("g")
       .append("rect")
       .attr("x", 0)
       .attr("y", 0)
-      .attr("width", (d) => x(Math.log(d.value + 1)))
+      .attr("width", (d: { name: string; value: number }) => x(Math.log(d.value + 1)))
       .attr("height", y.bandwidth())
       .attr("fill", prop.bar_color)
       .attr("fill-opacity", 0.8);
 
     chart.value
-      .append("g")
-      .attr("transform", (d) => `translate(${x(Math.log(d.value + 1)) + 3},${y.bandwidth()})`)
       .append("text")
+      .attr("transform", (d: { name: string; value: number }) => `translate(${x(Math.log(d.value + 1)) + 3},${y.bandwidth()})`)
       .attr("font-size", "0.6rem")
-      .text((d) => d.value);
+      .text((d: { name: string; value: number }) => d.value);
 
     // y axis
     let axis_y = d3
-      .axisLeft()
-      .scale(y)
+      .axisLeft(y)
       .ticks(displayed_data.value.length)
       .tickFormat((d) => d)
       .tickSizeOuter(0);
@@ -116,7 +114,7 @@ function initializeBarchart() {
       .call(axis_y) // 将g作为函数参数调用函数
       .attr("font-size", "0.55rem")
       .selectAll("text")
-      .text((d) => d);
+      .text((d: string) => d);
   }
 }
 

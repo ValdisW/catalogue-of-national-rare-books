@@ -6,23 +6,13 @@ import * as d3 from "d3";
 // import Droplist from "@/components/Droplist";
 
 const store = useStore();
-const emit = defineEmits([
-  "endLoading",
-  "startLoading",
-  "openBookDetail",
-  "openPersonDetail",
-]);
+const emit = defineEmits(["endLoading", "startLoading", "openBookDetail", "openPersonDetail"]);
 
 const complete = ref(false);
-const graph_data = { nodes: [], links: [] };
-const curr_nodes = ref([]);
-const curr_links = ref([]);
+const curr_nodes = ref<{ id: string; books: string; value: number }[]>([]);
+const curr_links = ref<{ source: string; target: string; value: string }[]>([]);
 const curr_relation = ref(null);
 const wait = ref(false); // 点击搜索按钮的等待，防止重复点击
-const display_attrs = [
-  { name: "題名", value: "book_name" },
-  { name: "人名", value: "person_name" },
-];
 const show_tooltip = ref(false);
 const show_relationship_detail = ref(false);
 const selected_id = ref(0);
@@ -54,19 +44,13 @@ const relation_list = computed(function () {
   if (curr_relation.value) {
     arr = `${getPersonNameById(curr_relation.value.source.id)} -- ${getPersonNameById(curr_relation.value.target.id)}`;
 
-    let r = store.person_ralations.filter(
-      (e) =>
-        (e.person1_id == curr_relation.value.source.id &&
-          e.person2_id == curr_relation.value.target.id) ||
-        (e.person2_id == curr_relation.value.source.id &&
-          e.person1_id == curr_relation.value.target.id),
-    );
+    let r = store.person_ralations.filter((e) => (e.person1_id == curr_relation.value.source.id && e.person2_id === curr_relation.value.target.id) || (e.person2_id == curr_relation.value.source.id && e.person1_id === curr_relation.value.target.id));
     arr = r;
   }
   return arr;
 });
 
-function convertBookId(id) {
+function convertBookId(id: string) {
   let t = "00000".split("");
   let id_str = "" + id;
   for (let i = 0; i < id_str.length; i++) {
@@ -75,29 +59,29 @@ function convertBookId(id) {
   return t.join("");
 }
 
-function getPersonNameById(id) {
+function getPersonNameById(id: string) {
   let r = store.persons.find((e) => e.id == id);
   if (r) return r.name;
   else return "未知人名";
 }
 
-function getBookNameById(id) {
+function getBookNameById(id: string) {
   let r = store.books.find((e) => e.id == convertBookId(id));
   if (r) return r.name;
   else return "未知书名";
 }
 
-function getActionNameById(id) {
+function getActionNameById(id: number) {
   let r = store.all_action.find((e) => e.id == id);
   if (r) return r.name;
   else return "未知行为";
 }
 
-function openBookDetail(id) {
+function openBookDetail(id: string) {
   emit("openBookDetail", id);
 }
 
-function openPersonDetail(id) {
+function openPersonDetail(id: string) {
   emit("openPersonDetail", id);
 }
 
@@ -108,6 +92,7 @@ function search() {
     wait.value = true;
     getRelByBookName(textRef.value.value)
       .then((d) => {
+        console.log(d);
         d.data[0].forEach((ele) => {
           // ele.value = 1.5 + Math.sqrt(ele.books); // 点的大小
           ele.value = 3 + ele.books / 3; // 点的大小
@@ -157,7 +142,7 @@ function forceGraph(
     width = 640, // outer width, in pixels
     height = 640, // outer height, in pixels
     invalidation, // when this promise resolves, stop the simulation
-  } = {},
+  } = {}
 ) {
   // Compute values.
   const N = d3.map(nodes, (d) => d.id).map(intern);
@@ -166,10 +151,7 @@ function forceGraph(
   if (nodeTitle === undefined) nodeTitle = (_, i) => N[i];
   // const T = nodeTitle == null ? null : d3.map(nodes, nodeTitle);
   const G = nodeGroup == null ? null : d3.map(nodes, nodeGroup).map(intern);
-  const W =
-    typeof linkStrokeWidth !== "function"
-      ? null
-      : d3.map(links, linkStrokeWidth);
+  const W = typeof linkStrokeWidth !== "function" ? null : d3.map(links, linkStrokeWidth);
   const L = typeof linkStroke !== "function" ? null : d3.map(links, linkStroke);
   const R = typeof nodeRadius != "function" ? null : d3.map(nodes, nodeRadius);
 
@@ -195,7 +177,7 @@ function forceGraph(
     .force("charge", forceNode)
     .force(
       "collide",
-      d3.forceCollide().radius((e) => e.value * 1.5 + 3),
+      d3.forceCollide().radius((e) => e.value * 1.5 + 3)
     )
     .force("center", d3.forceCenter())
     .on("tick", ticked);
@@ -213,10 +195,7 @@ function forceGraph(
     .append("g")
     .attr("stroke", typeof linkStroke !== "function" ? linkStroke : null)
     .attr("stroke-opacity", linkStrokeOpacity)
-    .attr(
-      "stroke-width",
-      typeof linkStrokeWidth !== "function" ? linkStrokeWidth : null,
-    )
+    .attr("stroke-width", typeof linkStrokeWidth !== "function" ? linkStrokeWidth : null)
     .attr("stroke-linecap", linkStrokeLinecap)
     .selectAll("line")
     .data(links)
@@ -300,7 +279,6 @@ function forceGraph(
     y = Number(y) - (e.offsetY / svg.attr("height")) * nh;
     w = Number(w) + nw;
     h = Number(h) + nh;
-    console.log([x, y, w, h]);
 
     svg.attr("viewBox", [x, y, w, h].toString());
   });
@@ -324,7 +302,6 @@ function forceGraph(
       let [x, y, w, h] = svg.attr("viewBox").split(",");
       x = Number(x) - e.movementX;
       y = Number(y) - e.movementY;
-      console.log([x, y, w, h]);
       svg.attr("viewBox", [x, y, w, h].toString());
     }
   });
@@ -352,11 +329,7 @@ function forceGraph(
       event.subject.fy = null;
     }
 
-    return d3
-      .drag()
-      .on("start", dragstarted)
-      .on("drag", dragged)
-      .on("end", dragended);
+    return d3.drag().on("start", dragstarted).on("drag", dragged).on("end", dragended);
   }
 
   return Object.assign(svg.node(), { scales: { color } });
@@ -375,7 +348,7 @@ function renderGraphChart(graph_data) {
       width: svgWrapperRef.value.parentNode.parentNode.offsetWidth,
       height: svgWrapperRef.value.parentNode.parentNode.offsetHeight,
       // invalidation, // a promise to stop the simulation when the cell is re-run
-    }),
+    })
   );
 }
 
@@ -388,17 +361,12 @@ function nodeHighlight(node_id, scroll) {
   d3.selectAll(`circle`).attr("fill", "#76978F");
   d3.selectAll("line").attr("stroke", "#C4A1A199");
   d3.select(`circle.n${node_id}`).attr("fill", "#FBB03B");
-  let box = document
-    .querySelector(`circle.n${node_id}`)
-    .getBoundingClientRect();
+  let box = document.querySelector(`circle.n${node_id}`).getBoundingClientRect();
 
   tooltipRef.value.style.left = `${box.x + 40}px`;
   tooltipRef.value.style.top = `${box.y - 40}px`;
 
-  if (scroll)
-    document
-      .querySelector(`li.n${node_id}`)
-      .scrollIntoView({ behavior: "smooth" });
+  if (scroll) document.querySelector(`li.n${node_id}`).scrollIntoView({ behavior: "smooth" });
 }
 
 onMounted(() => {
@@ -435,11 +403,7 @@ onUnmounted(() => {
           "
         />
         <!-- <Droplist ref="drop-list" :attr_list="display_attrs" /> -->
-        <button
-          id="search-button"
-          :class="{ invalid: wait }"
-          @click="search"
-        ></button>
+        <button id="search-button" :class="{ invalid: wait }" @click="search"></button>
         <button id="tip-button">
           <div id="tip-content">
             通過檢索古籍題名，挖掘古籍書目和人物之間的關聯。節點代表人物，節點之間的連線是指兩個人物共同創作、出版或收藏過同一本書。
@@ -461,14 +425,7 @@ onUnmounted(() => {
       <div class="list nodes-list">
         <h4>相關人物</h4>
         <ul ref="nodes-list">
-          <li
-            v-for="n in node_list"
-            :name="n.id"
-            :key="n.id"
-            v-text="`${n.name}(${n.curr_books})`"
-            :class="[`n${n.id}`, { active: n.active }]"
-            @mouseover="nodeHighlight(n.id, false)"
-          ></li>
+          <li v-for="n in node_list" :name="n.id" :key="n.id" v-text="`${n.name}(${n.curr_books})`" :class="[`n${n.id}`, { active: n.active }]" @mouseover="nodeHighlight(n.id, false)"></li>
         </ul>
       </div>
     </div>
@@ -478,18 +435,10 @@ onUnmounted(() => {
       <span @click="openPersonDetail(selected_info.id)">查看人物詳情</span>
     </div>
 
-    <div
-      class="list relationship-detail"
-      ref="relationshipDetailRef"
-      v-show="show_relationship_detail"
-    >
+    <div class="list relationship-detail" ref="relationshipDetailRef" v-show="show_relationship_detail">
       <h4>相關古籍</h4>
       <ul>
-        <li
-          v-for="r in relation_list"
-          :key="r"
-          @click="openBookDetail(convertBookId(r.book_id))"
-        >
+        <li v-for="r in relation_list" :key="r" @click="openBookDetail(convertBookId(r.book_id))">
           <!-- 古籍信息 -->
           <div class="book">
             <span v-text="convertBookId(r.book_id)"></span>
@@ -497,19 +446,7 @@ onUnmounted(() => {
           </div>
 
           <!-- 人物信息 -->
-          <div class="person">
-            <span class="name" v-text="getPersonNameById(r.person1_id)"></span
-            ><span
-              class="action"
-              v-text="getActionNameById(r.action1_id)"
-            ></span
-            >&nbsp;&nbsp;&nbsp;&nbsp;
-            <span class="name" v-text="getPersonNameById(r.person2_id)"></span
-            ><span
-              class="action"
-              v-text="getActionNameById(r.action2_id)"
-            ></span>
-          </div>
+          <div class="person"><span class="name" v-text="getPersonNameById(r.person1_id)"></span><span class="action" v-text="getActionNameById(r.action1_id)"></span>&nbsp;&nbsp;&nbsp;&nbsp; <span class="name" v-text="getPersonNameById(r.person2_id)"></span><span class="action" v-text="getActionNameById(r.action2_id)"></span></div>
         </li>
       </ul>
     </div>
