@@ -72,48 +72,48 @@ function getRecommendBook(all_books: Book[]) {
 
 <style lang="less" scoped>
 .everyday-book {
-  width: 5rem;
+  width: 13.9vh;
   display: flex;
   flex-direction: column;
-  margin: 0 3rem 0 0;
+  margin: 0 8.3vh 0 0;
   div:nth-child(1) {
     background-color: #ffda99;
     box-sizing: border-box;
-    padding: 0.5rem;
+    padding: 1.4vh;
     text-align: center;
     font-weight: bold;
-    line-height: 1.6rem;
+    line-height: 4.4vh;
     p:nth-child(1) {
-      font-size: 0.8rem;
+      font-size: 2.2vh;
     }
     p:nth-child(2) {
-      font-size: 1.8rem;
+      font-size: 5vh;
     }
     p:nth-child(3) {
-      font-size: 0.8rem;
+      font-size: 2.2vh;
     }
   }
   div:nth-child(2) {
-    font-size: 0.8rem;
+    font-size: 2.2vh;
     display: flex;
     flex-direction: column;
     align-items: center;
     background: #0009;
     cursor: pointer;
     p:nth-child(1) {
-      margin: 0.5rem 0 0 0;
+      margin: 1.4vh 0 0 0;
       color: #efefef;
     }
     p:nth-child(2) {
-      line-height: 0.9rem;
-      width: 0.8rem;
-      margin: 0.5rem 0 1rem;
+      line-height: 2.5vh;
+      width: 2.2vh;
+      margin: 1.4vh 0 2.8vh;
       color: #efefef;
     }
   }
   .image-wrapper {
     width: 100%;
-    height: 5rem;
+    height: 13.9vh;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -122,36 +122,36 @@ function getRecommendBook(all_books: Book[]) {
   }
   img {
     width: 100%;
-    height: 5rem;
+    height: 13.9vh;
     object-fit: contain;
   }
 }
 .cover {
   background-color: #111;
   user-select: none;
-  width: 20rem;
+  width: 55.5vh;
   height: 86vh;
   margin: 2vh 0 0;
-  box-shadow: 0.25rem 0.25rem 0.5rem 0 #0006;
+  box-shadow: 0.7vh 0.7vh 1.4vh 0 #0006;
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 20;
   div {
     background: #ffda99;
-    padding: 0.5rem;
+    padding: 1.4vh;
     div {
-      border: 0.2rem solid #111;
-      padding: 0.15rem;
+      border: 0.55vh solid #111;
+      padding: 0.4vh;
       h1 {
-        border: 0.1rem solid #111;
-        padding: 0.6rem 0.2rem 0.6rem 0.5rem;
+        border: 0.27vh solid #111;
+        padding: 1.67vh 0.55vh 1.67vh 1.4vh;
         font-family: huawenkaiti, "华文楷体", "楷体";
         text-align: center;
-        font-size: 2.3rem;
-        line-height: 2.8rem;
+        font-size: 6.4vh;
+        line-height: 7.8vh;
         font-weight: normal;
-        letter-spacing: 0.4rem;
+        letter-spacing: 1.1vh;
       }
     }
   }
@@ -159,40 +159,40 @@ function getRecommendBook(all_books: Book[]) {
 .slider {
   cursor: pointer;
   position: relative;
-  margin: 0 0 1.5rem -0.5rem;
-  width: 8.5rem;
+  margin: 0 0 4.2vh -1.4vh;
+  width: 23.6vh;
   transition: 0.3s;
   z-index: 10;
   .s1 {
-    width: 5.5rem;
+    width: 16.3vh;
     height: auto;
     position: absolute;
     z-index: 2;
   }
   .s2 {
-    width: 1.4rem;
+    width: 3.9vh;
     height: auto;
     position: absolute;
-    top: -1.8rem;
-    left: 4.7rem;
+    top: -5vh;
+    left: 13.5vh;
     z-index: 1;
   }
   .mouse-tip {
     pointer-events: none;
     box-sizing: border-box;
-    border: 1rem solid #fff8;
+    border: 2.78vh solid #fff8;
     border-radius: 50%;
     position: absolute;
     z-index: 21;
-    top: -0.4rem;
-    left: 4.5rem;
-    width: 2rem;
-    height: 2rem;
+    top: -1.1vh;
+    left: 12.5vh;
+    width: 5.6vh;
+    height: 5.6vh;
     animation: mousetip2 3s ease-out infinite;
   }
   &:hover {
-    margin: 0 0 1.5rem 0;
-    width: 8rem;
+    margin: 0 0 4.2vh 0;
+    width: 22.2vh;
   }
 }
 
