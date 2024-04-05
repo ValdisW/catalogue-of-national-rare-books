@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { ref } from "vue";
-
 import { useStore } from "@/store";
 
 import Loading from "@/components/Loading.vue";
@@ -10,10 +9,10 @@ import PersonDetail from "@/views/detail/PersonDetail.vue";
 
 const store = useStore();
 
+const REM_BASE = 20; // 用于设置rem单位的基准值
+
 const BookDetailRef = ref<InstanceType<typeof BookDetail> | null>(null);
 const PersonDetailRef = ref<InstanceType<typeof PersonDetail> | null>(null);
-
-const baseSize = 20; // 用于设置rem单位的基准值
 
 function openBookDetail(book_id: string) {
   BookDetailRef.value?.open(book_id);
@@ -30,15 +29,15 @@ function PageSize() {
   let width = window.innerWidth;
   let height = Math.min(window.innerHeight, (width * 9) / 16);
   width = (height * 16) / 9;
-  let size = { width, height };
-  return size;
+  return { width, height };
 }
 
 // 设置rem，以调节整体字号
 function setRem() {
   // 用于根据页面大小设定rem，以自适应元素大小
+  // const scale = 1;
   const scale = PageSize().width / 1280;
-  let rem = baseSize * Math.min(scale, 50);
+  let rem = REM_BASE * Math.min(scale, 50);
   store.changeRem(rem);
   document.documentElement.style.fontSize = rem + "px";
 }
@@ -49,14 +48,12 @@ function init() {
     init();
   };
 }
+init();
 
-function onMobileDevice() {
-  return navigator.userAgent.match(
-    /(Android|webOS|iPhone|iPad|iPod|BlackBerry|Windows Phone)/i,
-  );
+function isMobileDevice() {
+  return navigator.userAgent.match(/(Android|webOS|iPhone|iPad|iPod|BlackBerry|Windows Phone)/i);
 }
 
-init();
 
 const complete = ref(false);
 const nav_pages = [
@@ -68,44 +65,25 @@ const nav_pages = [
 </script>
 
 <template>
-  <!-- 不支持手机访问的提示 -->
-  <MobileWarning v-if="onMobileDevice()" />
-
-  <!-- 加载提示 -->
+  <MobileWarning v-if="isMobileDevice()" />
   <transition name="bg-fade"><Loading :complete="complete" /></transition>
 
   <div id="main-container">
-    <!-- 顶部导航 -->
     <nav>
       <ul>
         <li v-for="page in nav_pages" :key="page.name">
-          <router-link
-            :class="{ active: $router.currentRoute.value.path == page.router }"
-            :to="page.router"
-            v-text="page.name"
-          ></router-link>
+          <router-link :class="{ active: $router.currentRoute.value.path == page.router }" :to="page.router" v-text="page.name"></router-link>
         </li>
       </ul>
     </nav>
 
-    <!-- 用来显示四个主页面 -->
-    <router-view
-      v-slot="{ Component }"
-      :key="$route.fullPath"
-      @startLoading="complete = false"
-      @endLoading="complete = true"
-      @openBookDetail="openBookDetail"
-      @openPersonDetail="openPersonDetail"
-    >
+    <router-view v-slot="{ Component }" :key="$route.fullPath" @startLoading="complete = false" @endLoading="complete = true" @openBookDetail="openBookDetail" @openPersonDetail="openPersonDetail">
       <keep-alive>
         <component :is="Component" />
       </keep-alive>
     </router-view>
 
-    <!-- 古籍详情页 -->
     <BookDetail @openPersonDetail="openPersonDetail" ref="BookDetailRef" />
-
-    <!-- 人物详情页 -->
     <PersonDetail @openBookDetail="openBookDetail" ref="PersonDetailRef" />
   </div>
 </template>
