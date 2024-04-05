@@ -25,10 +25,10 @@ const store = useStore();
 
 // 筛选器数据
 const filter_data: {
-  id: string;
-  name: string;
+  id: string | number;
+  name: string; // 显示在筛选器左侧的名称
   db_column: string;
-  value: { name: string; value: any; selected: boolean }[];
+  value: { name: string; value: number; selected: boolean }[];
 }[] = reactive([
   { id: "document_type", name: "文獻類型", db_column: "name", value: [] },
   { id: "language", name: "文種", db_column: "type", value: [] },
@@ -127,19 +127,21 @@ function updateFilter() {
     filter_data[i].value = getSum(search_result.value, filter_data[i].id + "_id");
 
     // 根据大类，作进一步统计
-    let temp: { id: string; value: string; type: string }[] = [],
-      result: {
-        name: string;
-        ids: string[];
-        value: string;
-        selected: boolean;
-      }[] = [];
-    for (let e of filter_data[i].value)
+    let temp: { id: string | number; value: number; type: string }[] = [];
+    for (let e of filter_data[i].value) {
       temp.push({
         id: e.name,
         value: e.value,
         type: store["all_" + filter_data[i].id].find((el) => el.id == e.name)[filter_data[i].db_column],
       });
+    }
+
+    let result: {
+      name: string;
+      ids: string[];
+      value: string;
+      selected: boolean;
+    }[] = [];
     for (let i in temp) {
       if (!result.find((el) => el.name == temp[i].type))
         result.push({
@@ -192,9 +194,9 @@ function filterResult(e) {
  * @param {string} attr 属性名，应该是r中的某个键名
  * @returns 返回{属性名（id）, 属性值（数量）, 选中状态（给筛选器用）}
  */
-function getSum(r: Book[], attr: string) {
+function getSum(results: Book[], attr: string): { name: string; value: number; selected: boolean }[] {
   let a = {};
-  r.forEach((e) => {
+  results.forEach((e) => {
     a[e[attr]] = a[e[attr]] || 0;
     a[e[attr]]++;
   });
