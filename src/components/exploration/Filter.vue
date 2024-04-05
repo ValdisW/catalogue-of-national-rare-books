@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { computed } from "vue";
-
 import { Filter } from "#/axios";
 
 const emit = defineEmits(["filter"]);
@@ -11,6 +10,7 @@ const props = defineProps({
   attrs: Array<Filter>, // 筛选器展示的内容。键值对，各个属性id及其值 e.g. {name: "多文種", ids: ["1", "16", "23"], value: 345，selected: false}
   db_column: String,
 });
+
 const max_value = computed(() => {
   let max = 0;
   props.attrs!.forEach((e) => {
@@ -43,19 +43,12 @@ function updateSelect(e: Filter) {
     <p class="title" v-text="attr_name"></p>
     <div class="content">
       <ul>
-        <li
-          v-for="e in attrs"
-          :class="{ selected: e.selected }"
-          :key="e"
-          :val="e.value"
-          @click="updateSelect(e)"
-        >
+        <li v-for="e in attrs" :class="{ selected: e.selected }" :key="e" :val="e.value" @click="updateSelect(e)">
           <!-- 条形-->
           <div
             class="bar"
             :style="{
-              width:
-                (Math.log(e.value + 1) / Math.log(max_value + 1)) * 100 + '%',
+              width: (Math.log(e.value + 1) / Math.log(max_value + 1)) * 100 + '%',
             }"
           ></div>
 
