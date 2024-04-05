@@ -364,7 +364,8 @@ function mapWheel(e: WheelEvent) {
     #map-container {
       width: 80%;
       height: 100%;
-      border: 2px solid #201d1d;
+      border: 0.1rem solid #201d1d;
+      border-right-width: 0.08rem;
       .map {
         height: 100%;
       }
@@ -399,7 +400,7 @@ function mapWheel(e: WheelEvent) {
     }
 
     #map-list {
-      border: 2px solid #201d1d;
+      border: 0.1rem solid #201d1d;
       border-left: none;
       width: 20%;
       top: 0%;
