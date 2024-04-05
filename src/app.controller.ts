@@ -5,12 +5,6 @@ import { AppService } from './app.service';
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  // 进入首页的数据加载
-  // @Get()
-  // indexLoad() {
-  //   return this.appService.indexLoad();
-  // }
-
   // 名录介绍页的预加载
   @Get('/introduction-preload')
   introPreload() {
@@ -45,12 +39,6 @@ export class AppController {
   @Get('/person-detail/:personID')
   personDetail(@Param('personID') id: string) {
     return this.appService.personDetail(id);
-  }
-
-  // 机构详情页所需数据
-  @Get('/institution-detail/:institutionID')
-  instDetail(@Param('institutionID') id: string) {
-    return this.appService.instDetail(id);
   }
 
   // 古籍浏览 - 指定字段检索
@@ -89,16 +77,17 @@ export class AppController {
     return this.appService.getRelByBookName(text);
   }
 
-  // 按人名检索关系
-  @Get('/person-relationship')
-  getRelByPersonName(@Query('text') text: string) {
-    return this.appService.getRelByPersonName(text);
-  }
+  // 按人名检索关系(暂停使用)
+  // @Get('/person-relationship')
+  // getRelByPersonName(@Query('text') text: string) {
+  //   return this.appService.getRelByPersonName(text);
+  // }
 
-  @Get('/related-persons')
-  relatedPersons(@Query() query) {
-    return this.appService.relatedPersons(query);
-  }
+  // 未使用
+  // @Get('/related-persons')
+  // relatedPersons(@Query() query) {
+  //   return this.appService.relatedPersons(query);
+  // }
 
   @Get('/get-person-by-keyword')
   getPersonByKwd(@Query('kwd') kwd: string) {
